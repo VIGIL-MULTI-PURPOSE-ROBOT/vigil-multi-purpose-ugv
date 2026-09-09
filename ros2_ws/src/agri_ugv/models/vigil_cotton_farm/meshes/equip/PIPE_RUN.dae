@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor><authoring_tool>VIGIL SIH26126 farm generator</authoring_tool></contributor>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="MAT_METAL-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1180 0.1210 0.1260 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_RUST-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1060 0.0430 0.0180 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PAINT-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.2860 0.0480 0.0220 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_TYRE-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0140 0.0140 0.0150 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_WOOD-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0890 0.0550 0.0280 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PLASTER-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1760 0.1520 0.1210 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_ROOF-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1550 0.1520 0.1460 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PIPE-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0450 0.0980 0.1800 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_SEAT-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0300 0.0300 0.0340 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="MAT_METAL" name="MAT_METAL"><instance_effect url="#MAT_METAL-fx"/></material>
+    <material id="MAT_RUST" name="MAT_RUST"><instance_effect url="#MAT_RUST-fx"/></material>
+    <material id="MAT_PAINT" name="MAT_PAINT"><instance_effect url="#MAT_PAINT-fx"/></material>
+    <material id="MAT_TYRE" name="MAT_TYRE"><instance_effect url="#MAT_TYRE-fx"/></material>
+    <material id="MAT_WOOD" name="MAT_WOOD"><instance_effect url="#MAT_WOOD-fx"/></material>
+    <material id="MAT_PLASTER" name="MAT_PLASTER"><instance_effect url="#MAT_PLASTER-fx"/></material>
+    <material id="MAT_ROOF" name="MAT_ROOF"><instance_effect url="#MAT_ROOF-fx"/></material>
+    <material id="MAT_PIPE" name="MAT_PIPE"><instance_effect url="#MAT_PIPE-fx"/></material>
+    <material id="MAT_SEAT" name="MAT_SEAT"><instance_effect url="#MAT_SEAT-fx"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="PIPE_RUN-mesh" name="PIPE_RUN">
+      <mesh>
+        <source id="PIPE_RUN-pos"><float_array id="PIPE_RUN-pos-a" count="198">-3 0.055 0.055 -3 0.044496 0.087328 3 0.044496 0.087328 3 0.055 0.055 -3 0.016996 0.10731 3 0.016996 0.10731 -3 -0.016996 0.10731 3 -0.016996 0.10731 -3 -0.044496 0.087328 3 -0.044496 0.087328 -3 -0.055 0.055 3 -0.055 0.055 -3 -0.044496 0.022672 3 -0.044496 0.022672 -3 -0.016996 0.0026919 3 -0.016996 0.0026919 -3 0.016996 0.0026919 3 0.016996 0.0026919 -3 0.044496 0.022672 3 0.044496 0.022672 -3 0 0.055 3 0 0.055 -3.05 0.06875 0.055 -3.05 0.05562 0.09541 -2.95 0.05562 0.09541 -2.95 0.06875 0.055 -3.05 0.021245 0.12039 -2.95 0.021245 0.12039 -3.05 -0.021245 0.12039 -2.95 -0.021245 0.12039 -3.05 -0.05562 0.09541 -2.95 -0.05562 0.09541 -3.05 -0.06875 0.055 -2.95 -0.06875 0.055 -3.05 -0.05562 0.01459 -2.95 -0.05562 0.01459 -3.05 -0.021245 -0.010385 -2.95 -0.021245 -0.010385 -3.05 0.021245 -0.010385 -2.95 0.021245 -0.010385 -3.05 0.05562 0.01459 -2.95 0.05562 0.01459 -3.05 0 0.055 -2.95 0 0.055 2.95 0.06875 0.055 2.95 0.05562 0.09541 3.05 0.05562 0.09541 3.05 0.06875 0.055 2.95 0.021245 0.12039 3.05 0.021245 0.12039 2.95 -0.021245 0.12039 3.05 -0.021245 0.12039 2.95 -0.05562 0.09541 3.05 -0.05562 0.09541 2.95 -0.06875 0.055 3.05 -0.06875 0.055 2.95 -0.05562 0.01459 3.05 -0.05562 0.01459 2.95 -0.021245 -0.010385 3.05 -0.021245 -0.010385 2.95 0.021245 -0.010385 3.05 0.021245 -0.010385 2.95 0.05562 0.01459 3.05 0.05562 0.01459 2.95 0 0.055 3.05 0 0.055</float_array><technique_common><accessor source="#PIPE_RUN-pos-a" count="66" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+        <source id="PIPE_RUN-nrm"><float_array id="PIPE_RUN-nrm-a" count="66">-0.644 0.765 0 -0.644 0.619 0.45 0.644 0.619 0.45 0.644 0.765 0 -0.644 0.236 0.728 0.644 0.236 0.728 -0.644 -0.236 0.728 0.644 -0.236 0.728 -0.644 -0.619 0.45 0.644 -0.619 0.45 -0.644 -0.765 0 0.644 -0.765 0 -0.644 -0.619 -0.45 0.644 -0.619 -0.45 -0.644 -0.236 -0.728 0.644 -0.236 -0.728 -0.644 0.236 -0.728 0.644 0.236 -0.728 -0.644 0.619 -0.45 0.644 0.619 -0.45 -1 0 0 1 0 0</float_array><technique_common><accessor source="#PIPE_RUN-nrm-a" count="22" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+        <vertices id="PIPE_RUN-vtx"><input semantic="POSITION" source="#PIPE_RUN-pos"/></vertices>
+        <triangles count="120" material="MAT_PIPE-mat"><input semantic="VERTEX" source="#PIPE_RUN-vtx" offset="0"/><input semantic="NORMAL" source="#PIPE_RUN-nrm" offset="1"/><p>0 0 1 1 2 2 0 0 2 2 3 3 1 1 4 4 5 5 1 1 5 5 2 2 4 4 6 6 7 7 4 4 7 7 5 5 6 6 8 8 9 9 6 6 9 9 7 7 8 8 10 10 11 11 8 8 11 11 9 9 10 10 12 12 13 13 10 10 13 13 11 11 12 12 14 14 15 15 12 12 15 15 13 13 14 14 16 16 17 17 14 14 17 17 15 15 16 16 18 18 19 19 16 16 19 19 17 17 18 18 0 0 3 3 18 18 3 3 19 19 1 1 0 0 20 20 3 3 2 2 21 21 4 4 1 1 20 20 2 2 5 5 21 21 6 6 4 4 20 20 5 5 7 7 21 21 8 8 6 6 20 20 7 7 9 9 21 21 10 10 8 8 20 20 9 9 11 11 21 21 12 12 10 10 20 20 11 11 13 13 21 21 14 14 12 12 20 20 13 13 15 15 21 21 16 16 14 14 20 20 15 15 17 17 21 21 18 18 16 16 20 20 17 17 19 19 21 21 0 0 18 18 20 20 19 19 3 3 21 21 22 0 23 1 24 2 22 0 24 2 25 3 23 1 26 4 27 5 23 1 27 5 24 2 26 4 28 6 29 7 26 4 29 7 27 5 28 6 30 8 31 9 28 6 31 9 29 7 30 8 32 10 33 11 30 8 33 11 31 9 32 10 34 12 35 13 32 10 35 13 33 11 34 12 36 14 37 15 34 12 37 15 35 13 36 14 38 16 39 17 36 14 39 17 37 15 38 16 40 18 41 19 38 16 41 19 39 17 40 18 22 0 25 3 40 18 25 3 41 19 23 1 22 0 42 20 25 3 24 2 43 21 26 4 23 1 42 20 24 2 27 5 43 21 28 6 26 4 42 20 27 5 29 7 43 21 30 8 28 6 42 20 29 7 31 9 43 21 32 10 30 8 42 20 31 9 33 11 43 21 34 12 32 10 42 20 33 11 35 13 43 21 36 14 34 12 42 20 35 13 37 15 43 21 38 16 36 14 42 20 37 15 39 17 43 21 40 18 38 16 42 20 39 17 41 19 43 21 22 0 40 18 42 20 41 19 25 3 43 21 44 0 45 1 46 2 44 0 46 2 47 3 45 1 48 4 49 5 45 1 49 5 46 2 48 4 50 6 51 7 48 4 51 7 49 5 50 6 52 8 53 9 50 6 53 9 51 7 52 8 54 10 55 11 52 8 55 11 53 9 54 10 56 12 57 13 54 10 57 13 55 11 56 12 58 14 59 15 56 12 59 15 57 13 58 14 60 16 61 17 58 14 61 17 59 15 60 16 62 18 63 19 60 16 63 19 61 17 62 18 44 0 47 3 62 18 47 3 63 19 45 1 44 0 64 20 47 3 46 2 65 21 48 4 45 1 64 20 46 2 49 5 65 21 50 6 48 4 64 20 49 5 51 7 65 21 52 8 50 6 64 20 51 7 53 9 65 21 54 10 52 8 64 20 53 9 55 11 65 21 56 12 54 10 64 20 55 11 57 13 65 21 58 14 56 12 64 20 57 13 59 15 65 21 60 16 58 14 64 20 59 15 61 17 65 21 62 18 60 16 64 20 61 17 63 19 65 21 44 0 62 18 64 20 63 19 47 3 65 21</p></triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="scene" name="scene">
+    <node id="PIPE_RUN" name="PIPE_RUN" type="NODE"><instance_geometry url="#PIPE_RUN-mesh"><bind_material><technique_common>
+      <instance_material symbol="MAT_METAL-mat" target="#MAT_METAL"/>
+      <instance_material symbol="MAT_RUST-mat" target="#MAT_RUST"/>
+      <instance_material symbol="MAT_PAINT-mat" target="#MAT_PAINT"/>
+      <instance_material symbol="MAT_TYRE-mat" target="#MAT_TYRE"/>
+      <instance_material symbol="MAT_WOOD-mat" target="#MAT_WOOD"/>
+      <instance_material symbol="MAT_PLASTER-mat" target="#MAT_PLASTER"/>
+      <instance_material symbol="MAT_ROOF-mat" target="#MAT_ROOF"/>
+      <instance_material symbol="MAT_PIPE-mat" target="#MAT_PIPE"/>
+      <instance_material symbol="MAT_SEAT-mat" target="#MAT_SEAT"/>
+    </technique_common></bind_material></instance_geometry></node>
+  </visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#scene"/></scene>
+</COLLADA>

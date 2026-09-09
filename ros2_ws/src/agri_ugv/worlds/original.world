@@ -1,0 +1,164 @@
+<?xml version="1.0" ?>
+<sdf version="1.10">
+  <world name="vigil_cotton_farm">
+
+    <!-- gz-sim needs its system plugins declared explicitly. Without
+         these the world loads to an empty grey viewport. -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <physics name="1ms" type="dart">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>5.565e-6 22.92e-6 -42.19e-6</magnetic_field>
+
+    <scene>
+      <ambient>0.45 0.46 0.48 1</ambient>
+      <background>0.55 0.66 0.80 1</background>
+      <shadows>true</shadows>
+      <grid>false</grid>
+      <sky></sky>
+    </scene>
+
+    <!-- Sun matches the Blender MIDDAY preset exactly
+         (elevation 64.0 deg, azimuth 152.0 deg). -->
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 40 0 0 0</pose>
+      <diffuse>0.95 0.93 0.88 1</diffuse>
+      <specular>0.18 0.18 0.17 1</specular>
+      <direction>-0.20580 0.38706 -0.89879</direction>
+      <attenuation><range>250</range><constant>0.9</constant><linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+    </light>
+
+    <!-- Ground beyond the 128 m heightmap so the horizon is not void -->
+    <model name="distant_ground"><static>true</static><link name="link">
+      <visual name="v"><pose>0 0 -0.433 0 0 0</pose>
+        <geometry><box><size>600 600 0.02</size></box></geometry>
+        <material><ambient>0.30 0.20 0.13 1</ambient><diffuse>0.40 0.27 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material></visual>
+    </link></model>
+
+    <include><uri>model://vigil_cotton_farm</uri><pose>0 0 0 0 0 0</pose></include>
+
+    <!-- DYNAMIC OBSTACLES
+         gz-sim actors are rendered, so cameras and gpu_lidar see them.
+         They carry no collision geometry, so contact sensors and
+         physics do not. Use gpu_lidar on VIGIL.
+         These actors use a static mesh link rather than a skinned
+         skeleton: they translate and turn but do not animate a gait.
+         For an animated walk cycle, swap the <link> for:
+           <skin><filename>https://fuel.gazebosim.org/1.0/Mingfei/models/actor/tip/files/meshes/walk.dae</filename></skin>
+           <animation name="walk"><filename>...walk.dae</filename><interpolate_x>true</interpolate_x></animation>
+         (needs network access on first run). -->
+
+    <!-- TEST D - crosses the row-11 straddle line at right angles -->
+    <actor name="worker_d_01">
+      <link name="body">
+        <visual name="visual">
+          <geometry><mesh><uri>model://vigil_cotton_farm/meshes/human/HUMAN_M1.dae</uri></mesh></geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.00</time><pose>0.000 -7.500 -0.011 0 0 1.5708</pose></waypoint>
+          <waypoint><time>4.74</time><pose>0.000 -3.000 -0.016 0 0 1.5708</pose></waypoint>
+          <waypoint><time>7.89</time><pose>0.000 0.000 0.005 0 0 1.5708</pose></waypoint>
+          <waypoint><time>11.05</time><pose>0.000 3.000 -0.013 0 0 1.5708</pose></waypoint>
+          <waypoint><time>15.79</time><pose>0.000 7.500 -0.008 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>20.53</time><pose>0.000 3.000 -0.013 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>23.68</time><pose>0.000 0.000 0.005 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>26.84</time><pose>0.000 -3.000 -0.016 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>31.58</time><pose>0.000 -7.500 -0.011 0 0 -1.5708</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!-- Walks the western entry track toward the field -->
+    <actor name="worker_d_02">
+      <link name="body">
+        <visual name="visual">
+          <geometry><mesh><uri>model://vigil_cotton_farm/meshes/human/HUMAN_M1.dae</uri></mesh></geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.00</time><pose>-30.000 1.100 -0.139 0 0 -0.0666</pose></waypoint>
+          <waypoint><time>5.23</time><pose>-24.000 0.700 -0.203 0 0 -0.0666</pose></waypoint>
+          <waypoint><time>10.46</time><pose>-18.000 0.300 -0.157 0 0 -0.0599</pose></waypoint>
+          <waypoint><time>14.81</time><pose>-13.000 0.000 0.036 0 0 3.0817</pose></waypoint>
+          <waypoint><time>19.17</time><pose>-18.000 0.300 -0.157 0 0 3.0750</pose></waypoint>
+          <waypoint><time>24.40</time><pose>-24.000 0.700 -0.203 0 0 3.0750</pose></waypoint>
+          <waypoint><time>29.63</time><pose>-30.000 1.100 -0.139 0 0 3.0750</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!-- Walks the southern perimeter track -->
+    <actor name="worker_d_03">
+      <link name="body">
+        <visual name="visual">
+          <geometry><mesh><uri>model://vigil_cotton_farm/meshes/human/HUMAN_M1.dae</uri></mesh></geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.00</time><pose>-17.600 -17.600 -0.136 0 0 -0.0172</pose></waypoint>
+          <waypoint><time>11.05</time><pose>-6.000 -17.800 -0.069 0 0 0.0083</pose></waypoint>
+          <waypoint><time>22.48</time><pose>6.000 -17.700 -0.091 0 0 0.0088</pose></waypoint>
+          <waypoint><time>33.34</time><pose>17.400 -17.600 -0.220 0 0 -3.1328</pose></waypoint>
+          <waypoint><time>44.19</time><pose>6.000 -17.700 -0.091 0 0 -3.1333</pose></waypoint>
+          <waypoint><time>55.62</time><pose>-6.000 -17.800 -0.069 0 0 3.1244</pose></waypoint>
+          <waypoint><time>66.67</time><pose>-17.600 -17.600 -0.136 0 0 3.1244</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!-- TEST E - crawls anticlockwise round the perimeter track -->
+    <actor name="tractor_dynamic">
+      <link name="body">
+        <visual name="visual">
+          <geometry><mesh><uri>model://vigil_cotton_farm/meshes/equip/TRACTOR.dae</uri></mesh></geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>4.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="drive">
+          <waypoint><time>0.00</time><pose>17.600 17.400 -0.122 0 0 -1.5620</pose></waypoint>
+          <waypoint><time>7.13</time><pose>17.700 6.000 -0.115 0 0 -1.5791</pose></waypoint>
+          <waypoint><time>14.63</time><pose>17.600 -6.000 -0.149 0 0 -1.5795</pose></waypoint>
+          <waypoint><time>21.81</time><pose>17.500 -17.500 -0.220 0 0 -3.1242</pose></waypoint>
+          <waypoint><time>29.00</time><pose>6.000 -17.700 -0.091 0 0 3.1333</pose></waypoint>
+          <waypoint><time>36.50</time><pose>-6.000 -17.600 -0.070 0 0 3.1329</pose></waypoint>
+          <waypoint><time>43.69</time><pose>-17.500 -17.500 -0.137 0 0 -0.0087</pose></waypoint>
+          <waypoint><time>50.88</time><pose>-6.000 -17.600 -0.070 0 0 -0.0083</pose></waypoint>
+          <waypoint><time>58.38</time><pose>6.000 -17.700 -0.091 0 0 0.0174</pose></waypoint>
+          <waypoint><time>65.57</time><pose>17.500 -17.500 -0.220 0 0 1.5621</pose></waypoint>
+          <waypoint><time>72.75</time><pose>17.600 -6.000 -0.149 0 0 1.5625</pose></waypoint>
+          <waypoint><time>80.25</time><pose>17.700 6.000 -0.115 0 0 1.5796</pose></waypoint>
+          <waypoint><time>87.38</time><pose>17.600 17.400 -0.122 0 0 1.5796</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+  </world>
+</sdf>

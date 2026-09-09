@@ -1,0 +1,11 @@
+<root BTCPP_format="4" main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="5" name="NavigateWithReplanning">
+      <PipelineSequence>
+        <RateController hz="1.0"><ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/></RateController>
+        <FollowPath path="{path}" controller_id="FollowPath" goal_checker_id="general_goal_checker"/>
+      </PipelineSequence>
+      <Sequence><ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/><ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/><Wait wait_duration="2.0"/></Sequence>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

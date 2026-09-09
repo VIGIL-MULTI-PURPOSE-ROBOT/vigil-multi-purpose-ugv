@@ -1,0 +1,261 @@
+// VIGIL SIH26126 cotton farm - OGRE materials for Gazebo Classic 11.
+// Foliage uses `cull_hardware none` because leaves and grass blades are
+// single-sided geometry; without it a robot camera sees holes in every
+// plant it looks through. Alpha is deliberately not used anywhere: alpha
+// blending needs depth_write off, which corrupts depth-camera output.
+
+material VIGIL/CottonFoliage
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware none
+      cull_software none
+      ambient 0.108 0.190 0.065 1.0
+      diffuse 0.196 0.345 0.118 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/CottonStem
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.134 0.157 0.086 1.0
+      diffuse 0.243 0.286 0.157 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/WeedFoliage
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware none
+      cull_software none
+      ambient 0.147 0.207 0.080 1.0
+      diffuse 0.267 0.376 0.145 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/WeedStem
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.157 0.175 0.097 1.0
+      diffuse 0.286 0.318 0.176 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/GrassFoliage
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware none
+      cull_software none
+      ambient 0.171 0.201 0.091 1.0
+      diffuse 0.310 0.365 0.165 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/BushFoliage
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware none
+      cull_software none
+      ambient 0.121 0.190 0.080 1.0
+      diffuse 0.220 0.345 0.145 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/TreeFoliage
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware none
+      cull_software none
+      ambient 0.099 0.160 0.066 1.0
+      diffuse 0.180 0.290 0.120 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Bark
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.171 0.140 0.113 1.0
+      diffuse 0.310 0.255 0.205 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Rock
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.195 0.182 0.165 1.0
+      diffuse 0.355 0.330 0.300 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Structure
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.250 0.231 0.204 1.0
+      diffuse 0.455 0.420 0.370 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/TractorPaint
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.308 0.099 0.063 1.0
+      diffuse 0.560 0.180 0.115 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Metal
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.198 0.201 0.206 1.0
+      diffuse 0.360 0.365 0.375 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Tyre
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.041 0.041 0.044 1.0
+      diffuse 0.075 0.075 0.080 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Pipe
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.083 0.160 0.259 1.0
+      diffuse 0.150 0.290 0.470 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Wood
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.176 0.129 0.080 1.0
+      diffuse 0.320 0.235 0.145 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}
+
+material VIGIL/Human
+{
+  technique
+  {
+    pass
+    {
+      lighting on
+      cull_hardware clockwise
+      cull_software back
+      ambient 0.231 0.220 0.204 1.0
+      diffuse 0.420 0.400 0.370 1.0
+      specular 0.03 0.03 0.03 1.0 6.0
+    }
+  }
+}

@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+project(agri_ugv_description)
+find_package(ament_cmake REQUIRED)
+install(DIRECTORY launch urdf meshes rviz config DESTINATION share/${PROJECT_NAME})
+ament_package()

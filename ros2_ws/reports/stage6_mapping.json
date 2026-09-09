@@ -1,0 +1,15 @@
+{
+  "camera": true,
+  "map": {
+    "size": [
+      295,
+      296
+    ],
+    "resolution": 0.15000000596046448,
+    "known": 42129,
+    "free": 41828,
+    "occupied": 301
+  },
+  "cloud_points": 3289,
+  "map_tf": true
+}

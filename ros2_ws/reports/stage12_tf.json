@@ -1,0 +1,14 @@
+{
+  "base_link": true,
+  "lidar_link": true,
+  "camera_optical_frame": true,
+  "imu_link": true,
+  "L1_wheel": true,
+  "L2_wheel": true,
+  "L3_wheel": true,
+  "L4_wheel": true,
+  "R1_wheel": true,
+  "R2_wheel": true,
+  "R3_wheel": true,
+  "R4_wheel": true
+}

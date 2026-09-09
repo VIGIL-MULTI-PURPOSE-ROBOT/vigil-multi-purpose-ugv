@@ -1,0 +1,13 @@
+.agents/
+.codex/
+**/build/
+**/install/
+**/log/
+**/run/
+**/.migration-backup/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]
+.env
+.env.*
+.DS_Store

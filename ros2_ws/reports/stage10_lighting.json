@@ -1,0 +1,44 @@
+{
+  "pass": true,
+  "samples": [
+    {
+      "level": 1.0,
+      "state": {
+        "ambient_level": 1.0,
+        "headlight_requested": false,
+        "applied": {
+          "sun": 1.0,
+          "headlight": 0.0
+        }
+      },
+      "raw_mean": 85.70330295138889,
+      "gain_mean": 85.70330295138889
+    },
+    {
+      "level": 0.03,
+      "state": {
+        "ambient_level": 0.029999999329447746,
+        "headlight_requested": true,
+        "applied": {
+          "sun": 0.029999999329447746,
+          "headlight": 8.0
+        }
+      },
+      "raw_mean": 82.60888888888888,
+      "gain_mean": 136.83006510416666
+    },
+    {
+      "level": 1.0,
+      "state": {
+        "ambient_level": 1.0,
+        "headlight_requested": false,
+        "applied": {
+          "sun": 1.0,
+          "headlight": 0.0
+        }
+      },
+      "raw_mean": 85.59576388888888,
+      "gain_mean": 85.59576388888888
+    }
+  ]
+}

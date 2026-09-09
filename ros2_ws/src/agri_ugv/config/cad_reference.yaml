@@ -1,0 +1,19 @@
+source: User-provided Fusion active-suspension notes; no joint-rich export attached
+standing_angle_deg: -3.6
+travel_deg: 12.0
+hard_limits_deg:
+- -15.6
+- 8.4
+total_mass_kg: 286.11
+shell_mass_kg: 26.4
+rocker_mass_kg: 9.4
+large_wheel_mass_kg: 35.2
+small_wheel_mass_kg: 15.3
+climbing_wheel_clearance_m: 0.262
+cylinder:
+  a_m: 0.3387
+  b_m: 0.52735
+  theta_zero_deg: 71.041
+  retracted_length_m: 0.4782
+geometry_limit: Link origins and 8 passive travel joints are still provisional; lumped
+  hardware distribution is approximate.

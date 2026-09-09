@@ -1,0 +1,8 @@
+[
+  {
+    "state": "arrived",
+    "message": "Arrived at start.",
+    "position_error_m": 0.2951735189829208,
+    "yaw_error_rad": 0.015318113390497575
+  }
+]

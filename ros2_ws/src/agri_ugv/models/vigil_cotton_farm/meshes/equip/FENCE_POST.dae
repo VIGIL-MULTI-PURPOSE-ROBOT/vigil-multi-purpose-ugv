@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor><authoring_tool>VIGIL SIH26126 farm generator</authoring_tool></contributor>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="MAT_METAL-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1180 0.1210 0.1260 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_RUST-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1060 0.0430 0.0180 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PAINT-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.2860 0.0480 0.0220 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_TYRE-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0140 0.0140 0.0150 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_WOOD-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0890 0.0550 0.0280 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PLASTER-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1760 0.1520 0.1210 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_ROOF-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.1550 0.1520 0.1460 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_PIPE-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0450 0.0980 0.1800 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+    <effect id="MAT_SEAT-fx"><profile_COMMON><technique sid="c"><lambert><diffuse><color>0.0300 0.0300 0.0340 1</color></diffuse></lambert></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="MAT_METAL" name="MAT_METAL"><instance_effect url="#MAT_METAL-fx"/></material>
+    <material id="MAT_RUST" name="MAT_RUST"><instance_effect url="#MAT_RUST-fx"/></material>
+    <material id="MAT_PAINT" name="MAT_PAINT"><instance_effect url="#MAT_PAINT-fx"/></material>
+    <material id="MAT_TYRE" name="MAT_TYRE"><instance_effect url="#MAT_TYRE-fx"/></material>
+    <material id="MAT_WOOD" name="MAT_WOOD"><instance_effect url="#MAT_WOOD-fx"/></material>
+    <material id="MAT_PLASTER" name="MAT_PLASTER"><instance_effect url="#MAT_PLASTER-fx"/></material>
+    <material id="MAT_ROOF" name="MAT_ROOF"><instance_effect url="#MAT_ROOF-fx"/></material>
+    <material id="MAT_PIPE" name="MAT_PIPE"><instance_effect url="#MAT_PIPE-fx"/></material>
+    <material id="MAT_SEAT" name="MAT_SEAT"><instance_effect url="#MAT_SEAT-fx"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="FENCE_POST-mesh" name="FENCE_POST">
+      <mesh>
+        <source id="FENCE_POST-pos"><float_array id="FENCE_POST-pos-a" count="114">0 0.008 0.46 0 4.8986e-19 0.468 2.6 4.8986e-19 0.468 2.6 0.008 0.46 0 -0.008 0.46 2.6 -0.008 0.46 0 -1.4696e-18 0.452 2.6 -1.4696e-18 0.452 0 0 0.46 2.6 0 0.46 0 0.008 0.82 0 4.8986e-19 0.828 2.6 4.8986e-19 0.828 2.6 0.008 0.82 0 -0.008 0.82 2.6 -0.008 0.82 0 -1.4696e-18 0.812 2.6 -1.4696e-18 0.812 0 0 0.82 2.6 0 0.82 0 0.008 1.16 0 4.8986e-19 1.168 2.6 4.8986e-19 1.168 2.6 0.008 1.16 0 -0.008 1.16 2.6 -0.008 1.16 0 -1.4696e-18 1.152 2.6 -1.4696e-18 1.152 0 0 1.16 2.6 0 1.16 -0.048 -0.048 0 -0.048 0.048 0 0.048 0.048 0 0.048 -0.048 0 -0.048 -0.048 1.28 0.048 -0.048 1.28 0.048 0.048 1.28 -0.048 0.048 1.28</float_array><technique_common><accessor source="#FENCE_POST-pos-a" count="38" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+        <source id="FENCE_POST-nrm"><float_array id="FENCE_POST-nrm-a" count="30">0 0.707 0.707 0 -0.707 0.707 0 -0.707 -0.707 0 0.707 -0.707 -1 0 0 1 0 0 0 0 -1 0 0 1 0 -1 0 0 1 0</float_array><technique_common><accessor source="#FENCE_POST-nrm-a" count="10" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+        <vertices id="FENCE_POST-vtx"><input semantic="POSITION" source="#FENCE_POST-pos"/></vertices>
+        <triangles count="48" material="MAT_RUST-mat"><input semantic="VERTEX" source="#FENCE_POST-vtx" offset="0"/><input semantic="NORMAL" source="#FENCE_POST-nrm" offset="1"/><p>0 0 1 0 2 0 0 0 2 0 3 0 1 1 4 1 5 1 1 1 5 1 2 1 4 2 6 2 7 2 4 2 7 2 5 2 6 3 0 3 3 3 6 3 3 3 7 3 1 4 0 4 8 4 3 5 2 5 9 5 4 4 1 4 8 4 2 5 5 5 9 5 6 4 4 4 8 4 5 5 7 5 9 5 0 4 6 4 8 4 7 5 3 5 9 5 10 0 11 0 12 0 10 0 12 0 13 0 11 1 14 1 15 1 11 1 15 1 12 1 14 2 16 2 17 2 14 2 17 2 15 2 16 3 10 3 13 3 16 3 13 3 17 3 11 4 10 4 18 4 13 5 12 5 19 5 14 4 11 4 18 4 12 5 15 5 19 5 16 4 14 4 18 4 15 5 17 5 19 5 10 4 16 4 18 4 17 5 13 5 19 5 20 0 21 0 22 0 20 0 22 0 23 0 21 1 24 1 25 1 21 1 25 1 22 1 24 2 26 2 27 2 24 2 27 2 25 2 26 3 20 3 23 3 26 3 23 3 27 3 21 4 20 4 28 4 23 5 22 5 29 5 24 4 21 4 28 4 22 5 25 5 29 5 26 4 24 4 28 4 25 5 27 5 29 5 20 4 26 4 28 4 27 5 23 5 29 5</p></triangles>
+        <triangles count="12" material="MAT_WOOD-mat"><input semantic="VERTEX" source="#FENCE_POST-vtx" offset="0"/><input semantic="NORMAL" source="#FENCE_POST-nrm" offset="1"/><p>30 6 31 6 32 6 30 6 32 6 33 6 34 7 35 7 36 7 34 7 36 7 37 7 30 8 33 8 35 8 30 8 35 8 34 8 33 5 32 5 36 5 33 5 36 5 35 5 32 9 31 9 37 9 32 9 37 9 36 9 31 4 30 4 34 4 31 4 34 4 37 4</p></triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="scene" name="scene">
+    <node id="FENCE_POST" name="FENCE_POST" type="NODE"><instance_geometry url="#FENCE_POST-mesh"><bind_material><technique_common>
+      <instance_material symbol="MAT_METAL-mat" target="#MAT_METAL"/>
+      <instance_material symbol="MAT_RUST-mat" target="#MAT_RUST"/>
+      <instance_material symbol="MAT_PAINT-mat" target="#MAT_PAINT"/>
+      <instance_material symbol="MAT_TYRE-mat" target="#MAT_TYRE"/>
+      <instance_material symbol="MAT_WOOD-mat" target="#MAT_WOOD"/>
+      <instance_material symbol="MAT_PLASTER-mat" target="#MAT_PLASTER"/>
+      <instance_material symbol="MAT_ROOF-mat" target="#MAT_ROOF"/>
+      <instance_material symbol="MAT_PIPE-mat" target="#MAT_PIPE"/>
+      <instance_material symbol="MAT_SEAT-mat" target="#MAT_SEAT"/>
+    </technique_common></bind_material></instance_geometry></node>
+  </visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#scene"/></scene>
+</COLLADA>

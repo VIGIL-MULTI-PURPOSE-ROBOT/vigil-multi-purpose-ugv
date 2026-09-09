@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="agri_cad_preview">
+  <link name="base_footprint" />
+  <link name="cad_assembly">
+    <visual>
+      <origin xyz="-0.5697 0.51126 0.5872" rpy="0 0 1.5707963267948966" />
+      <geometry>
+        <mesh filename="package://agri_ugv_description/meshes/assembly_preview.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="preview_aluminum">
+        <color rgba="0.62 0.65 0.69 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="preview_fixed" type="fixed">
+    <parent link="base_footprint" />
+    <child link="cad_assembly" />
+  </joint>
+</robot>

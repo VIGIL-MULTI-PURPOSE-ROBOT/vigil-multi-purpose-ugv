@@ -1,0 +1,39 @@
+{
+  "pass": true,
+  "mission_events": [
+    {
+      "state": "exploring",
+      "message": "Recorded start pose",
+      "sim_time": 5.0,
+      "pose": [
+        -1.5903521951108296e-10,
+        6.127474252365734e-15,
+        -5.643451069535971e-05
+      ],
+      "bounds": [
+        -10.0,
+        60.0,
+        -10.0,
+        60.0
+      ]
+    },
+    {
+      "state": "return_requested",
+      "message": "Computing return path (Dijkstra/BFS)",
+      "sim_time": 40.0
+    },
+    {
+      "state": "returning",
+      "message": "Returning to start",
+      "sim_time": 40.0,
+      "grid_length_m": 2.886396217762969
+    },
+    {
+      "state": "arrived",
+      "message": "Arrived at start.",
+      "sim_time": 50.932,
+      "position_error_m": 0.292000056476878,
+      "yaw_error_rad": 0.12249013691064749
+    }
+  ]
+}

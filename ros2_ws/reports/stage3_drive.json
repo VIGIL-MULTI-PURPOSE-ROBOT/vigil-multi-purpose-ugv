@@ -1,0 +1,154 @@
+{
+  "encoders": {
+    "names": [
+      "L1_joint",
+      "L2_joint",
+      "L3_joint",
+      "R1_joint",
+      "R2_joint",
+      "R3_joint"
+    ],
+    "velocities": [
+      1.2190323195326869e-09,
+      1.1258482479625798e-09,
+      -1.2436702223617147e-09,
+      -6.643955940965895e-10,
+      -1.361785628706258e-09,
+      1.4536285508626179e-09
+    ]
+  },
+  "imu": {
+    "q": [
+      -0.007686548262208061,
+      0.007657173857769537,
+      0.1355659233364558,
+      0.9907089204676917
+    ],
+    "accel": [
+      -0.17031974905463737,
+      -0.12857124152945104,
+      9.797656828529234
+    ]
+  },
+  "depth": {
+    "finite_positive": 46437,
+    "median": 1.8611810207366943
+  },
+  "rgb": {
+    "shape": [
+      320,
+      240
+    ],
+    "std": 37.70230969055036,
+    "frame": "camera_optical_frame"
+  },
+  "link_poses": [
+    [
+      "agri_ugv",
+      "agri_ugv/R4_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R3_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R2_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R2_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/base_footprint"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L4_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R3_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L_rocker_link"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L1_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L4_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R4_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L1_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L2_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L2_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R1_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L3_carrier"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/L3_wheel"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R_rocker_link"
+    ],
+    [
+      "agri_ugv",
+      "agri_ugv/R1_wheel"
+    ]
+  ],
+  "ground_truth": {
+    "position": [
+      -18.29079424671518,
+      0.24781688968246038,
+      0.2136087909765368
+    ],
+    "rpy_deg": [
+      -0.7518345666578915,
+      0.9960516829548808,
+      15.577046387647934
+    ]
+  },
+  "lidar": {
+    "valid": 4519,
+    "frame": "lidar_link",
+    "total": 8192
+  },
+  "counts": {
+    "encoders": 5907,
+    "imu": 1182,
+    "depth": 119,
+    "rgb": 119,
+    "link_poses": 584,
+    "ground_truth": 236,
+    "lidar": 59
+  },
+  "motion_delta": [
+    1.7231917403158263,
+    0.2568226836961607,
+    0.03796676450710157
+  ]
+}
