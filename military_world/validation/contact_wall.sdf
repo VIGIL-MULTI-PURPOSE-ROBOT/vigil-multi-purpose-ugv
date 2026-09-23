@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.10">
+  <world name="military_world">
+    
+    
+    <physics name="default" type="dart">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    <dart><collision_detector>bullet</collision_detector><solver><solver_type>pgs</solver_type></solver></dart></physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact" />
+    
+    <gravity>0 0 -9.81</gravity>
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.36 0.50 0.74 1</background>
+      <grid>false</grid>
+      
+      
+    </scene>
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 120 0 0 0</pose>
+      <diffuse>1.0 0.97 0.92 1</diffuse>
+      <specular>0.25 0.25 0.25 1</specular>
+      <direction>-0.5 0.35 -0.78</direction>
+    </light>
+<model name="demo_ground"><static>true</static><pose>0 0 -0.1 0 0 0</pose><link name="ground"><collision name="c"><geometry><box><size>24 24 0.2</size></box></geometry></collision><visual name="v"><geometry><box><size>24 24 0.2</size></box></geometry><material><ambient>0.35 0.4 0.3 1</ambient><diffuse>0.35 0.4 0.3 1</diffuse></material></visual></link></model>
+<model name="SAR_DynamicPerson_test_a">
+      <static>false</static>
+      <pose>-4.0 0.0 0.05 0.0 0.0 -1.5707963267948966</pose>
+      
+      <link name="body">
+        <visual name="v00"><pose>0.0000 0.0000 0.0000 0.03000 -0.00000 -0.00000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Torso.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>305.15</temperature></plugin></visual>
+        <collision name="c00"><pose>0.00000 -0.03154 1.05106 0.03000 -0.00000 -0.00000</pose><geometry><box><size>0.3626 0.2130 0.5439</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v01"><pose>0.0000 0.0000 0.0000 0.00000 -0.00000 -0.00000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Hips.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>305.15</temperature></plugin></visual>
+        <collision name="c01"><pose>0.00000 0.00000 0.76599 0.00000 -0.00000 -0.00000</pose><geometry><box><size>0.2991 0.1949 0.1632</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v02"><pose>0.0000 0.0000 0.0000 0.00000 -0.00000 -0.00000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Head.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>307.65</temperature></plugin></visual>
+        <collision name="c02"><pose>0.00000 0.00000 1.46399 0.00000 -0.00000 -0.00000</pose><geometry><box><size>0.1751 0.1904 0.2246</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v03"><pose>-0.0861 0.0000 0.7660 0.42000 -0.00000 -0.00000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Leg_L.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>303.65</temperature></plugin></visual>
+        <collision name="c03"><pose>-0.08215 0.15617 0.41629 0.42000 -0.00000 -0.00000</pose><geometry><box><size>0.1516 0.1555 0.7660</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v04"><pose>0.0861 0.0000 0.7660 -0.38000 -0.00000 -0.00000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Leg_R.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>303.65</temperature></plugin></visual>
+        <collision name="c04"><pose>0.09005 -0.14206 0.41033 -0.38000 -0.00000 -0.00000</pose><geometry><box><size>0.1516 0.1555 0.7660</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v05"><pose>-0.1858 -0.0000 1.2872 -0.30000 -0.00000 0.12000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Arm_L.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>303.65</temperature></plugin></visual>
+        <collision name="c05"><pose>-0.17176 -0.09545 0.97544 -0.30000 -0.00000 0.12000</pose><geometry><box><size>0.0965 0.0990 0.6527</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+        <visual name="v06"><pose>0.1858 0.0000 1.2872 0.30000 -0.00000 -0.12000</pose><geometry><mesh><uri>/home/user/Documents/military_world/gazebo_export/meshes/SARM_SAR_DynamicPerson_016_Arm_R.glb</uri><scale>0.90649 0.90649 0.90649</scale></mesh></geometry><plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"><temperature>303.65</temperature></plugin></visual>
+        <collision name="c06"><pose>0.19984 0.09545 0.97544 0.30000 -0.00000 -0.12000</pose><geometry><box><size>0.0965 0.0990 0.6527</size></box></geometry><surface><friction><ode><mu>0.08</mu><mu2>0.08</mu2></ode></friction></surface></collision>
+      <gravity>true</gravity><sensor name="touch" type="contact"><always_on>true</always_on><contact><collision>c00</collision><collision>c01</collision><collision>c02</collision><collision>c03</collision><collision>c04</collision><collision>c05</collision><collision>c06</collision></contact></sensor><inertial><mass>75.0</mass><pose>0 0 0.85 0 0 0</pose><inertia><ixx>20</ixx><iyy>20</iyy><izz>4</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial></link>
+      <self_collide>false</self_collide><plugin filename="libsar-waypoint-system.so" name="sar::WaypointSystem"><offset>0 0 0</offset><waypoint><time>0.000000000</time><pose>-4.000000000 0.000000000 0.050000000 0.000000000 0.000000000 -1.570796327</pose></waypoint><waypoint><time>8.000000000</time><pose>4.000000000 0.000000000 0.050000000 0.000000000 0.000000000 1.570796327</pose></waypoint><waypoint><time>30.000000000</time><pose>4.000000000 0.000000000 0.050000000 0.000000000 0.000000000 1.570796327</pose></waypoint><waypoint><time>38.000000000</time><pose>-4.000000000 0.000000000 0.050000000 0.000000000 0.000000000 -1.570796327</pose></waypoint><controller_version>2</controller_version><mass>75.0</mass><carried>false</carried><cruise_speed>2.2</cruise_speed></plugin></model>
+<model name="test_wall"><static>true</static>
+          <pose>0 0 2 0 0 0</pose><link name="wall">
+          <collision name="wall_collision"><geometry><box><size>0.2 20 4</size></box></geometry></collision>
+          <visual name="wall_visual"><geometry><box><size>0.2 20 4</size></box></geometry></visual>
+          </link></model></world>
+</sdf>

@@ -1,0 +1,755 @@
+{
+  "schema": "sar_dynamic_paths/1.0",
+  "seed": 20260915,
+  "note": "Blender keyframes do NOT cross into a Gazebo world. These waypoint loops are the portable form. Turn each into a Gazebo <actor> with a <trajectory>, or drive the models from a ROS 2 node. The generated SDF below is a starting point, not a finished world.",
+  "fps": 30,
+  "duration_s": 240,
+  "actors": [
+    {
+      "person_id": "PERSON_016",
+      "object": "SAR_DynamicPerson_016",
+      "speed_mps": 1.25,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -14,
+          66,
+          0.089
+        ],
+        [
+          -2,
+          70,
+          0.249
+        ],
+        [
+          10,
+          74,
+          0.598
+        ],
+        [
+          20,
+          70,
+          0.846
+        ],
+        [
+          8,
+          64,
+          0.443
+        ],
+        [
+          -14,
+          66,
+          0.089
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_017",
+      "object": "SAR_DynamicPerson_017",
+      "speed_mps": 0.65,
+      "dwell_s": [
+        6.0,
+        14.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -34,
+          44,
+          0.356
+        ],
+        [
+          -26,
+          52,
+          0.412
+        ],
+        [
+          -30,
+          60,
+          0.271
+        ],
+        [
+          -40,
+          56,
+          0.003
+        ],
+        [
+          -34,
+          44,
+          0.356
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_018",
+      "object": "SAR_DynamicPerson_018",
+      "speed_mps": 1.85,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          24,
+          150,
+          0.902
+        ],
+        [
+          36,
+          160,
+          1.157
+        ],
+        [
+          24,
+          170,
+          0.667
+        ],
+        [
+          10,
+          164,
+          0.402
+        ],
+        [
+          24,
+          150,
+          0.902
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_019",
+      "object": "SAR_DynamicPerson_019",
+      "speed_mps": 0.95,
+      "dwell_s": [
+        3.0,
+        9.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -30,
+          157,
+          1.03
+        ],
+        [
+          -48,
+          162,
+          0.831
+        ],
+        [
+          -64,
+          168,
+          0.347
+        ],
+        [
+          -48,
+          162,
+          0.831
+        ],
+        [
+          -30,
+          157,
+          1.03
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_B"
+    },
+    {
+      "person_id": "PERSON_020",
+      "object": "SAR_DynamicPerson_020",
+      "speed_mps": 0.8,
+      "dwell_s": [
+        4.0,
+        10.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -84,
+          150,
+          0.199
+        ],
+        [
+          -92,
+          158,
+          0.189
+        ],
+        [
+          -86,
+          166,
+          -0.069
+        ],
+        [
+          -76,
+          158,
+          0.231
+        ],
+        [
+          -84,
+          150,
+          0.199
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_B"
+    },
+    {
+      "person_id": "PERSON_021",
+      "object": "SAR_DynamicPerson_021",
+      "speed_mps": 1.35,
+      "dwell_s": [
+        2.0,
+        6.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          60,
+          30,
+          0.182
+        ],
+        [
+          61,
+          50,
+          0.097
+        ],
+        [
+          62,
+          70,
+          0.116
+        ],
+        [
+          61,
+          50,
+          0.097
+        ],
+        [
+          60,
+          30,
+          0.182
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_C"
+    },
+    {
+      "person_id": "PERSON_022",
+      "object": "SAR_DynamicPerson_022",
+      "speed_mps": 1.15,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          56,
+          62,
+          0.07
+        ],
+        [
+          78,
+          64,
+          0.08
+        ],
+        [
+          100,
+          66,
+          0.079
+        ],
+        [
+          78,
+          64,
+          0.08
+        ],
+        [
+          56,
+          62,
+          0.07
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_C"
+    },
+    {
+      "person_id": "PERSON_023",
+      "object": "SAR_DynamicPerson_023",
+      "speed_mps": 0.7,
+      "dwell_s": [
+        8.0,
+        16.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          90,
+          66,
+          0.081
+        ],
+        [
+          95,
+          67,
+          0.056
+        ],
+        [
+          93,
+          73,
+          -0.069
+        ],
+        [
+          88,
+          71,
+          -0.039
+        ],
+        [
+          90,
+          66,
+          0.081
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_C"
+    },
+    {
+      "person_id": "PERSON_024",
+      "object": "SAR_DynamicPerson_024",
+      "speed_mps": 1.45,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          4,
+          22,
+          0.349
+        ],
+        [
+          8,
+          44,
+          0.477
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          8,
+          44,
+          0.477
+        ],
+        [
+          4,
+          22,
+          0.349
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_025",
+      "object": "SAR_DynamicPerson_025",
+      "speed_mps": 0.75,
+      "dwell_s": [
+        5.0,
+        12.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          18,
+          100,
+          0.912
+        ],
+        [
+          26,
+          108,
+          0.965
+        ],
+        [
+          22,
+          120,
+          1.223
+        ],
+        [
+          12,
+          112,
+          1.146
+        ],
+        [
+          18,
+          100,
+          0.912
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_B"
+    },
+    {
+      "person_id": "PERSON_026",
+      "object": "SAR_DynamicPerson_026",
+      "speed_mps": 0.85,
+      "dwell_s": [
+        4.0,
+        11.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -98,
+          54,
+          -0.679
+        ],
+        [
+          -104,
+          62,
+          -0.519
+        ],
+        [
+          -110,
+          70,
+          -0.899
+        ],
+        [
+          -104,
+          62,
+          -0.519
+        ],
+        [
+          -98,
+          54,
+          -0.679
+        ]
+      ],
+      "thermal_contrast": "LOW",
+      "search_zone": "SAR_ZONE_F"
+    },
+    {
+      "person_id": "PERSON_027",
+      "object": "SAR_DynamicPerson_027",
+      "speed_mps": 1.3,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          5,
+          26,
+          0.403
+        ],
+        [
+          8,
+          48,
+          0.471
+        ],
+        [
+          12,
+          70,
+          0.546
+        ],
+        [
+          8,
+          48,
+          0.471
+        ],
+        [
+          5,
+          26,
+          0.403
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_028",
+      "object": "SAR_DynamicPerson_028",
+      "speed_mps": 1.1,
+      "dwell_s": [
+        2.0,
+        5.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -26,
+          56,
+          0.36
+        ],
+        [
+          -13,
+          62,
+          0.149
+        ],
+        [
+          0,
+          68,
+          0.225
+        ],
+        [
+          -13,
+          62,
+          0.149
+        ],
+        [
+          -26,
+          56,
+          0.36
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_029",
+      "object": "SAR_DynamicPerson_029",
+      "speed_mps": 1.45,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          16,
+          82,
+          0.83
+        ],
+        [
+          7,
+          74,
+          0.56
+        ],
+        [
+          0,
+          68,
+          0.225
+        ],
+        [
+          7,
+          74,
+          0.56
+        ],
+        [
+          16,
+          82,
+          0.83
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_030",
+      "object": "SAR_DynamicPerson_030",
+      "speed_mps": 1.05,
+      "dwell_s": [
+        3.0,
+        7.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          38,
+          110,
+          0.48
+        ],
+        [
+          24,
+          118,
+          1.035
+        ],
+        [
+          16,
+          108,
+          1.195
+        ],
+        [
+          32,
+          102,
+          0.713
+        ],
+        [
+          38,
+          110,
+          0.48
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_B"
+    },
+    {
+      "person_id": "PERSON_031",
+      "object": "SAR_DynamicPerson_031",
+      "speed_mps": 0.95,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -7,
+          38,
+          0.513
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          3,
+          70,
+          0.304
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          -7,
+          38,
+          0.513
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_032",
+      "object": "SAR_DynamicPerson_032",
+      "speed_mps": 0.95,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          -7,
+          38,
+          0.513
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          3,
+          70,
+          0.304
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          -7,
+          38,
+          0.513
+        ]
+      ],
+      "thermal_contrast": "HIGH",
+      "search_zone": "SAR_ZONE_A"
+    },
+    {
+      "person_id": "PERSON_033",
+      "object": "SAR_DynamicPerson_033",
+      "speed_mps": 1.2,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          89,
+          60,
+          0.089
+        ],
+        [
+          98,
+          50,
+          0.094
+        ],
+        [
+          89,
+          40,
+          0.053
+        ],
+        [
+          80,
+          50,
+          0.028
+        ],
+        [
+          89,
+          60,
+          0.089
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_C"
+    },
+    {
+      "person_id": "PERSON_034",
+      "object": "SAR_DynamicPerson_034",
+      "speed_mps": 0.9,
+      "dwell_s": [
+        6.0,
+        14.0
+      ],
+      "closed_loop": true,
+      "waypoints": [
+        [
+          112,
+          96,
+          -0.513
+        ],
+        [
+          118,
+          110,
+          -0.86
+        ],
+        [
+          112,
+          124,
+          -1.567
+        ],
+        [
+          104,
+          110,
+          -1.311
+        ],
+        [
+          112,
+          96,
+          -0.513
+        ]
+      ],
+      "thermal_contrast": "MEDIUM",
+      "search_zone": "SAR_ZONE_E"
+    }
+  ]
+}

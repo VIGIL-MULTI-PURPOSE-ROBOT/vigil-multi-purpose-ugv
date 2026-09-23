@@ -1,0 +1,2756 @@
+{
+  "schema": "sar_ground_truth/1.0",
+  "seed": 20260915,
+  "generated_utc": "2026-09-15T05:45:43Z",
+  "warning": "EVALUATION ONLY. Do not publish any of this to ROS at runtime. Use it to score detections after a run. Feeding it to the robot invalidates every result the environment exists to produce.",
+  "world": {
+    "x_min": -150.0,
+    "x_max": 150.0,
+    "y_min": -40.0,
+    "y_max": 260.0,
+    "units": "metres",
+    "up_axis": "Z"
+  },
+  "people": [
+    {
+      "person_id": "PERSON_001",
+      "object": "SAR_StaticPerson_001",
+      "type": "STATIC",
+      "position": [
+        0.0,
+        62.0,
+        0.095
+      ],
+      "pose": "STANDING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "EASY",
+      "height_m": 1.565,
+      "cluster": "NONE",
+      "note": "Scenario A. Standing, hi-vis, open field, unobstructed. The baseline detection test -- if this one fails, stop and fix the stack."
+    },
+    {
+      "person_id": "PERSON_002",
+      "object": "SAR_StaticPerson_002",
+      "type": "STATIC",
+      "position": [
+        -78.0,
+        160.0,
+        0.096
+      ],
+      "pose": "LYING",
+      "victim_status": "INJURED_UNRESPONSIVE",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "VEGETATION_PARTIAL",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "detection_difficulty": "HARD",
+      "height_m": 1.819,
+      "cluster": "NONE",
+      "note": "Scenario C/G. Dark clothing, prone, under canopy shadow. RGB is weak here; thermal carries the detection."
+    },
+    {
+      "person_id": "PERSON_003",
+      "object": "SAR_StaticPerson_003",
+      "type": "STATIC",
+      "position": [
+        -92.0,
+        172.0,
+        0.729
+      ],
+      "pose": "SITTING",
+      "victim_status": "INJURED_RESPONSIVE",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "VEGETATION_PARTIAL",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.56,
+      "cluster": "NONE",
+      "note": "Seated against a fallen tree, half behind brush."
+    },
+    {
+      "person_id": "PERSON_004",
+      "object": "SAR_StaticPerson_004",
+      "type": "STATIC",
+      "position": [
+        -66.0,
+        150.0,
+        0.278
+      ],
+      "pose": "STANDING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.571,
+      "cluster": "NONE",
+      "note": "Standing in a forest clearing -- RGB workable, canopy breaks GNSS."
+    },
+    {
+      "person_id": "PERSON_005",
+      "object": "SAR_StaticPerson_005",
+      "type": "STATIC",
+      "position": [
+        -12.0,
+        104.0,
+        1.174
+      ],
+      "pose": "SITTING",
+      "victim_status": "INJURED_RESPONSIVE",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "RUBBLE_PARTIAL",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "detection_difficulty": "HARD",
+      "height_m": 1.552,
+      "cluster": "NONE",
+      "note": "Seated on debris at the edge of the collapse field."
+    },
+    {
+      "person_id": "PERSON_006",
+      "object": "SAR_StaticPerson_006",
+      "type": "STATIC",
+      "position": [
+        2.0,
+        116.0,
+        0.555
+      ],
+      "pose": "LYING",
+      "victim_status": "INJURED_UNRESPONSIVE",
+      "thermal_contrast": "LOW",
+      "thermal_delta_k": 2.5,
+      "occlusion": "RUBBLE_PARTIAL",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "detection_difficulty": "HARD",
+      "height_m": 1.782,
+      "cluster": "NONE",
+      "note": "Scenario F/G. Concrete-dust covered, lying among cold slabs. LOW thermal contrast on purpose: this is where a single-sensor detector quits. NOT buried -- torso and head are exposed."
+    },
+    {
+      "person_id": "PERSON_007",
+      "object": "SAR_StaticPerson_007",
+      "type": "STATIC",
+      "position": [
+        15.5,
+        119.5,
+        1.15
+      ],
+      "pose": "STANDING",
+      "victim_status": "TRAPPED",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "BUILDING_OPENING",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "detection_difficulty": "HARD",
+      "height_m": 1.701,
+      "cluster": "NONE",
+      "note": "Scenario H. Inside SAR_Building_RUB_002. Visible ONLY through the collapsed wall opening -- there is no line of sight through the intact walls, for RGB or for thermal."
+    },
+    {
+      "person_id": "PERSON_008",
+      "object": "SAR_StaticPerson_008",
+      "type": "STATIC",
+      "position": [
+        76.0,
+        79.5,
+        -0.022
+      ],
+      "pose": "LYING",
+      "victim_status": "INJURED_UNRESPONSIVE",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "BUILDING_INTERIOR",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "HARD",
+      "height_m": 1.802,
+      "cluster": "NONE",
+      "note": "Inside SAR_Building_URB_003, dark interior. Requires entry via the doorway or the collapsed NE corner."
+    },
+    {
+      "person_id": "PERSON_009",
+      "object": "SAR_StaticPerson_009",
+      "type": "STATIC",
+      "position": [
+        92.0,
+        70.0,
+        -0.03
+      ],
+      "pose": "STANDING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "EASY",
+      "height_m": 1.781,
+      "cluster": "TRIAGE_01",
+      "note": "Scenario I. Multi-person triage point, 4 casualties within 4 m."
+    },
+    {
+      "person_id": "PERSON_010",
+      "object": "SAR_StaticPerson_010",
+      "type": "STATIC",
+      "position": [
+        93.6,
+        71.6,
+        -0.052
+      ],
+      "pose": "SITTING",
+      "victim_status": "INJURED_RESPONSIVE",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.846,
+      "cluster": "TRIAGE_01",
+      "note": ""
+    },
+    {
+      "person_id": "PERSON_011",
+      "object": "SAR_StaticPerson_011",
+      "type": "STATIC",
+      "position": [
+        90.8,
+        72.4,
+        -0.073
+      ],
+      "pose": "LYING",
+      "victim_status": "INJURED_UNRESPONSIVE",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.613,
+      "cluster": "TRIAGE_01",
+      "note": ""
+    },
+    {
+      "person_id": "PERSON_012",
+      "object": "SAR_StaticPerson_012",
+      "type": "STATIC",
+      "position": [
+        94.2,
+        68.4,
+        0.024
+      ],
+      "pose": "KNEELING",
+      "victim_status": "RESCUER",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "NONE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "EASY",
+      "height_m": 1.794,
+      "cluster": "TRIAGE_01",
+      "note": "Rescue personnel kneeling beside a casualty. Tests person-role reasoning, not just person-or-not."
+    },
+    {
+      "person_id": "PERSON_013",
+      "object": "SAR_StaticPerson_013",
+      "type": "STATIC",
+      "position": [
+        82.0,
+        230.0,
+        18.8
+      ],
+      "pose": "SITTING",
+      "victim_status": "INJURED_RESPONSIVE",
+      "thermal_contrast": "LOW",
+      "thermal_delta_k": 2.5,
+      "occlusion": "ROCK_PARTIAL",
+      "search_zone": "SAR_ZONE_D",
+      "sector": "MOUNTAIN",
+      "detection_difficulty": "HARD",
+      "height_m": 1.559,
+      "cluster": "NONE",
+      "note": "High on the mountain, on a shoulder above where the risky and safe tracks converge, behind rock. Cold and heavily clothed: LOW contrast against sun-warmed rock. Getting here is the risk-aware routing test -- the short track runs the SAR_Ravine_001 rim, the long one climbs the east side."
+    },
+    {
+      "person_id": "PERSON_014",
+      "object": "SAR_StaticPerson_014",
+      "type": "STATIC",
+      "position": [
+        -50.0,
+        230.0,
+        9.954
+      ],
+      "pose": "LYING",
+      "victim_status": "INJURED_UNRESPONSIVE",
+      "thermal_contrast": "LOW",
+      "thermal_delta_k": 2.5,
+      "occlusion": "SNOW_PARTIAL",
+      "search_zone": "SAR_ZONE_D",
+      "sector": "SNOW",
+      "detection_difficulty": "HARD",
+      "height_m": 1.739,
+      "cluster": "NONE",
+      "note": "Avalanche debris field. PARTIALLY snow-dusted and still exposed. Deliberately NOT buried: a LWIR camera cannot see through a snowpack and this environment will not pretend otherwise."
+    },
+    {
+      "person_id": "PERSON_015",
+      "object": "SAR_StaticPerson_015",
+      "type": "STATIC",
+      "position": [
+        87.6,
+        24.2,
+        0.163
+      ],
+      "pose": "SITTING",
+      "victim_status": "INJURED_RESPONSIVE",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "VEHICLE_PARTIAL",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.596,
+      "cluster": "NONE",
+      "note": "Scenario E. Beside SAR_Vehicle_Civilian_004, whose engine bay is 62 C. Two warm blobs, one of them a person."
+    },
+    {
+      "person_id": "PERSON_016",
+      "object": "SAR_DynamicPerson_016",
+      "type": "DYNAMIC",
+      "position": [
+        -14,
+        66,
+        0.089
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.559,
+      "speed_mps": 1.25,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "CROSSING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -14,
+          66,
+          0.089
+        ],
+        [
+          -2,
+          70,
+          0.249
+        ],
+        [
+          10,
+          74,
+          0.598
+        ],
+        [
+          20,
+          70,
+          0.846
+        ],
+        [
+          8,
+          64,
+          0.443
+        ],
+        [
+          -14,
+          66,
+          0.089
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Crosses SAR_Road_MainSupply at ~y=70. This is the dynamic obstacle the robot is expected to detect and yield to."
+    },
+    {
+      "person_id": "PERSON_017",
+      "object": "SAR_DynamicPerson_017",
+      "type": "DYNAMIC",
+      "position": [
+        -34,
+        44,
+        0.356
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.677,
+      "speed_mps": 0.65,
+      "dwell_s": [
+        6.0,
+        14.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -34,
+          44,
+          0.356
+        ],
+        [
+          -26,
+          52,
+          0.412
+        ],
+        [
+          -30,
+          60,
+          0.271
+        ],
+        [
+          -40,
+          56,
+          0.003
+        ],
+        [
+          -34,
+          44,
+          0.356
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Slow, frequent stops -- behaves like a walking wounded."
+    },
+    {
+      "person_id": "PERSON_018",
+      "object": "SAR_DynamicPerson_018",
+      "type": "DYNAMIC",
+      "position": [
+        24,
+        150,
+        0.902
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.589,
+      "speed_mps": 1.85,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          24,
+          150,
+          0.902
+        ],
+        [
+          36,
+          160,
+          1.157
+        ],
+        [
+          24,
+          170,
+          0.667
+        ],
+        [
+          10,
+          164,
+          0.402
+        ],
+        [
+          24,
+          150,
+          0.902
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Fast mover, dark clothing."
+    },
+    {
+      "person_id": "PERSON_019",
+      "object": "SAR_DynamicPerson_019",
+      "type": "DYNAMIC",
+      "position": [
+        -30,
+        157,
+        1.03
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.794,
+      "speed_mps": 0.95,
+      "dwell_s": [
+        3.0,
+        9.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -30,
+          157,
+          1.03
+        ],
+        [
+          -48,
+          162,
+          0.831
+        ],
+        [
+          -64,
+          168,
+          0.347
+        ],
+        [
+          -48,
+          162,
+          0.831
+        ],
+        [
+          -30,
+          157,
+          1.03
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Along SAR_Track_Forest. Repeated occlusion by trunks."
+    },
+    {
+      "person_id": "PERSON_020",
+      "object": "SAR_DynamicPerson_020",
+      "type": "DYNAMIC",
+      "position": [
+        -84,
+        150,
+        0.199
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.85,
+      "speed_mps": 0.8,
+      "dwell_s": [
+        4.0,
+        10.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -84,
+          150,
+          0.199
+        ],
+        [
+          -92,
+          158,
+          0.189
+        ],
+        [
+          -86,
+          166,
+          -0.069
+        ],
+        [
+          -76,
+          158,
+          0.231
+        ],
+        [
+          -84,
+          150,
+          0.199
+        ]
+      ],
+      "closed_loop": true,
+      "note": ""
+    },
+    {
+      "person_id": "PERSON_021",
+      "object": "SAR_DynamicPerson_021",
+      "type": "DYNAMIC",
+      "position": [
+        60,
+        30,
+        0.182
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.649,
+      "speed_mps": 1.35,
+      "dwell_s": [
+        2.0,
+        6.0
+      ],
+      "motion_pattern": "CROSSING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          60,
+          30,
+          0.182
+        ],
+        [
+          61,
+          50,
+          0.097
+        ],
+        [
+          62,
+          70,
+          0.116
+        ],
+        [
+          61,
+          50,
+          0.097
+        ],
+        [
+          60,
+          30,
+          0.182
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Urban Street A. Crosses paths with PERSON_022 -> multi-target tracking and ID re-assignment test."
+    },
+    {
+      "person_id": "PERSON_022",
+      "object": "SAR_DynamicPerson_022",
+      "type": "DYNAMIC",
+      "position": [
+        56,
+        62,
+        0.07
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.731,
+      "speed_mps": 1.15,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "CROSSING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          56,
+          62,
+          0.07
+        ],
+        [
+          78,
+          64,
+          0.08
+        ],
+        [
+          100,
+          66,
+          0.079
+        ],
+        [
+          78,
+          64,
+          0.08
+        ],
+        [
+          56,
+          62,
+          0.07
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Urban Street C, perpendicular to PERSON_021."
+    },
+    {
+      "person_id": "PERSON_023",
+      "object": "SAR_DynamicPerson_023",
+      "type": "DYNAMIC",
+      "position": [
+        90,
+        66,
+        0.081
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.629,
+      "speed_mps": 0.7,
+      "dwell_s": [
+        8.0,
+        16.0
+      ],
+      "motion_pattern": "ORBIT",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          90,
+          66,
+          0.081
+        ],
+        [
+          95,
+          67,
+          0.056
+        ],
+        [
+          93,
+          73,
+          -0.069
+        ],
+        [
+          88,
+          71,
+          -0.039
+        ],
+        [
+          90,
+          66,
+          0.081
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Rescuer circulating in the triage cluster."
+    },
+    {
+      "person_id": "PERSON_024",
+      "object": "SAR_DynamicPerson_024",
+      "type": "DYNAMIC",
+      "position": [
+        4,
+        22,
+        0.349
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.715,
+      "speed_mps": 1.45,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "ROAD_PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          4,
+          22,
+          0.349
+        ],
+        [
+          8,
+          44,
+          0.477
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          8,
+          44,
+          0.477
+        ],
+        [
+          4,
+          22,
+          0.349
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Walking the main supply route between base and the open field."
+    },
+    {
+      "person_id": "PERSON_025",
+      "object": "SAR_DynamicPerson_025",
+      "type": "DYNAMIC",
+      "position": [
+        18,
+        100,
+        0.912
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.754,
+      "speed_mps": 0.75,
+      "dwell_s": [
+        5.0,
+        12.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          18,
+          100,
+          0.912
+        ],
+        [
+          26,
+          108,
+          0.965
+        ],
+        [
+          22,
+          120,
+          1.223
+        ],
+        [
+          12,
+          112,
+          1.146
+        ],
+        [
+          18,
+          100,
+          0.912
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Skirting the collapse field. Slow, uneven ground."
+    },
+    {
+      "person_id": "PERSON_026",
+      "object": "SAR_DynamicPerson_026",
+      "type": "DYNAMIC",
+      "position": [
+        -98,
+        54,
+        -0.679
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "LOW",
+      "thermal_delta_k": 2.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.591,
+      "speed_mps": 0.85,
+      "dwell_s": [
+        4.0,
+        11.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -98,
+          54,
+          -0.679
+        ],
+        [
+          -104,
+          62,
+          -0.519
+        ],
+        [
+          -110,
+          70,
+          -0.899
+        ],
+        [
+          -104,
+          62,
+          -0.519
+        ],
+        [
+          -98,
+          54,
+          -0.679
+        ]
+      ],
+      "closed_loop": true,
+      "note": "East bank of the river, near the stranded vehicle. LOW contrast: wet clothing, cold air off the water."
+    },
+    {
+      "person_id": "PERSON_027",
+      "object": "SAR_DynamicPerson_027",
+      "type": "DYNAMIC",
+      "position": [
+        5,
+        26,
+        0.403
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.577,
+      "speed_mps": 1.3,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "HEAD_ON",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          5,
+          26,
+          0.403
+        ],
+        [
+          8,
+          48,
+          0.471
+        ],
+        [
+          12,
+          70,
+          0.546
+        ],
+        [
+          8,
+          48,
+          0.471
+        ],
+        [
+          5,
+          26,
+          0.403
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Walks the main supply route and turns around, so it approaches the robot head-on for half of every cycle. A closing target with almost no lateral optical flow is the case a forward-facing detector handles worst."
+    },
+    {
+      "person_id": "PERSON_028",
+      "object": "SAR_DynamicPerson_028",
+      "type": "DYNAMIC",
+      "position": [
+        -26,
+        56,
+        0.36
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.773,
+      "speed_mps": 1.1,
+      "dwell_s": [
+        2.0,
+        5.0
+      ],
+      "motion_pattern": "CONVERGING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          -26,
+          56,
+          0.36
+        ],
+        [
+          -13,
+          62,
+          0.149
+        ],
+        [
+          0,
+          68,
+          0.225
+        ],
+        [
+          -13,
+          62,
+          0.149
+        ],
+        [
+          -26,
+          56,
+          0.36
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Converges with PERSON_029 near (0, 68). Speeds and dwells differ, so the meeting drifts through the run instead of repeating on a fixed beat."
+    },
+    {
+      "person_id": "PERSON_029",
+      "object": "SAR_DynamicPerson_029",
+      "type": "DYNAMIC",
+      "position": [
+        16,
+        82,
+        0.83
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.736,
+      "speed_mps": 1.45,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "CONVERGING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          16,
+          82,
+          0.83
+        ],
+        [
+          7,
+          74,
+          0.56
+        ],
+        [
+          0,
+          68,
+          0.225
+        ],
+        [
+          7,
+          74,
+          0.56
+        ],
+        [
+          16,
+          82,
+          0.83
+        ]
+      ],
+      "closed_loop": true,
+      "note": "The other half of the converging pair. Two tracks that merge, occlude one another, then separate -- the classic ID-swap trap for a nearest-neighbour data association."
+    },
+    {
+      "person_id": "PERSON_030",
+      "object": "SAR_DynamicPerson_030",
+      "type": "DYNAMIC",
+      "position": [
+        38,
+        110,
+        0.48
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.827,
+      "speed_mps": 1.05,
+      "dwell_s": [
+        3.0,
+        7.0
+      ],
+      "motion_pattern": "CROSSING",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          38,
+          110,
+          0.48
+        ],
+        [
+          24,
+          118,
+          1.035
+        ],
+        [
+          16,
+          108,
+          1.195
+        ],
+        [
+          32,
+          102,
+          0.713
+        ],
+        [
+          38,
+          110,
+          0.48
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Crosses SAR_Track_RubbleBypass twice per lap. The bypass is what the robot takes once the main route is blocked, so it meets this one while already mid-replan."
+    },
+    {
+      "person_id": "PERSON_031",
+      "object": "SAR_DynamicPerson_031",
+      "type": "DYNAMIC",
+      "position": [
+        -7,
+        38,
+        0.513
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.759,
+      "speed_mps": 0.95,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "GROUP_CARRY",
+      "motion_group": "STRETCHER_01",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.95,
+      "waypoints": [
+        [
+          -7,
+          38,
+          0.513
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          3,
+          70,
+          0.304
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          -7,
+          38,
+          0.513
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Front bearer of a two-person stretcher party. Both bearers and the stretcher share one key list, so they hold formation rather than drifting apart over a four-minute run."
+    },
+    {
+      "person_id": "PERSON_032",
+      "object": "SAR_DynamicPerson_032",
+      "type": "DYNAMIC",
+      "position": [
+        -7,
+        38,
+        0.513
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "HIGH",
+      "thermal_delta_k": 12.0,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_A",
+      "sector": "OPEN_FIELD",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.747,
+      "speed_mps": 0.95,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "GROUP_CARRY",
+      "motion_group": "STRETCHER_01",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": -0.95,
+      "waypoints": [
+        [
+          -7,
+          38,
+          0.513
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          3,
+          70,
+          0.304
+        ],
+        [
+          -3,
+          54,
+          0.174
+        ],
+        [
+          -7,
+          38,
+          0.513
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Rear bearer. Two people plus the load between them read as one long obstacle to a clustering front-end and as three separate tracks to a naive one. That disagreement is the point."
+    },
+    {
+      "person_id": "PERSON_033",
+      "object": "SAR_DynamicPerson_033",
+      "type": "DYNAMIC",
+      "position": [
+        89,
+        60,
+        0.089
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.685,
+      "speed_mps": 1.2,
+      "dwell_s": [
+        0.0,
+        0.0
+      ],
+      "motion_pattern": "ORBIT",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          89,
+          60,
+          0.089
+        ],
+        [
+          98,
+          50,
+          0.094
+        ],
+        [
+          89,
+          40,
+          0.053
+        ],
+        [
+          80,
+          50,
+          0.028
+        ],
+        [
+          89,
+          60,
+          0.089
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Laps SAR_Building_URB_002 and passes through the 7.5 m canyon on its west leg. Goes fully out of sight behind the block each circuit: track continuation through total occlusion."
+    },
+    {
+      "person_id": "PERSON_034",
+      "object": "SAR_DynamicPerson_034",
+      "type": "DYNAMIC",
+      "position": [
+        112,
+        96,
+        -0.513
+      ],
+      "pose": "WALKING",
+      "victim_status": "AMBULATORY",
+      "thermal_contrast": "MEDIUM",
+      "thermal_delta_k": 6.5,
+      "occlusion": "DYNAMIC_VARIABLE",
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "detection_difficulty": "MEDIUM",
+      "height_m": 1.803,
+      "speed_mps": 0.9,
+      "dwell_s": [
+        6.0,
+        14.0
+      ],
+      "motion_pattern": "PATROL",
+      "motion_group": "NONE",
+      "lateral_offset_m": 0.0,
+      "lead_offset_m": 0.0,
+      "waypoints": [
+        [
+          112,
+          96,
+          -0.513
+        ],
+        [
+          118,
+          110,
+          -0.86
+        ],
+        [
+          112,
+          124,
+          -1.567
+        ],
+        [
+          104,
+          110,
+          -1.311
+        ],
+        [
+          112,
+          96,
+          -0.513
+        ]
+      ],
+      "closed_loop": true,
+      "note": "Desert track margin. Sparse background and long sightlines -- the easy-detection counterweight to the forest cases."
+    }
+  ],
+  "hazards": [
+    {
+      "gt_marker": "GT_HAZARD_001",
+      "hazard_id": "SAR_Ditch_001",
+      "hazard_type": "DITCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_A",
+      "position": [
+        -14.5,
+        30.5,
+        -0.458
+      ],
+      "extra": {
+        "depth_m": 1.1,
+        "width_m": 2.6,
+        "visual_salience": "OBVIOUS",
+        "length_m": 14.8,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_002",
+      "hazard_id": "SAR_Ditch_002",
+      "hazard_type": "DITCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_A",
+      "position": [
+        -31.0,
+        70.0,
+        -0.821
+      ],
+      "extra": {
+        "depth_m": 1.0,
+        "width_m": 2.2,
+        "visual_salience": "SUBTLE",
+        "length_m": 18.4,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_003",
+      "hazard_id": "SAR_Ditch_003",
+      "hazard_type": "DITCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        41.0,
+        92.0,
+        -0.728
+      ],
+      "extra": {
+        "depth_m": 1.4,
+        "width_m": 3.0,
+        "visual_salience": "OBVIOUS",
+        "length_m": 23.4,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_004",
+      "hazard_id": "SAR_Ditch_004",
+      "hazard_type": "DITCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -19.5,
+        124.5,
+        -0.237
+      ],
+      "extra": {
+        "depth_m": 1.2,
+        "width_m": 2.4,
+        "visual_salience": "SUBTLE",
+        "length_m": 15.6,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_005",
+      "hazard_id": "SAR_Ditch_005",
+      "hazard_type": "DITCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_E",
+      "position": [
+        77.0,
+        145.0,
+        -2.001
+      ],
+      "extra": {
+        "depth_m": 1.6,
+        "width_m": 3.4,
+        "visual_salience": "SUBTLE",
+        "length_m": 17.2,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_006",
+      "hazard_id": "SAR_Hole_001",
+      "hazard_type": "HOLE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_A",
+      "position": [
+        20.0,
+        56.0,
+        -1.334
+      ],
+      "extra": {
+        "depth_m": 1.85,
+        "width_m": 3.2,
+        "visual_salience": "SUBTLE",
+        "length_m": 3.2,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_007",
+      "hazard_id": "SAR_Hole_002",
+      "hazard_type": "HOLE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        72.0,
+        52.0,
+        -2.484
+      ],
+      "extra": {
+        "depth_m": 2.4,
+        "width_m": 4.4,
+        "visual_salience": "OBVIOUS",
+        "length_m": 4.4,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_008",
+      "hazard_id": "SAR_Hole_003",
+      "hazard_type": "HOLE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -5.0,
+        113.0,
+        -1.519
+      ],
+      "extra": {
+        "depth_m": 2.6,
+        "width_m": 5.4,
+        "visual_salience": "OBVIOUS",
+        "length_m": 5.4,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_009",
+      "hazard_id": "SAR_Trench_001",
+      "hazard_type": "TRENCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -57.33,
+        102.67,
+        -1.243
+      ],
+      "extra": {
+        "depth_m": 1.5,
+        "width_m": 1.8,
+        "visual_salience": "OBVIOUS",
+        "length_m": 34.4,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_010",
+      "hazard_id": "SAR_Trench_002",
+      "hazard_type": "TRENCH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_E",
+      "position": [
+        67.0,
+        117.0,
+        -1.018
+      ],
+      "extra": {
+        "depth_m": 1.3,
+        "width_m": 2.0,
+        "visual_salience": "SUBTLE",
+        "length_m": 22.8,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_011",
+      "hazard_id": "SAR_Ravine_001",
+      "hazard_type": "RAVINE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        37.75,
+        212.75,
+        17.916
+      ],
+      "extra": {
+        "depth_m": 5.5,
+        "width_m": 8.4,
+        "visual_salience": "OBVIOUS",
+        "length_m": 37.3,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_012",
+      "hazard_id": "SAR_Ravine_002",
+      "hazard_type": "RAVINE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        109.33,
+        228.67,
+        18.521
+      ],
+      "extra": {
+        "depth_m": 6.0,
+        "width_m": 7.2,
+        "visual_salience": "OBVIOUS",
+        "length_m": 31.7,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_013",
+      "hazard_id": "SAR_Washout_001",
+      "hazard_type": "ROAD_WASHOUT",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_F",
+      "position": [
+        -107.0,
+        46.0,
+        -2.683
+      ],
+      "extra": {
+        "depth_m": 2.2,
+        "width_m": 5.2,
+        "visual_salience": "OBVIOUS",
+        "length_m": 7.9,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_014",
+      "hazard_id": "SAR_Washout_002",
+      "hazard_type": "ROAD_WASHOUT",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_E",
+      "position": [
+        117.0,
+        115.0,
+        -2.83
+      ],
+      "extra": {
+        "depth_m": 1.8,
+        "width_m": 4.2,
+        "visual_salience": "OBVIOUS",
+        "length_m": 7.1,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Easy to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_015",
+      "hazard_id": "SAR_Subsidence_001",
+      "hazard_type": "COLLAPSED_GROUND",
+      "severity": "MEDIUM",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -22.0,
+        96.0,
+        -0.092
+      ],
+      "extra": {
+        "depth_m": 1.15,
+        "width_m": 10.0,
+        "visual_salience": "SUBTLE",
+        "length_m": 10.0,
+        "detection_modality": "3D_LIDAR,DEPTH,TERRAIN_ANALYSIS"
+      },
+      "note": "Negative obstacle. Real void in the terrain mesh -- no invisible floor. Hard to see from the approach."
+    },
+    {
+      "gt_marker": "GT_HAZARD_016",
+      "hazard_id": "SAR_Cliff_001",
+      "hazard_type": "CLIFF",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        67.2,
+        202.8,
+        15.487
+      ],
+      "extra": {
+        "drop_m": 7.8,
+        "face_width_m": 2.6,
+        "approx_slope_deg": 56.3,
+        "length_m": 79.1
+      },
+      "note": "Hard no-go edge. The drop is modelled in the terrain mesh; the robot must refuse it from LiDAR/terrain analysis alone."
+    },
+    {
+      "gt_marker": "GT_HAZARD_017",
+      "hazard_id": "SAR_Cliff_002",
+      "hazard_type": "CLIFF",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        3.5,
+        227.0,
+        13.375
+      ],
+      "extra": {
+        "drop_m": 5.6,
+        "face_width_m": 2.2,
+        "approx_slope_deg": 51.8,
+        "length_m": 50.4
+      },
+      "note": "Hard no-go edge. The drop is modelled in the terrain mesh; the robot must refuse it from LiDAR/terrain analysis alone."
+    },
+    {
+      "gt_marker": "GT_HAZARD_018",
+      "hazard_id": "HAZARD_WATER_001",
+      "hazard_type": "WATER",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_F",
+      "position": [
+        -120.0,
+        60.0,
+        -4.053
+      ],
+      "extra": {
+        "max_depth_m": 3.55,
+        "surface_z": -1.05,
+        "length_m": 182.4
+      },
+      "note": "River channel. Deep water: forbidden for a wheeled UGV."
+    },
+    {
+      "gt_marker": "GT_HAZARD_019",
+      "hazard_id": "HAZARD_WATER_002",
+      "hazard_type": "WATER",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        40.0,
+        50.0,
+        -1.72
+      ],
+      "extra": {
+        "max_depth_m": 2.1,
+        "surface_z": -0.35,
+        "radius_m": 9.0
+      },
+      "note": "Flooded urban depression, depth not observable from the bank."
+    },
+    {
+      "gt_marker": "GT_HAZARD_020",
+      "hazard_id": "SAR_Rubble_001",
+      "hazard_type": "RUBBLE",
+      "severity": "HIGH",
+      "traversability": "VERY_DIFFICULT",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -6,
+        108,
+        0.986
+      ],
+      "extra": {
+        "extent_x_m": 60,
+        "extent_y_m": 38,
+        "piece_count": 230
+      },
+      "note": "Primary collapse field. Traversable in places, not in others -- the robot has to classify, not assume."
+    },
+    {
+      "gt_marker": "GT_HAZARD_021",
+      "hazard_id": "SAR_Rubble_002",
+      "hazard_type": "RUBBLE",
+      "severity": "HIGH",
+      "traversability": "VERY_DIFFICULT",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        76,
+        56,
+        -0.035
+      ],
+      "extra": {
+        "extent_x_m": 34,
+        "extent_y_m": 26,
+        "piece_count": 110
+      },
+      "note": "Urban street collapse. Traversable in places, not in others -- the robot has to classify, not assume."
+    },
+    {
+      "gt_marker": "GT_HAZARD_022",
+      "hazard_id": "SAR_Rubble_003",
+      "hazard_type": "RUBBLE",
+      "severity": "HIGH",
+      "traversability": "VERY_DIFFICULT",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -36,
+        120,
+        0.415
+      ],
+      "extra": {
+        "extent_x_m": 28,
+        "extent_y_m": 22,
+        "piece_count": 80
+      },
+      "note": "Secondary debris apron. Traversable in places, not in others -- the robot has to classify, not assume."
+    },
+    {
+      "gt_marker": "GT_HAZARD_023",
+      "hazard_id": "SAR_Rubble_004",
+      "hazard_type": "RUBBLE",
+      "severity": "HIGH",
+      "traversability": "VERY_DIFFICULT",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        -52,
+        232,
+        10.819
+      ],
+      "extra": {
+        "extent_x_m": 44,
+        "extent_y_m": 30,
+        "piece_count": 95
+      },
+      "note": "Avalanche debris field. Traversable in places, not in others -- the robot has to classify, not assume."
+    },
+    {
+      "gt_marker": "GT_HAZARD_024",
+      "hazard_id": "SAR_SteepSlope_001",
+      "hazard_type": "STEEP_SLOPE",
+      "severity": "HIGH",
+      "traversability": "DIFFICULT",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        37,
+        202,
+        1.113
+      ],
+      "extra": {
+        "measured_slope_deg": 28.1
+      },
+      "note": "Measured from the generated height field, not asserted."
+    },
+    {
+      "gt_marker": "GT_HAZARD_025",
+      "hazard_id": "SAR_SteepSlope_002",
+      "hazard_type": "STEEP_SLOPE",
+      "severity": "HIGH",
+      "traversability": "DIFFICULT",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        -30,
+        220,
+        10.588
+      ],
+      "extra": {
+        "measured_slope_deg": 7.7
+      },
+      "note": "Measured from the generated height field, not asserted."
+    },
+    {
+      "gt_marker": "GT_HAZARD_026",
+      "hazard_id": "SAR_SteepSlope_003",
+      "hazard_type": "STEEP_SLOPE",
+      "severity": "CRITICAL",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        96,
+        232,
+        27.496
+      ],
+      "extra": {
+        "measured_slope_deg": 65.6
+      },
+      "note": "Measured from the generated height field, not asserted."
+    },
+    {
+      "gt_marker": "GT_HAZARD_027",
+      "hazard_id": "SAR_BlockedRoad_001",
+      "hazard_type": "BLOCKED_PATH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -4.0,
+        110.0,
+        0.71
+      ],
+      "extra": {
+        "alternative_route": "SAR_Track_RubbleBypass"
+      },
+      "note": "Main supply route blocked by the collapse field. A graded gravel bypass exists to the east -- replan, do not give up."
+    },
+    {
+      "gt_marker": "GT_HAZARD_028",
+      "hazard_id": "SAR_BlockedRoad_002",
+      "hazard_type": "BLOCKED_PATH",
+      "severity": "HIGH",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        82.0,
+        62.0,
+        0.031
+      ],
+      "extra": {
+        "alternative_route": "SAR_Street_Urban_B / SAR_Street_Urban_D"
+      },
+      "note": "Urban Street C blocked by an overturned truck plus debris."
+    },
+    {
+      "gt_marker": "GT_HAZARD_029",
+      "hazard_id": "SAR_BlockedEntrance_001",
+      "hazard_type": "BLOCKED_PATH",
+      "severity": "MEDIUM",
+      "traversability": "FORBIDDEN",
+      "search_zone": "SAR_ZONE_C",
+      "position": [
+        112.0,
+        46.2,
+        0.107
+      ],
+      "extra": {
+        "alternative_route": "warehouse side door at approx (101, 54)"
+      },
+      "note": "Warehouse main door blocked. A narrow side door is passable."
+    },
+    {
+      "gt_marker": "GT_HAZARD_030",
+      "hazard_id": "SAR_DeadEnd_001",
+      "hazard_type": "DEAD_END",
+      "severity": "LOW",
+      "traversability": "DIFFICULT",
+      "search_zone": "SAR_ZONE_B",
+      "position": [
+        -36,
+        128,
+        0.392
+      ],
+      "extra": {},
+      "note": "No through route. Turning space is available within 12 m: the robot must detect the dead end, reverse or turn, and replan."
+    },
+    {
+      "gt_marker": "GT_HAZARD_031",
+      "hazard_id": "SAR_DeadEnd_002",
+      "hazard_type": "DEAD_END",
+      "severity": "LOW",
+      "traversability": "DIFFICULT",
+      "search_zone": "SAR_ZONE_E",
+      "position": [
+        118,
+        92,
+        -0.25
+      ],
+      "extra": {},
+      "note": "No through route. Turning space is available within 12 m: the robot must detect the dead end, reverse or turn, and replan."
+    },
+    {
+      "gt_marker": "GT_HAZARD_032",
+      "hazard_id": "SAR_DeadEnd_003",
+      "hazard_type": "DEAD_END",
+      "severity": "LOW",
+      "traversability": "DIFFICULT",
+      "search_zone": "SAR_ZONE_D",
+      "position": [
+        68,
+        214,
+        13.236
+      ],
+      "extra": {},
+      "note": "No through route. Turning space is available within 12 m: the robot must detect the dead end, reverse or turn, and replan."
+    }
+  ],
+  "markers": [
+    {
+      "name": "SAR_ROBOT_START",
+      "role": "ROBOT_START",
+      "position": [
+        0.0,
+        -8.0,
+        0.374
+      ],
+      "heading_deg": 0.0
+    },
+    {
+      "name": "SAR_BASE_LOCATION",
+      "role": "BASE_HOME",
+      "position": [
+        0.0,
+        -14.0,
+        0.189
+      ]
+    },
+    {
+      "name": "SAR_DOCK_POSE",
+      "role": "DOCK",
+      "position": [
+        13.0,
+        -20.0,
+        0.187
+      ]
+    },
+    {
+      "name": "SAR_SEARCH_START",
+      "role": "SEARCH_START",
+      "position": [
+        0.0,
+        20.0,
+        0.533
+      ]
+    },
+    {
+      "name": "SAR_SEARCH_END",
+      "role": "SEARCH_END",
+      "position": [
+        -10.0,
+        132.0,
+        1.283
+      ]
+    },
+    {
+      "name": "SAR_RETURN_BASE",
+      "role": "RETURN_BASE",
+      "position": [
+        1.0,
+        1.0,
+        0.337
+      ]
+    }
+  ],
+  "search_zones": [
+    {
+      "id": "SAR_ZONE_HOME",
+      "label": "Base / staging",
+      "bounds": [
+        -46,
+        46,
+        -38,
+        12
+      ],
+      "difficulty": "TRIVIAL",
+      "terrain": "CONCRETE,GRAVEL",
+      "purpose": "Initialisation, docking, return-to-base"
+    },
+    {
+      "id": "SAR_ZONE_A",
+      "label": "Open search area",
+      "bounds": [
+        -56,
+        46,
+        12,
+        92
+      ],
+      "difficulty": "EASY",
+      "terrain": "GRASS,SOIL,DIRT",
+      "purpose": "Lawnmower / grid coverage, long-range LiDAR, baseline detection"
+    },
+    {
+      "id": "SAR_ZONE_B",
+      "label": "Collapse field + forest",
+      "bounds": [
+        -120,
+        46,
+        92,
+        196
+      ],
+      "difficulty": "HARD",
+      "terrain": "RUBBLE,SOIL,GRASS",
+      "purpose": "Rubble traversability, forest occlusion, building interiors"
+    },
+    {
+      "id": "SAR_ZONE_C",
+      "label": "Urban disaster",
+      "bounds": [
+        46,
+        140,
+        14,
+        96
+      ],
+      "difficulty": "MEDIUM",
+      "terrain": "CONCRETE,ROAD,RUBBLE",
+      "purpose": "GPS-denied urban canyon, blocked routes, multi-person triage"
+    },
+    {
+      "id": "SAR_ZONE_D",
+      "label": "Mountain + snow",
+      "bounds": [
+        -110,
+        130,
+        190,
+        258
+      ],
+      "difficulty": "HARD",
+      "terrain": "ROCK,SNOW,GRAVEL",
+      "purpose": "Risk-aware route choice, cliffs, ravines, avalanche debris"
+    },
+    {
+      "id": "SAR_ZONE_E",
+      "label": "Desert transition",
+      "bounds": [
+        60,
+        148,
+        96,
+        190
+      ],
+      "difficulty": "MEDIUM",
+      "terrain": "SAND,ROCK",
+      "purpose": "Wheel slip, dune traverse, low-feature localisation"
+    },
+    {
+      "id": "SAR_ZONE_F",
+      "label": "Flood / river margin",
+      "bounds": [
+        -148,
+        -34,
+        0,
+        100
+      ],
+      "difficulty": "HARD",
+      "terrain": "MUD,WATER,DIRT",
+      "purpose": "Water boundary detection, washouts, bridge crossing"
+    }
+  ],
+  "mission_boundary": [
+    [
+      -146,
+      -36
+    ],
+    [
+      146,
+      -36
+    ],
+    [
+      146,
+      256
+    ],
+    [
+      -146,
+      256
+    ],
+    [
+      -146,
+      -36
+    ]
+  ],
+  "validation_routes": [
+    {
+      "id": "SAR_Route_01_Disaster",
+      "label": "BASE -> ROAD -> RUBBLE BYPASS -> COLLAPSED BUILDING -> PERSON -> RETURN",
+      "target": "PERSON_007",
+      "waypoints": [
+        [
+          0,
+          -6,
+          0.117
+        ],
+        [
+          0,
+          16,
+          0.314
+        ],
+        [
+          7,
+          38,
+          0.476
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          6,
+          88,
+          0.764
+        ],
+        [
+          10,
+          96,
+          0.92
+        ],
+        [
+          26,
+          106,
+          0.954
+        ],
+        [
+          30,
+          122,
+          1.024
+        ],
+        [
+          24,
+          121,
+          0.989
+        ],
+        [
+          19,
+          120,
+          1.17
+        ]
+      ],
+      "length_m": 151.8
+    },
+    {
+      "id": "SAR_Route_02_Mountain",
+      "label": "BASE -> OPEN FIELD -> MOUNTAIN (long safe line) -> RAVINE RIM -> PERSON -> RETURN",
+      "target": "PERSON_013",
+      "waypoints": [
+        [
+          0,
+          -6,
+          0.117
+        ],
+        [
+          0,
+          16,
+          0.314
+        ],
+        [
+          7,
+          38,
+          0.476
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          6,
+          88,
+          0.764
+        ],
+        [
+          10,
+          96,
+          0.92
+        ],
+        [
+          26,
+          106,
+          0.954
+        ],
+        [
+          30,
+          122,
+          1.024
+        ],
+        [
+          20,
+          136,
+          1.178
+        ],
+        [
+          4,
+          144,
+          1.302
+        ],
+        [
+          2,
+          152,
+          0.698
+        ],
+        [
+          10,
+          176,
+          0.626
+        ],
+        [
+          36,
+          179,
+          1.978
+        ],
+        [
+          62,
+          183,
+          6.611
+        ],
+        [
+          86,
+          193,
+          11.232
+        ],
+        [
+          98,
+          209,
+          14.771
+        ],
+        [
+          88,
+          222,
+          17.873
+        ],
+        [
+          76,
+          228,
+          19.224
+        ],
+        [
+          79,
+          229,
+          18.628
+        ],
+        [
+          81.5,
+          229.8,
+          18.755
+        ]
+      ],
+      "length_m": 343.3
+    },
+    {
+      "id": "SAR_Route_03_UrbanFlood",
+      "label": "BASE -> URBAN -> FLOOD BOUNDARY -> DAMAGED VEHICLE -> PERSON -> RETURN",
+      "target": "PERSON_015",
+      "waypoints": [
+        [
+          8,
+          2,
+          0.088
+        ],
+        [
+          30,
+          10,
+          0.164
+        ],
+        [
+          54,
+          20,
+          0.216
+        ],
+        [
+          72,
+          30,
+          0.134
+        ],
+        [
+          84,
+          39,
+          0.097
+        ],
+        [
+          80,
+          40,
+          0.078
+        ],
+        [
+          56,
+          38,
+          0.112
+        ],
+        [
+          48,
+          43,
+          -0.205
+        ],
+        [
+          56,
+          34,
+          0.139
+        ],
+        [
+          61,
+          29,
+          0.146
+        ],
+        [
+          70,
+          27,
+          0.105
+        ],
+        [
+          80,
+          26,
+          0.067
+        ],
+        [
+          87.0,
+          24.8,
+          0.157
+        ]
+      ],
+      "length_m": 168.1
+    },
+    {
+      "id": "SAR_Route_04_Snow",
+      "label": "BASE -> FOREST TRACK -> SNOW -> AVALANCHE DEBRIS -> PERSON -> SAFE RETURN",
+      "target": "PERSON_014",
+      "waypoints": [
+        [
+          0,
+          -6,
+          0.117
+        ],
+        [
+          0,
+          16,
+          0.314
+        ],
+        [
+          7,
+          38,
+          0.476
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          6,
+          88,
+          0.764
+        ],
+        [
+          10,
+          96,
+          0.92
+        ],
+        [
+          26,
+          106,
+          0.954
+        ],
+        [
+          30,
+          122,
+          1.024
+        ],
+        [
+          20,
+          136,
+          1.178
+        ],
+        [
+          4,
+          144,
+          1.302
+        ],
+        [
+          2,
+          152,
+          0.698
+        ],
+        [
+          -22,
+          158,
+          1.006
+        ],
+        [
+          -46,
+          163,
+          0.893
+        ],
+        [
+          -68,
+          171,
+          0.308
+        ],
+        [
+          -88,
+          182,
+          0.984
+        ],
+        [
+          -80,
+          199,
+          3.156
+        ],
+        [
+          -66,
+          213,
+          6.493
+        ],
+        [
+          -52,
+          225,
+          9.55
+        ],
+        [
+          -50.5,
+          229,
+          9.86
+        ]
+      ],
+      "length_m": 340.7
+    },
+    {
+      "id": "SAR_Route_05_AllTerrain",
+      "label": "asphalt -> bridge -> flood margin -> grass -> rubble -> gravel -> forest dirt",
+      "target": "TERRAIN_ADAPTATION",
+      "waypoints": [
+        [
+          -8,
+          4,
+          0.133
+        ],
+        [
+          -24,
+          12,
+          0.186
+        ],
+        [
+          -36,
+          18,
+          0.199
+        ],
+        [
+          -44,
+          26,
+          0.13
+        ],
+        [
+          -56,
+          36,
+          -0.116
+        ],
+        [
+          -74,
+          50,
+          -0.639
+        ],
+        [
+          -92,
+          66,
+          -0.631
+        ],
+        [
+          -106,
+          74,
+          -0.482
+        ],
+        [
+          -118,
+          82,
+          -0.35
+        ],
+        [
+          -132,
+          90,
+          -0.254
+        ],
+        [
+          -142,
+          96,
+          -0.21
+        ],
+        [
+          -142,
+          96,
+          -0.21
+        ],
+        [
+          -132,
+          90,
+          -0.254
+        ],
+        [
+          -118,
+          82,
+          -0.35
+        ],
+        [
+          -106,
+          74,
+          -0.482
+        ],
+        [
+          -92,
+          66,
+          -0.631
+        ],
+        [
+          -100,
+          60,
+          -0.625
+        ],
+        [
+          -96,
+          52,
+          -0.729
+        ],
+        [
+          -88,
+          48,
+          -0.867
+        ],
+        [
+          -74,
+          50,
+          -0.639
+        ],
+        [
+          -56,
+          36,
+          -0.116
+        ],
+        [
+          -44,
+          26,
+          0.13
+        ],
+        [
+          -36,
+          18,
+          0.199
+        ],
+        [
+          -24,
+          12,
+          0.186
+        ],
+        [
+          -8,
+          4,
+          0.133
+        ],
+        [
+          0,
+          16,
+          0.314
+        ],
+        [
+          7,
+          38,
+          0.476
+        ],
+        [
+          12,
+          64,
+          0.535
+        ],
+        [
+          6,
+          88,
+          0.764
+        ],
+        [
+          10,
+          96,
+          0.92
+        ],
+        [
+          26,
+          106,
+          0.954
+        ],
+        [
+          30,
+          122,
+          1.024
+        ],
+        [
+          24,
+          128,
+          1.088
+        ],
+        [
+          18,
+          132,
+          1.023
+        ],
+        [
+          12,
+          136,
+          1.162
+        ],
+        [
+          4,
+          144,
+          1.302
+        ],
+        [
+          2,
+          152,
+          0.698
+        ],
+        [
+          -22,
+          158,
+          1.006
+        ],
+        [
+          -46,
+          163,
+          0.893
+        ]
+      ],
+      "length_m": 569.6
+    }
+  ]
+}

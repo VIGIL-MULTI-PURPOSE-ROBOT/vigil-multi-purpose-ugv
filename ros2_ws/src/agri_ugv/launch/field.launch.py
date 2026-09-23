@@ -21,7 +21,7 @@ def setup(context):
     def node(package,executable,**kw):
         return Node(package=package,executable=executable,output='screen',**kw)
     sim_args=['gz','sim','-r','-v','2','--gui-config',str(p/'config/gazebo_gui.config')]+(['-s','--headless-rendering'] if headless else [])+[str(p/'worlds/field.world')]
-    # Crop row 1 is y=-13.418 m. The wheel centres sit at +/-0.50 m, placing
+    # Crop row 1 is y=-13.418 m. CAD wheel centres sit at +/-0.436 to +/-0.466 m, placing
     # each tyre in an adjacent empty 1.22 m-pitch aisle while the chassis
     # straddles the plants.  x=-14.5 m is before the crop-row endpoint.
     spawn=node('ros_gz_sim','create',arguments=['-name','agri_ugv','-topic','robot_description','-x','-14.5','-y','-13.418','-z','0.10','-Y','0'])

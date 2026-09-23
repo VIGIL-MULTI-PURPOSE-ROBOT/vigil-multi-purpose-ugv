@@ -1,0 +1,2809 @@
+{
+  "schema": "sar_metadata/1.0",
+  "seed": 20260915,
+  "target_simulator": "Gazebo Sim Harmonic",
+  "target_middleware": "ROS 2 (ros_gz)",
+  "not_supported": [
+    "Isaac Sim (explicitly out of scope)"
+  ],
+  "weaponised": false,
+  "units": {
+    "length": "metre",
+    "scale_length": 1.0,
+    "up_axis": "Z",
+    "note": "1 Blender unit == 1 m. No arbitrary scaling anywhere."
+  },
+  "world": {
+    "extent_m": [
+      300.0,
+      300.0
+    ],
+    "x_range": [
+      -150.0,
+      150.0
+    ],
+    "y_range": [
+      -40.0,
+      260.0
+    ],
+    "origin_note": "Base sits on the world origin; the map extends north."
+  },
+  "semantic_classes": [
+    "TREE",
+    "ROCK",
+    "BUILDING",
+    "VEHICLE",
+    "HUMAN",
+    "ROAD",
+    "WATER",
+    "RUBBLE",
+    "GROUND",
+    "WALL",
+    "BRIDGE",
+    "PROP",
+    "VEGETATION",
+    "MARKER",
+    "DECOY",
+    "STRUCTURE",
+    "HAZARD"
+  ],
+  "traversability_model": {
+    "ROAD": {
+      "trav": "EASY",
+      "cost": 1.0,
+      "mu": 0.85,
+      "risk": "LOW"
+    },
+    "CONCRETE": {
+      "trav": "EASY",
+      "cost": 1.0,
+      "mu": 0.82,
+      "risk": "LOW"
+    },
+    "GRASS": {
+      "trav": "EASY",
+      "cost": 1.2,
+      "mu": 0.65,
+      "risk": "LOW"
+    },
+    "SOIL": {
+      "trav": "EASY",
+      "cost": 1.3,
+      "mu": 0.62,
+      "risk": "LOW"
+    },
+    "GRAVEL": {
+      "trav": "MODERATE",
+      "cost": 1.6,
+      "mu": 0.55,
+      "risk": "LOW"
+    },
+    "DIRT": {
+      "trav": "MODERATE",
+      "cost": 1.5,
+      "mu": 0.58,
+      "risk": "LOW"
+    },
+    "SNOW": {
+      "trav": "DIFFICULT",
+      "cost": 2.6,
+      "mu": 0.3,
+      "risk": "MEDIUM"
+    },
+    "MUD": {
+      "trav": "DIFFICULT",
+      "cost": 3.0,
+      "mu": 0.28,
+      "risk": "MEDIUM"
+    },
+    "SAND": {
+      "trav": "DIFFICULT",
+      "cost": 2.9,
+      "mu": 0.35,
+      "risk": "MEDIUM"
+    },
+    "ROCK": {
+      "trav": "DIFFICULT",
+      "cost": 3.2,
+      "mu": 0.7,
+      "risk": "MEDIUM"
+    },
+    "RUBBLE": {
+      "trav": "VERY_DIFFICULT",
+      "cost": 5.5,
+      "mu": 0.6,
+      "risk": "HIGH"
+    },
+    "WATER": {
+      "trav": "FORBIDDEN",
+      "cost": -1.0,
+      "mu": 0.05,
+      "risk": "CRITICAL"
+    },
+    "CLIFF": {
+      "trav": "FORBIDDEN",
+      "cost": -1.0,
+      "mu": 0.7,
+      "risk": "CRITICAL"
+    }
+  },
+  "terrain_class_to_material": {
+    "GRASS": "MAT_GRASS",
+    "SOIL": "MAT_SOIL",
+    "DIRT": "MAT_DIRT",
+    "ROCK": "MAT_ROCK",
+    "GRAVEL": "MAT_GRAVEL",
+    "SAND": "MAT_SAND",
+    "SNOW": "MAT_SNOW",
+    "MUD": "MAT_MUD",
+    "CONCRETE": "MAT_CONCRETE",
+    "ROAD": "MAT_ROAD",
+    "RUBBLE": "MAT_RUBBLE",
+    "WATER": "MAT_WATER"
+  },
+  "terrain_class_to_thermal": {
+    "GRASS": "THERMAL_VEGETATION",
+    "SOIL": "THERMAL_SOIL",
+    "DIRT": "THERMAL_SOIL",
+    "ROCK": "THERMAL_ROCK",
+    "GRAVEL": "THERMAL_ROCK",
+    "SAND": "THERMAL_SAND",
+    "SNOW": "THERMAL_SNOW",
+    "MUD": "THERMAL_SOIL",
+    "CONCRETE": "THERMAL_CONCRETE",
+    "ROAD": "THERMAL_CONCRETE",
+    "RUBBLE": "THERMAL_CONCRETE",
+    "WATER": "THERMAL_WATER"
+  },
+  "thermal_table": {
+    "THERMAL_HUMAN_HEAD": {
+      "temp": 34.5,
+      "emis": 0.98,
+      "note": "exposed skin"
+    },
+    "THERMAL_HUMAN_TORSO": {
+      "temp": 32.0,
+      "emis": 0.97,
+      "note": "clothed core"
+    },
+    "THERMAL_HUMAN_LIMB": {
+      "temp": 30.5,
+      "emis": 0.97,
+      "note": "clothed limb"
+    },
+    "THERMAL_HUMAN_COVERED": {
+      "temp": 24.5,
+      "emis": 0.95,
+      "note": "jacket/debris/snow covered"
+    },
+    "THERMAL_VEHICLE_ENGINE": {
+      "temp": 62.0,
+      "emis": 0.9,
+      "note": "recently run engine bay"
+    },
+    "THERMAL_VEHICLE_BODY": {
+      "temp": 27.0,
+      "emis": 0.88,
+      "note": "sun-loaded panel"
+    },
+    "THERMAL_VEHICLE_COLD": {
+      "temp": 15.0,
+      "emis": 0.88,
+      "note": "long-cold wreck"
+    },
+    "THERMAL_GENERATOR": {
+      "temp": 74.0,
+      "emis": 0.92,
+      "note": "running generator -- decoy"
+    },
+    "THERMAL_EQUIPMENT_WARM": {
+      "temp": 41.0,
+      "emis": 0.93,
+      "note": "powered comms case -- decoy"
+    },
+    "THERMAL_CONCRETE": {
+      "temp": 22.0,
+      "emis": 0.92,
+      "note": ""
+    },
+    "THERMAL_METAL": {
+      "temp": 17.0,
+      "emis": 0.25,
+      "note": "low emissivity, reflective"
+    },
+    "THERMAL_WOOD": {
+      "temp": 18.5,
+      "emis": 0.9,
+      "note": ""
+    },
+    "THERMAL_ROCK": {
+      "temp": 14.0,
+      "emis": 0.93,
+      "note": "cold rock mass"
+    },
+    "THERMAL_SOIL": {
+      "temp": 19.0,
+      "emis": 0.94,
+      "note": ""
+    },
+    "THERMAL_SAND": {
+      "temp": 27.5,
+      "emis": 0.93,
+      "note": "high diurnal swing"
+    },
+    "THERMAL_VEGETATION": {
+      "temp": 20.0,
+      "emis": 0.96,
+      "note": "transpiring canopy"
+    },
+    "THERMAL_WATER": {
+      "temp": 11.5,
+      "emis": 0.96,
+      "note": ""
+    },
+    "THERMAL_SNOW": {
+      "temp": -1.5,
+      "emis": 0.98,
+      "note": ""
+    },
+    "THERMAL_AMBIENT": {
+      "temp": 20.0,
+      "emis": 0.92,
+      "note": "inert object at air temp"
+    }
+  },
+  "thermal_contrast_classes": {
+    "HIGH": {
+      "surface": "THERMAL_HUMAN_TORSO",
+      "delta_k": 12.0
+    },
+    "MEDIUM": {
+      "surface": "THERMAL_HUMAN_TORSO",
+      "delta_k": 6.5
+    },
+    "LOW": {
+      "surface": "THERMAL_HUMAN_COVERED",
+      "delta_k": 2.5
+    }
+  },
+  "thermal_disclaimer": "Blender performs no radiometric simulation. These are apparent surface temperatures for a temperate late-afternoon condition, intended to be transcribed into Gazebo thermal camera / <temperature> parameters. Walls, rubble and snowpack are opaque in LWIR: objects flagged opaque_to_thermal must occlude. Ambient air temperature per lighting preset is in lighting_presets[*].ambient_c; contrast is human_surface_temp minus local background, not an absolute.",
+  "lighting_presets": {
+    "DAY": {
+      "sun_energy": 4.2,
+      "sun_angle_deg": 52,
+      "sun_az_deg": 140,
+      "sun_color": [
+        1.0,
+        0.97,
+        0.92
+      ],
+      "world": [
+        0.36,
+        0.5,
+        0.74
+      ],
+      "world_strength": 1.1,
+      "fog_density": 0.0,
+      "ambient_c": 22.0,
+      "note": "Reference condition. RGB easy, thermal contrast modest."
+    },
+    "CLOUDY": {
+      "sun_energy": 1.5,
+      "sun_angle_deg": 48,
+      "sun_az_deg": 150,
+      "sun_color": [
+        0.95,
+        0.96,
+        1.0
+      ],
+      "world": [
+        0.46,
+        0.48,
+        0.52
+      ],
+      "world_strength": 1.55,
+      "fog_density": 0.0,
+      "ambient_c": 17.0,
+      "note": "Flat light, weak shadows, low texture contrast."
+    },
+    "SUNSET": {
+      "sun_energy": 2.4,
+      "sun_angle_deg": 8,
+      "sun_az_deg": 255,
+      "sun_color": [
+        1.0,
+        0.62,
+        0.33
+      ],
+      "world": [
+        0.22,
+        0.17,
+        0.2
+      ],
+      "world_strength": 0.62,
+      "fog_density": 0.002,
+      "ambient_c": 19.0,
+      "note": "Long shadows, strong glare, worst case for RGB exposure. Terrain still holds residual heat."
+    },
+    "LOW_LIGHT": {
+      "sun_energy": 0.35,
+      "sun_angle_deg": -3,
+      "sun_az_deg": 268,
+      "sun_color": [
+        0.62,
+        0.68,
+        0.88
+      ],
+      "world": [
+        0.045,
+        0.058,
+        0.085
+      ],
+      "world_strength": 0.34,
+      "fog_density": 0.0015,
+      "ambient_c": 13.0,
+      "note": "Civil twilight. RGB degrading, thermal improving."
+    },
+    "NIGHT": {
+      "sun_energy": 0.04,
+      "sun_angle_deg": -14,
+      "sun_az_deg": 280,
+      "sun_color": [
+        0.52,
+        0.62,
+        0.92
+      ],
+      "world": [
+        0.012,
+        0.016,
+        0.028
+      ],
+      "world_strength": 0.1,
+      "fog_density": 0.002,
+      "ambient_c": 9.0,
+      "note": "Base floodlights on, everything else near-dark. Human-to-background delta T is largest here: this is where thermal earns its place. Not pitch black -- the point is fusion, not sensor failure."
+    },
+    "FOG": {
+      "sun_energy": 1.0,
+      "sun_angle_deg": 35,
+      "sun_az_deg": 160,
+      "sun_color": [
+        0.92,
+        0.94,
+        0.96
+      ],
+      "world": [
+        0.55,
+        0.57,
+        0.6
+      ],
+      "world_strength": 1.3,
+      "fog_density": 0.02,
+      "ambient_c": 12.0,
+      "note": "Visual range ~35 m. LiDAR degrades with the model you choose in Gazebo; Blender volumetrics do not export."
+    }
+  },
+  "weather_presets": {
+    "CLEAR": {
+      "rain": 0.0,
+      "dust": 0.0,
+      "snowfall": 0.0,
+      "wind_mps": 1.5,
+      "visibility_m": 2000,
+      "lighting": "DAY"
+    },
+    "RAIN": {
+      "rain": 0.7,
+      "dust": 0.0,
+      "snowfall": 0.0,
+      "wind_mps": 6.0,
+      "visibility_m": 250,
+      "lighting": "CLOUDY",
+      "note": "Wet surfaces: drop friction_mu by ~0.15 on ROAD/CONCRETE and by ~0.08 elsewhere in the Gazebo surface params."
+    },
+    "FOG": {
+      "rain": 0.0,
+      "dust": 0.0,
+      "snowfall": 0.0,
+      "wind_mps": 0.5,
+      "visibility_m": 35,
+      "lighting": "FOG"
+    },
+    "DUST": {
+      "rain": 0.0,
+      "dust": 0.8,
+      "snowfall": 0.0,
+      "wind_mps": 12.0,
+      "visibility_m": 60,
+      "lighting": "SUNSET",
+      "note": "Desert sector only. Sand-laden air: RGB washes out, LiDAR returns get noisy."
+    },
+    "SNOWFALL": {
+      "rain": 0.0,
+      "dust": 0.0,
+      "snowfall": 0.75,
+      "wind_mps": 8.0,
+      "visibility_m": 45,
+      "lighting": "CLOUDY",
+      "note": "Whiteout-like. Do NOT model this as total sensor failure; the objective is robust navigation, not a scripted blackout."
+    },
+    "NIGHT_CLEAR": {
+      "rain": 0.0,
+      "dust": 0.0,
+      "snowfall": 0.0,
+      "wind_mps": 2.0,
+      "visibility_m": 1200,
+      "lighting": "NIGHT"
+    }
+  },
+  "weather_disclaimer": "Fog / rain / dust / snowfall are Blender-side visual variations plus this table. Gazebo needs its own <scene><fog> and sensor noise configuration -- none of it crosses the mesh export.",
+  "search_zones": [
+    {
+      "id": "SAR_ZONE_HOME",
+      "label": "Base / staging",
+      "bounds": [
+        -46,
+        46,
+        -38,
+        12
+      ],
+      "difficulty": "TRIVIAL",
+      "terrain": "CONCRETE,GRAVEL",
+      "purpose": "Initialisation, docking, return-to-base"
+    },
+    {
+      "id": "SAR_ZONE_A",
+      "label": "Open search area",
+      "bounds": [
+        -56,
+        46,
+        12,
+        92
+      ],
+      "difficulty": "EASY",
+      "terrain": "GRASS,SOIL,DIRT",
+      "purpose": "Lawnmower / grid coverage, long-range LiDAR, baseline detection"
+    },
+    {
+      "id": "SAR_ZONE_B",
+      "label": "Collapse field + forest",
+      "bounds": [
+        -120,
+        46,
+        92,
+        196
+      ],
+      "difficulty": "HARD",
+      "terrain": "RUBBLE,SOIL,GRASS",
+      "purpose": "Rubble traversability, forest occlusion, building interiors"
+    },
+    {
+      "id": "SAR_ZONE_C",
+      "label": "Urban disaster",
+      "bounds": [
+        46,
+        140,
+        14,
+        96
+      ],
+      "difficulty": "MEDIUM",
+      "terrain": "CONCRETE,ROAD,RUBBLE",
+      "purpose": "GPS-denied urban canyon, blocked routes, multi-person triage"
+    },
+    {
+      "id": "SAR_ZONE_D",
+      "label": "Mountain + snow",
+      "bounds": [
+        -110,
+        130,
+        190,
+        258
+      ],
+      "difficulty": "HARD",
+      "terrain": "ROCK,SNOW,GRAVEL",
+      "purpose": "Risk-aware route choice, cliffs, ravines, avalanche debris"
+    },
+    {
+      "id": "SAR_ZONE_E",
+      "label": "Desert transition",
+      "bounds": [
+        60,
+        148,
+        96,
+        190
+      ],
+      "difficulty": "MEDIUM",
+      "terrain": "SAND,ROCK",
+      "purpose": "Wheel slip, dune traverse, low-feature localisation"
+    },
+    {
+      "id": "SAR_ZONE_F",
+      "label": "Flood / river margin",
+      "bounds": [
+        -148,
+        -34,
+        0,
+        100
+      ],
+      "difficulty": "HARD",
+      "terrain": "MUD,WATER,DIRT",
+      "purpose": "Water boundary detection, washouts, bridge crossing"
+    }
+  ],
+  "roads": [
+    {
+      "id": "SAR_Road_MainSupply",
+      "cls": "ASPHALT",
+      "width_m": 6.0,
+      "length_m": 191.9,
+      "centerline": [
+        [
+          0,
+          -6
+        ],
+        [
+          0,
+          16
+        ],
+        [
+          7,
+          38
+        ],
+        [
+          12,
+          64
+        ],
+        [
+          6,
+          88
+        ],
+        [
+          -4,
+          110
+        ],
+        [
+          -10,
+          132
+        ],
+        [
+          2,
+          152
+        ],
+        [
+          10,
+          176
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Road_West",
+      "cls": "ASPHALT",
+      "width_m": 5.0,
+      "length_m": 163.5,
+      "centerline": [
+        [
+          -8,
+          4
+        ],
+        [
+          -24,
+          12
+        ],
+        [
+          -36,
+          18
+        ],
+        [
+          -44,
+          26
+        ],
+        [
+          -56,
+          36
+        ],
+        [
+          -74,
+          50
+        ],
+        [
+          -92,
+          66
+        ],
+        [
+          -106,
+          74
+        ],
+        [
+          -118,
+          82
+        ],
+        [
+          -132,
+          90
+        ],
+        [
+          -142,
+          96
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Road_East",
+      "cls": "ASPHALT",
+      "width_m": 5.5,
+      "length_m": 85.0,
+      "centerline": [
+        [
+          8,
+          2
+        ],
+        [
+          30,
+          10
+        ],
+        [
+          54,
+          20
+        ],
+        [
+          72,
+          30
+        ],
+        [
+          84,
+          39
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Street_Urban_A",
+      "cls": "ASPHALT",
+      "width_m": 5.0,
+      "length_m": 66.5,
+      "centerline": [
+        [
+          60,
+          26
+        ],
+        [
+          60,
+          50
+        ],
+        [
+          62,
+          74
+        ],
+        [
+          66,
+          92
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Street_Urban_B",
+      "cls": "ASPHALT",
+      "width_m": 4.5,
+      "length_m": 66.6,
+      "centerline": [
+        [
+          96,
+          24
+        ],
+        [
+          98,
+          48
+        ],
+        [
+          100,
+          70
+        ],
+        [
+          104,
+          90
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Street_Urban_C",
+      "cls": "ASPHALT",
+      "width_m": 4.5,
+      "length_m": 72.2,
+      "centerline": [
+        [
+          54,
+          62
+        ],
+        [
+          78,
+          64
+        ],
+        [
+          102,
+          66
+        ],
+        [
+          126,
+          68
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Street_Urban_D",
+      "cls": "ASPHALT",
+      "width_m": 4.0,
+      "length_m": 72.5,
+      "centerline": [
+        [
+          56,
+          38
+        ],
+        [
+          80,
+          40
+        ],
+        [
+          104,
+          42
+        ],
+        [
+          128,
+          46
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_RubbleBypass",
+      "cls": "GRAVEL",
+      "width_m": 4.0,
+      "length_m": 70.5,
+      "centerline": [
+        [
+          10,
+          96
+        ],
+        [
+          26,
+          106
+        ],
+        [
+          30,
+          122
+        ],
+        [
+          20,
+          136
+        ],
+        [
+          4,
+          144
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_Desert",
+      "cls": "DIRT",
+      "width_m": 4.5,
+      "length_m": 106.8,
+      "centerline": [
+        [
+          120,
+          76
+        ],
+        [
+          122,
+          102
+        ],
+        [
+          112,
+          128
+        ],
+        [
+          98,
+          152
+        ],
+        [
+          86,
+          174
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_Forest",
+      "cls": "DIRT",
+      "width_m": 3.2,
+      "length_m": 95.5,
+      "centerline": [
+        [
+          2,
+          152
+        ],
+        [
+          -22,
+          158
+        ],
+        [
+          -46,
+          163
+        ],
+        [
+          -68,
+          171
+        ],
+        [
+          -88,
+          182
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_Mountain_Risk",
+      "cls": "GRAVEL",
+      "width_m": 3.0,
+      "length_m": 81.5,
+      "centerline": [
+        [
+          10,
+          176
+        ],
+        [
+          28,
+          187
+        ],
+        [
+          44,
+          199
+        ],
+        [
+          55,
+          211
+        ],
+        [
+          66,
+          221
+        ],
+        [
+          72,
+          228
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_Mountain_Safe",
+      "cls": "GRAVEL",
+      "width_m": 3.6,
+      "length_m": 128.3,
+      "centerline": [
+        [
+          10,
+          176
+        ],
+        [
+          36,
+          179
+        ],
+        [
+          62,
+          183
+        ],
+        [
+          86,
+          193
+        ],
+        [
+          98,
+          209
+        ],
+        [
+          88,
+          222
+        ],
+        [
+          76,
+          228
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_Snow",
+      "cls": "DIRT",
+      "width_m": 4.0,
+      "length_m": 74.0,
+      "centerline": [
+        [
+          -88,
+          182
+        ],
+        [
+          -80,
+          199
+        ],
+        [
+          -66,
+          213
+        ],
+        [
+          -52,
+          225
+        ],
+        [
+          -40,
+          237
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Track_FloodBank",
+      "cls": "DIRT",
+      "width_m": 3.4,
+      "length_m": 52.2,
+      "centerline": [
+        [
+          -92,
+          66
+        ],
+        [
+          -104,
+          54
+        ],
+        [
+          -110,
+          38
+        ],
+        [
+          -112,
+          20
+        ]
+      ]
+    }
+  ],
+  "negative_obstacles": [
+    {
+      "id": "SAR_Ditch_001",
+      "kind": "DITCH",
+      "depth_m": 1.1,
+      "width_m": 2.6,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_A",
+      "centerline": [
+        [
+          -21,
+          27
+        ],
+        [
+          -8,
+          34
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ditch_002",
+      "kind": "DITCH",
+      "depth_m": 1.0,
+      "width_m": 2.2,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_A",
+      "centerline": [
+        [
+          -38,
+          64
+        ],
+        [
+          -24,
+          76
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ditch_003",
+      "kind": "DITCH",
+      "depth_m": 1.4,
+      "width_m": 3.0,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_C",
+      "centerline": [
+        [
+          30,
+          88
+        ],
+        [
+          52,
+          96
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ditch_004",
+      "kind": "DITCH",
+      "depth_m": 1.2,
+      "width_m": 2.4,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_B",
+      "centerline": [
+        [
+          -25,
+          119
+        ],
+        [
+          -14,
+          130
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ditch_005",
+      "kind": "DITCH",
+      "depth_m": 1.6,
+      "width_m": 3.4,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_E",
+      "centerline": [
+        [
+          70,
+          150
+        ],
+        [
+          84,
+          140
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Hole_001",
+      "kind": "HOLE",
+      "depth_m": 1.85,
+      "width_m": 3.2,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_A",
+      "centerline": [
+        [
+          20,
+          56
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Hole_002",
+      "kind": "HOLE",
+      "depth_m": 2.4,
+      "width_m": 4.4,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_C",
+      "centerline": [
+        [
+          72,
+          52
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Hole_003",
+      "kind": "HOLE",
+      "depth_m": 2.6,
+      "width_m": 5.4,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_B",
+      "centerline": [
+        [
+          -5,
+          113
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Trench_001",
+      "kind": "TRENCH",
+      "depth_m": 1.5,
+      "width_m": 1.8,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_B",
+      "centerline": [
+        [
+          -72,
+          92
+        ],
+        [
+          -56,
+          104
+        ],
+        [
+          -44,
+          112
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Trench_002",
+      "kind": "TRENCH",
+      "depth_m": 1.3,
+      "width_m": 2.0,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_E",
+      "centerline": [
+        [
+          58,
+          110
+        ],
+        [
+          76,
+          124
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ravine_001",
+      "kind": "RAVINE",
+      "depth_m": 5.5,
+      "width_m": 8.4,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_D",
+      "centerline": [
+        [
+          30,
+          196
+        ],
+        [
+          35,
+          207
+        ],
+        [
+          41,
+          218
+        ],
+        [
+          45,
+          230
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Ravine_002",
+      "kind": "RAVINE",
+      "depth_m": 6.0,
+      "width_m": 7.2,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_D",
+      "centerline": [
+        [
+          104,
+          214
+        ],
+        [
+          110,
+          228
+        ],
+        [
+          114,
+          244
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Washout_001",
+      "kind": "ROAD_WASHOUT",
+      "depth_m": 2.2,
+      "width_m": 5.2,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_F",
+      "centerline": [
+        [
+          -103.3,
+          44.6
+        ],
+        [
+          -110.7,
+          47.4
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Washout_002",
+      "kind": "ROAD_WASHOUT",
+      "depth_m": 1.8,
+      "width_m": 4.2,
+      "salience": "OBVIOUS",
+      "zone": "SAR_ZONE_E",
+      "centerline": [
+        [
+          120.3,
+          116.3
+        ],
+        [
+          113.7,
+          113.7
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Subsidence_001",
+      "kind": "COLLAPSED_GROUND",
+      "depth_m": 1.15,
+      "width_m": 10.0,
+      "salience": "SUBTLE",
+      "zone": "SAR_ZONE_B",
+      "centerline": [
+        [
+          -22,
+          96
+        ]
+      ]
+    }
+  ],
+  "cliffs": [
+    {
+      "id": "SAR_Cliff_001",
+      "drop_m": 7.8,
+      "width_m": 2.6,
+      "polyline": [
+        [
+          28.0,
+          196.0
+        ],
+        [
+          48.0,
+          204.0
+        ],
+        [
+          68.0,
+          208.0
+        ],
+        [
+          88.0,
+          206.0
+        ],
+        [
+          104.0,
+          200.0
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Cliff_002",
+      "drop_m": 5.6,
+      "width_m": 2.2,
+      "polyline": [
+        [
+          -18.0,
+          214.0
+        ],
+        [
+          -4.0,
+          224.0
+        ],
+        [
+          10.0,
+          232.0
+        ],
+        [
+          26.0,
+          238.0
+        ]
+      ]
+    }
+  ],
+  "water": [
+    {
+      "id": "SAR_Water_River_001",
+      "surface_z": -1.05,
+      "max_depth_m": 3.55,
+      "polyline": [
+        [
+          -150.0,
+          132.0
+        ],
+        [
+          -138.0,
+          116.0
+        ],
+        [
+          -128.0,
+          98.0
+        ],
+        [
+          -122.0,
+          78.0
+        ],
+        [
+          -120.0,
+          56.0
+        ],
+        [
+          -122.0,
+          34.0
+        ],
+        [
+          -128.0,
+          12.0
+        ],
+        [
+          -136.0,
+          -12.0
+        ],
+        [
+          -142.0,
+          -40.0
+        ]
+      ]
+    },
+    {
+      "id": "SAR_Water_FloodPool_002",
+      "surface_z": -0.35,
+      "max_depth_m": 2.1,
+      "center": [
+        40.0,
+        50.0
+      ],
+      "radius_m": 9.0
+    }
+  ],
+  "buildings": [
+    {
+      "id": "SAR_Building_URB_001",
+      "center": [
+        70.0,
+        50.0
+      ],
+      "w": 11.0,
+      "d": 12.0,
+      "storeys": 3,
+      "damage": "MODERATE",
+      "interior": true,
+      "roof": "PARTIAL",
+      "label": "3-storey office block. West face of the urban canyon."
+    },
+    {
+      "id": "SAR_Building_URB_002",
+      "center": [
+        89.0,
+        50.0
+      ],
+      "w": 11.0,
+      "d": 12.0,
+      "storeys": 3,
+      "damage": "LIGHT",
+      "interior": false,
+      "roof": "FULL",
+      "label": "3-storey block. East face of the urban canyon; ~7.5 m of open street between 001 and 002 with 10 m walls either side -> GPS multipath / sky occlusion, and wide enough to drive."
+    },
+    {
+      "id": "SAR_Building_URB_003",
+      "center": [
+        75.5,
+        79.0
+      ],
+      "w": 13.0,
+      "d": 10.0,
+      "storeys": 2,
+      "damage": "SEVERE",
+      "interior": true,
+      "roof": "COLLAPSED",
+      "label": "Partially collapsed 2-storey. Victim inside, visible ONLY through the collapsed north-east wall opening."
+    },
+    {
+      "id": "SAR_Building_URB_004",
+      "center": [
+        114.0,
+        55.5
+      ],
+      "w": 22.0,
+      "d": 13.0,
+      "storeys": 1,
+      "damage": "MODERATE",
+      "interior": true,
+      "roof": "PARTIAL",
+      "label": "Warehouse. Wide roller entrance + narrow side door + one blocked door; dark interior, rooms and a corridor."
+    },
+    {
+      "id": "SAR_Building_RUB_001",
+      "center": [
+        -14.0,
+        100.0
+      ],
+      "w": 11.0,
+      "d": 9.0,
+      "storeys": 1,
+      "damage": "COLLAPSED",
+      "interior": true,
+      "roof": "COLLAPSED",
+      "label": "Collapsed house. One survivable void with a crawl-height opening; casualty adjacent, NOT buried."
+    },
+    {
+      "id": "SAR_Building_RUB_002",
+      "center": [
+        14.0,
+        118.0
+      ],
+      "w": 14.0,
+      "d": 10.0,
+      "storeys": 2,
+      "damage": "SEVERE",
+      "interior": true,
+      "roof": "PARTIAL",
+      "label": "Partially collapsed 2-storey. Three approaches: wide (unsafe), narrow (tight clearance), blocked. Forces entrance selection."
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "SAR_Vehicle_Rescue_001",
+      "center": [
+        -8.0,
+        -22.0
+      ],
+      "kind": "TRUCK",
+      "damage": "NONE",
+      "thermal": "THERMAL_VEHICLE_ENGINE",
+      "label": "Rescue truck, engine warm"
+    },
+    {
+      "id": "SAR_Vehicle_Rescue_002",
+      "center": [
+        -1.0,
+        -22.0
+      ],
+      "kind": "VAN",
+      "damage": "NONE",
+      "thermal": "THERMAL_VEHICLE_BODY",
+      "label": "Medical van"
+    },
+    {
+      "id": "SAR_Vehicle_Utility_003",
+      "center": [
+        6.0,
+        -22.0
+      ],
+      "kind": "UTILITY",
+      "damage": "NONE",
+      "thermal": "THERMAL_VEHICLE_BODY",
+      "label": "Utility 4x4"
+    },
+    {
+      "id": "SAR_Vehicle_Civilian_004",
+      "center": [
+        86.0,
+        25.5
+      ],
+      "kind": "CAR",
+      "damage": "LIGHT",
+      "thermal": "THERMAL_VEHICLE_ENGINE",
+      "label": "Abandoned car, engine still warm. Casualty PERSON_015 alongside -> warm vehicle vs warm human discrimination."
+    },
+    {
+      "id": "SAR_Vehicle_Civilian_005",
+      "center": [
+        69.0,
+        43.0
+      ],
+      "kind": "CAR",
+      "damage": "HEAVY",
+      "thermal": "THERMAL_VEHICLE_COLD",
+      "label": "Crushed car under debris, parked at the Street D kerb -- an obstacle beside the carriageway, not across it"
+    },
+    {
+      "id": "SAR_Vehicle_Truck_006",
+      "center": [
+        82.0,
+        62.5
+      ],
+      "kind": "TRUCK",
+      "damage": "OVERTURNED",
+      "thermal": "THERMAL_VEHICLE_COLD",
+      "label": "Overturned truck blocking Urban Street C -> forces a reroute"
+    },
+    {
+      "id": "SAR_Vehicle_Civilian_007",
+      "center": [
+        106.0,
+        71.0
+      ],
+      "kind": "CAR",
+      "damage": "MODERATE",
+      "thermal": "THERMAL_VEHICLE_COLD",
+      "label": "Damaged car, kerbside"
+    },
+    {
+      "id": "SAR_Vehicle_Stranded_008",
+      "center": [
+        -112.0,
+        62.0
+      ],
+      "kind": "UTILITY",
+      "damage": "MODERATE",
+      "thermal": "THERMAL_VEHICLE_COLD",
+      "label": "Stranded vehicle at the flood margin, partly in the channel"
+    },
+    {
+      "id": "SAR_Vehicle_Wreck_009",
+      "center": [
+        -9.0,
+        112.0
+      ],
+      "kind": "CAR",
+      "damage": "HEAVY",
+      "thermal": "THERMAL_VEHICLE_COLD",
+      "label": "Wreck in the collapse field"
+    },
+    {
+      "id": "SAR_Vehicle_Abandoned_010",
+      "center": [
+        114.0,
+        118.0
+      ],
+      "kind": "TRUCK",
+      "damage": "MODERATE",
+      "thermal": "THERMAL_VEHICLE_BODY",
+      "label": "Abandoned truck, desert track"
+    }
+  ],
+  "dynamic_obstacles": {
+    "keyframed_humans": 19,
+    "carried_loads": 1,
+    "physics_reactive_props": 77,
+    "prop_clusters": [
+      {
+        "id": "SAR_DynProps_BaseYard",
+        "center": [
+          -14.0,
+          -8.0
+        ],
+        "radius_m": 6.5,
+        "zone": "SAR_ZONE_HOME",
+        "sector": "BASE",
+        "exposure": "ADJACENT",
+        "mix": {
+          "BARREL": 3,
+          "CRATE": 4,
+          "PALLET": 3,
+          "CONE": 2
+        },
+        "note": "Staging yard on the apron. First movable things the robot sees, on flat ground where a failed push is unambiguous."
+      },
+      {
+        "id": "SAR_DynProps_BaseGate",
+        "center": [
+          1.5,
+          3.0
+        ],
+        "radius_m": 4.0,
+        "zone": "SAR_ZONE_HOME",
+        "sector": "BASE",
+        "exposure": "ON_ROUTE",
+        "mix": {
+          "CONE": 4,
+          "BARREL": 2
+        },
+        "note": "Cones narrowing the base gate. Directly on the exit path -- the robot meets these in the first ten metres of every run."
+      },
+      {
+        "id": "SAR_DynProps_StreetA",
+        "center": [
+          61.0,
+          44.0
+        ],
+        "radius_m": 7.0,
+        "zone": "SAR_ZONE_C",
+        "sector": "URBAN",
+        "exposure": "ON_ROUTE",
+        "mix": {
+          "CONE": 4,
+          "BIN": 3,
+          "PANEL": 2
+        },
+        "note": "Street furniture strewn across Urban Street A, the alternative when Street C is blocked by the overturned truck."
+      },
+      {
+        "id": "SAR_DynProps_Canyon",
+        "center": [
+          79.5,
+          50.0
+        ],
+        "radius_m": 2.8,
+        "zone": "SAR_ZONE_C",
+        "sector": "URBAN",
+        "exposure": "ADJACENT",
+        "mix": {
+          "BARREL": 3,
+          "PALLET": 2
+        },
+        "note": "Inside the 7.5 m canyon between URB_001 and URB_002. Narrows an already tight corridor, and the walls leave nowhere to swing wide -- the robot either pushes through or backs out."
+      },
+      {
+        "id": "SAR_DynProps_WarehouseYard",
+        "center": [
+          108.0,
+          40.0
+        ],
+        "radius_m": 5.0,
+        "zone": "SAR_ZONE_C",
+        "sector": "URBAN",
+        "exposure": "ADJACENT",
+        "mix": {
+          "CRATE": 5,
+          "PALLET": 4,
+          "BARREL": 2
+        },
+        "note": "Loading yard outside the warehouse roller door."
+      },
+      {
+        "id": "SAR_DynProps_RubbleEdge",
+        "center": [
+          14.0,
+          104.0
+        ],
+        "radius_m": 7.0,
+        "zone": "SAR_ZONE_B",
+        "sector": "RUBBLE",
+        "exposure": "ADJACENT",
+        "mix": {
+          "PIPE": 4,
+          "PANEL": 4,
+          "BARREL": 2
+        },
+        "note": "Loose pipe and sheet at the collapse-field margin, beside the rubble bypass. Rolling pipe on sloped debris is the nastiest case here: it moves after the robot has passed it."
+      },
+      {
+        "id": "SAR_DynProps_FloodBank",
+        "center": [
+          -96.0,
+          58.0
+        ],
+        "radius_m": 8.0,
+        "zone": "SAR_ZONE_F",
+        "sector": "FLOOD",
+        "exposure": "OFF_ROUTE",
+        "mix": {
+          "BARREL": 4,
+          "JERRYCAN": 4,
+          "PANEL": 2
+        },
+        "note": "Debris washed onto the flood plain. Scattered, low contrast against mud."
+      },
+      {
+        "id": "SAR_DynProps_DesertTrack",
+        "center": [
+          116.0,
+          104.0
+        ],
+        "radius_m": 6.0,
+        "zone": "SAR_ZONE_E",
+        "sector": "DESERT",
+        "exposure": "ADJACENT",
+        "mix": {
+          "JERRYCAN": 3,
+          "BARREL": 2,
+          "CRATE": 2
+        },
+        "note": "Dropped stores beside the desert track. Sand gives low friction under both the prop and the robot."
+      },
+      {
+        "id": "SAR_DynProps_ForestStaging",
+        "center": [
+          -40.0,
+          162.0
+        ],
+        "radius_m": 5.0,
+        "zone": "SAR_ZONE_B",
+        "sector": "FOREST",
+        "exposure": "ADJACENT",
+        "mix": {
+          "CRATE": 3,
+          "PALLET": 2,
+          "CONE": 2
+        },
+        "note": "Forward staging point on the forest track, under canopy shadow."
+      }
+    ],
+    "prop_kinds": {
+      "BARREL": {
+        "shape": "CYL_Z",
+        "dims": [
+          0.29,
+          0.88
+        ],
+        "mass": 21.0,
+        "mat": "MAT_RUSTMETAL",
+        "thermal": "THERMAL_METAL",
+        "mu": 0.45,
+        "restitution": 0.2,
+        "collision": "CYLINDER",
+        "note": "Part-full steel drum. Tips, then rolls.",
+        "inertia": [
+          1.7967249999999997,
+          1.7967249999999997,
+          0.8830499999999999
+        ]
+      },
+      "CRATE": {
+        "shape": "BOX",
+        "dims": [
+          0.6,
+          0.6,
+          0.55
+        ],
+        "mass": 14.0,
+        "mat": "MAT_WOOD",
+        "thermal": "THERMAL_WOOD",
+        "mu": 0.62,
+        "restitution": 0.1,
+        "collision": "BOX",
+        "note": "Supply crate. Slides and tumbles, does not roll.",
+        "inertia": [
+          0.7729166666666668,
+          0.7729166666666668,
+          0.84
+        ]
+      },
+      "PALLET": {
+        "shape": "BOX",
+        "dims": [
+          1.2,
+          0.8,
+          0.14
+        ],
+        "mass": 16.0,
+        "mat": "MAT_WOOD",
+        "thermal": "THERMAL_WOOD",
+        "mu": 0.58,
+        "restitution": 0.05,
+        "collision": "BOX",
+        "note": "Flat and low -- a genuine LiDAR ambiguity: the robot must decide whether to drive over it.",
+        "inertia": [
+          0.8794666666666667,
+          1.9461333333333333,
+          2.7733333333333334
+        ]
+      },
+      "CONE": {
+        "shape": "CYL_Z",
+        "dims": [
+          0.19,
+          0.75
+        ],
+        "mass": 4.5,
+        "mat": "MAT_RESCUE",
+        "thermal": "THERMAL_AMBIENT",
+        "mu": 0.7,
+        "restitution": 0.3,
+        "collision": "CYLINDER",
+        "note": "Traffic cone. Light enough to knock flat without stopping the robot -- tests whether contact is detected at all.",
+        "inertia": [
+          0.25155,
+          0.25155,
+          0.081225
+        ]
+      },
+      "PANEL": {
+        "shape": "BOX",
+        "dims": [
+          1.4,
+          0.9,
+          0.05
+        ],
+        "mass": 9.0,
+        "mat": "MAT_METAL",
+        "thermal": "THERMAL_METAL",
+        "mu": 0.35,
+        "restitution": 0.15,
+        "collision": "BOX",
+        "note": "Loose sheet metal. Low friction, slides a long way.",
+        "inertia": [
+          0.609375,
+          1.4718749999999998,
+          2.0774999999999997
+        ]
+      },
+      "PIPE": {
+        "shape": "CYL_X",
+        "dims": [
+          0.12,
+          2.2
+        ],
+        "mass": 15.0,
+        "mat": "MAT_METAL",
+        "thermal": "THERMAL_METAL",
+        "mu": 0.3,
+        "restitution": 0.1,
+        "collision": "CYLINDER",
+        "note": "Loose pipe lying across the ground. Rolls perpendicular to its axis and not at all along it.",
+        "inertia": [
+          0.10799999999999998,
+          6.104,
+          6.104
+        ]
+      },
+      "JERRYCAN": {
+        "shape": "BOX",
+        "dims": [
+          0.35,
+          0.18,
+          0.45
+        ],
+        "mass": 6.5,
+        "mat": "MAT_RESCUE",
+        "thermal": "THERMAL_AMBIENT",
+        "mu": 0.55,
+        "restitution": 0.2,
+        "collision": "BOX",
+        "note": "Fuel can. Small enough to vanish under a bumper.",
+        "inertia": [
+          0.1272375,
+          0.17604166666666668,
+          0.08390416666666665
+        ]
+      },
+      "BIN": {
+        "shape": "BOX",
+        "dims": [
+          0.58,
+          0.52,
+          0.92
+        ],
+        "mass": 9.0,
+        "mat": "MAT_VEHICLE_B",
+        "thermal": "THERMAL_AMBIENT",
+        "mu": 0.5,
+        "restitution": 0.15,
+        "collision": "BOX",
+        "note": "Wheeled bin. Tall, light, topples easily.",
+        "inertia": [
+          0.8376,
+          0.8871000000000001,
+          0.4551
+        ]
+      }
+    },
+    "note": "Two mechanisms, deliberately different. Humans and carried loads follow scripted trajectories and move whatever the robot does. Props have mass and inertia and no script at all -- they move only when something pushes them, which is the case that punishes a planner for assuming a static world and for assuming 'it moved once' means 'it will keep moving'."
+  },
+  "terrain_tiles": [
+    {
+      "name": "SAR_Terrain_00_00",
+      "sector": "FLOOD",
+      "dominant": "WATER",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -125.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_00_01",
+      "sector": "FLOOD",
+      "dominant": "MUD",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -125.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_00_02",
+      "sector": "FLOOD",
+      "dominant": "MUD",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -125.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_00_03",
+      "sector": "FOREST",
+      "dominant": "SOIL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -125.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_00_04",
+      "sector": "FOREST",
+      "dominant": "GRASS",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -125.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_00_05",
+      "sector": "SNOW",
+      "dominant": "SNOW",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -125.0,
+        235.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_00",
+      "sector": "BASE",
+      "dominant": "GRAVEL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -75.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_01",
+      "sector": "FLOOD",
+      "dominant": "MUD",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -75.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_02",
+      "sector": "FLOOD",
+      "dominant": "MUD",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -75.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_03",
+      "sector": "FOREST",
+      "dominant": "SOIL",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -75.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_04",
+      "sector": "FOREST",
+      "dominant": "SOIL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -75.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_01_05",
+      "sector": "SNOW",
+      "dominant": "SNOW",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -75.0,
+        235.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_00",
+      "sector": "BASE",
+      "dominant": "GRAVEL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        -25.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_01",
+      "sector": "OPEN_FIELD",
+      "dominant": "GRASS",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -25.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_02",
+      "sector": "OPEN_FIELD",
+      "dominant": "GRASS",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -25.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_03",
+      "sector": "RUBBLE",
+      "dominant": "RUBBLE",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -25.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_04",
+      "sector": "OPEN_FIELD",
+      "dominant": "GRASS",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -25.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_02_05",
+      "sector": "SNOW",
+      "dominant": "SNOW",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        -25.0,
+        235.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_00",
+      "sector": "BASE",
+      "dominant": "GRAVEL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        25.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_01",
+      "sector": "OPEN_FIELD",
+      "dominant": "GRASS",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        25.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_02",
+      "sector": "RUBBLE",
+      "dominant": "RUBBLE",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        25.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_03",
+      "sector": "RUBBLE",
+      "dominant": "RUBBLE",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        25.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_04",
+      "sector": "OPEN_FIELD",
+      "dominant": "GRASS",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        25.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_03_05",
+      "sector": "MOUNTAIN",
+      "dominant": "ROCK",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        25.0,
+        235.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_00",
+      "sector": "URBAN",
+      "dominant": "GRAVEL",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        75.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_01",
+      "sector": "URBAN",
+      "dominant": "CONCRETE",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        75.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_02",
+      "sector": "URBAN",
+      "dominant": "SAND",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        75.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_03",
+      "sector": "DESERT",
+      "dominant": "SAND",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        75.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_04",
+      "sector": "MOUNTAIN",
+      "dominant": "ROCK",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        75.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_04_05",
+      "sector": "MOUNTAIN",
+      "dominant": "ROCK",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        75.0,
+        235.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_00",
+      "sector": "URBAN",
+      "dominant": "CONCRETE",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        125.0,
+        -15.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_01",
+      "sector": "URBAN",
+      "dominant": "CONCRETE",
+      "res": 1.0,
+      "verts": 2601,
+      "faces": 2500,
+      "center": [
+        125.0,
+        35.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_02",
+      "sector": "DESERT",
+      "dominant": "SAND",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        125.0,
+        85.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_03",
+      "sector": "DESERT",
+      "dominant": "SAND",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        125.0,
+        135.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_04",
+      "sector": "DESERT",
+      "dominant": "SAND",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        125.0,
+        185.0
+      ]
+    },
+    {
+      "name": "SAR_Terrain_05_05",
+      "sector": "MOUNTAIN",
+      "dominant": "ROCK",
+      "res": 0.5,
+      "verts": 10201,
+      "faces": 10000,
+      "center": [
+        125.0,
+        235.0
+      ]
+    }
+  ],
+  "collections": {
+    "SAR_GENERATED": 3537,
+    "SAR_ENVIRONMENT": 3281,
+    "SAR_TERRAIN": 36,
+    "BASE": 36,
+    "OPEN_FIELD": 1,
+    "FOREST": 684,
+    "MOUNTAIN": 33,
+    "SNOW": 188,
+    "DESERT": 0,
+    "FLOOD": 1,
+    "URBAN": 1,
+    "RUBBLE": 578,
+    "BUILDINGS": 137,
+    "VEHICLES": 74,
+    "VEGETATION": 1667,
+    "ROADS": 14,
+    "BRIDGES": 6,
+    "HAZARDS": 34,
+    "STATIC_HUMANS": 120,
+    "DYNAMIC_HUMANS": 153,
+    "DYNAMIC_PROPS": 78,
+    "PROPS": 0,
+    "LIGHTING": 16,
+    "GROUND_TRUTH": 193,
+    "SAR_EXPORT": 3144,
+    "SAR_VISUAL": 3238,
+    "SAR_COLLISION": 2483,
+    "SAR_HUMAN_TEST": 272,
+    "SAR_SENSOR_TEST": 143
+  },
+  "statistics": {
+    "base_objects": 40,
+    "buildings": 6,
+    "vehicles": 10,
+    "static_humans": 15,
+    "carried_loads": 1,
+    "dynamic_humans": 19,
+    "decoys": 12,
+    "dynamic_props": 77,
+    "dynamic_prop_clusters": 9,
+    "sensor_test_objects": 11,
+    "hazards": 32,
+    "trees": 891,
+    "bushes": 605,
+    "grass_patches": 94,
+    "fallen_trees": 52,
+    "rocks": 358,
+    "boulders": 24,
+    "rubble_pieces": 515,
+    "lighting_presets": 6,
+    "weather_presets": 6
+  },
+  "validation": {
+    "checks": [
+      {
+        "check": "extent_300x300",
+        "pass_": true,
+        "detail": "300 x 300 m"
+      },
+      {
+        "check": "start_pose_flat",
+        "pass_": true,
+        "detail": "1.23 deg"
+      },
+      {
+        "check": "start_pose_6m_clear_of_hazards",
+        "pass_": true,
+        "detail": "6 m radius"
+      },
+      {
+        "check": "start_faces_open_ground_25m",
+        "pass_": true,
+        "detail": "heading +Y"
+      },
+      {
+        "check": "route_SAR_Route_01_Disaster_no_water",
+        "pass_": true,
+        "detail": "0 samples in water"
+      },
+      {
+        "check": "route_SAR_Route_01_Disaster_slope_under_32deg",
+        "pass_": true,
+        "detail": "max 6.1 deg at (22, 121)"
+      },
+      {
+        "check": "route_SAR_Route_02_Mountain_no_water",
+        "pass_": true,
+        "detail": "0 samples in water"
+      },
+      {
+        "check": "route_SAR_Route_02_Mountain_slope_under_32deg",
+        "pass_": true,
+        "detail": "max 12.7 deg at (96, 211)"
+      },
+      {
+        "check": "route_SAR_Route_03_UrbanFlood_no_water",
+        "pass_": true,
+        "detail": "0 samples in water"
+      },
+      {
+        "check": "route_SAR_Route_03_UrbanFlood_slope_under_32deg",
+        "pass_": true,
+        "detail": "max 11.9 deg at (48, 43)"
+      },
+      {
+        "check": "route_SAR_Route_04_Snow_no_water",
+        "pass_": true,
+        "detail": "0 samples in water"
+      },
+      {
+        "check": "route_SAR_Route_04_Snow_slope_under_32deg",
+        "pass_": true,
+        "detail": "max 18.6 deg at (-88, 183)"
+      },
+      {
+        "check": "route_SAR_Route_05_AllTerrain_no_water",
+        "pass_": true,
+        "detail": "0 samples in water"
+      },
+      {
+        "check": "route_SAR_Route_05_AllTerrain_slope_under_32deg",
+        "pass_": true,
+        "detail": "max 7.6 deg at (3, 146)"
+      },
+      {
+        "check": "humans_total_20_plus",
+        "pass_": true,
+        "detail": "34"
+      },
+      {
+        "check": "static_humans_10_plus",
+        "pass_": true,
+        "detail": "15"
+      },
+      {
+        "check": "dynamic_humans_10_plus",
+        "pass_": true,
+        "detail": "19"
+      },
+      {
+        "check": "stationary_casualties_5_plus",
+        "pass_": true,
+        "detail": "11"
+      },
+      {
+        "check": "occluded_humans_5_plus",
+        "pass_": true,
+        "detail": "9"
+      },
+      {
+        "check": "thermal_targets_10_plus",
+        "pass_": true,
+        "detail": "34"
+      },
+      {
+        "check": "multi_person_cluster_3_to_5",
+        "pass_": true,
+        "detail": "{\"TRIAGE_01\": 4}"
+      },
+      {
+        "check": "ditches_5_plus",
+        "pass_": true,
+        "detail": "5"
+      },
+      {
+        "check": "holes_3_plus",
+        "pass_": true,
+        "detail": "3"
+      },
+      {
+        "check": "steep_slopes_3_plus",
+        "pass_": true,
+        "detail": "3"
+      },
+      {
+        "check": "rubble_zones_3_plus",
+        "pass_": true,
+        "detail": "4"
+      },
+      {
+        "check": "cliffs_2_plus",
+        "pass_": true,
+        "detail": "2"
+      },
+      {
+        "check": "water_boundaries_2_plus",
+        "pass_": true,
+        "detail": "2"
+      },
+      {
+        "check": "blocked_paths_2_plus",
+        "pass_": true,
+        "detail": "3"
+      },
+      {
+        "check": "buildings_3_to_6",
+        "pass_": true,
+        "detail": "6"
+      },
+      {
+        "check": "vehicles_5_plus",
+        "pass_": true,
+        "detail": "10"
+      },
+      {
+        "check": "human_heights_1p5_to_1p9",
+        "pass_": true,
+        "detail": "min 1.55 max 1.85"
+      },
+      {
+        "check": "door_width_realistic",
+        "pass_": true,
+        "detail": "1.05 m"
+      },
+      {
+        "check": "door_height_realistic",
+        "pass_": true,
+        "detail": "2.10 m"
+      },
+      {
+        "check": "road_widths_3_to_7m",
+        "pass_": true,
+        "detail": "min 3.0 max 6.0"
+      },
+      {
+        "check": "tree_heights_4_to_17m",
+        "pass_": true,
+        "detail": "min 4.3 max 14.8"
+      },
+      {
+        "check": "vehicle_sizes_realistic",
+        "pass_": true,
+        "detail": "4.4 - 7.2 m"
+      },
+      {
+        "check": "terrain_types_6_plus",
+        "pass_": true,
+        "detail": "{\"WATER\": 1, \"MUD\": 4, \"SOIL\": 3, \"GRASS\": 6, \"SNOW\": 3, \"GRAVEL\": 4, \"RUBBLE\": 3, \"ROCK\": 4, \"CONCRETE\": 3, \"SAND\": 5}"
+      },
+      {
+        "check": "no_large_perfectly_flat_areas",
+        "pass_": true,
+        "detail": "2 of 36 tiles with <0.15 m relief (base apron is expected)"
+      },
+      {
+        "check": "clearance_gates_narrow_and_wide",
+        "pass_": true,
+        "detail": "0.80 / 1.00 / 1.40 m gates built"
+      },
+      {
+        "check": "spawn_clearance_6m_radius",
+        "pass_": true,
+        "detail": "clear"
+      },
+      {
+        "check": "building_footprints_clear_of_carriageways",
+        "pass_": true,
+        "detail": "clear"
+      },
+      {
+        "check": "urban_canyon_gap_over_5m",
+        "pass_": true,
+        "detail": "7.53 m"
+      },
+      {
+        "check": "physics_reactive_props_30_plus",
+        "pass_": true,
+        "detail": "77"
+      },
+      {
+        "check": "dynamic_props_have_positive_mass_and_inertia",
+        "pass_": true,
+        "detail": "bad: none"
+      },
+      {
+        "check": "dynamic_props_not_in_water_or_voids",
+        "pass_": true,
+        "detail": "bad: none"
+      },
+      {
+        "check": "prop_clusters_mixed_exposure",
+        "pass_": true,
+        "detail": "2 of 9 clusters on a route corridor"
+      },
+      {
+        "check": "dynamic_obstacles_total_25_plus",
+        "pass_": true,
+        "detail": "97"
+      },
+      {
+        "check": "motion_patterns_5_plus",
+        "pass_": true,
+        "detail": "CONVERGING, CROSSING, GROUP_CARRY, HEAD_ON, ORBIT, PATROL, ROAD_PATROL"
+      },
+      {
+        "check": "ground_truth_not_in_export",
+        "pass_": true,
+        "detail": "leaked: none"
+      },
+      {
+        "check": "no_prebuilt_occupancy_grid",
+        "pass_": true,
+        "detail": "no navigation map, no occupancy grid, no pose oracle in the scene"
+      }
+    ],
+    "warnings": [],
+    "route_analysis": [
+      {
+        "route": "SAR_Route_01_Disaster",
+        "target": "PERSON_007",
+        "length_m": 151.8,
+        "samples": 103,
+        "max_slope_deg": 6.1,
+        "max_slope_at": [
+          22.2,
+          120.6
+        ],
+        "samples_in_water": 0,
+        "samples_in_negative_obstacle": 0,
+        "terrain_mix": {
+          "ROAD": 0.66,
+          "GRAVEL": 0.262,
+          "CONCRETE": 0.049,
+          "RUBBLE": 0.029
+        }
+      },
+      {
+        "route": "SAR_Route_02_Mountain",
+        "target": "PERSON_013",
+        "length_m": 343.3,
+        "samples": 230,
+        "max_slope_deg": 12.7,
+        "max_slope_at": [
+          96.3,
+          211.2
+        ],
+        "samples_in_water": 0,
+        "samples_in_negative_obstacle": 0,
+        "terrain_mix": {
+          "GRAVEL": 0.596,
+          "ROAD": 0.383,
+          "ROCK": 0.009,
+          "CONCRETE": 0.004,
+          "GRASS": 0.004,
+          "DIRT": 0.004
+        }
+      },
+      {
+        "route": "SAR_Route_03_UrbanFlood",
+        "target": "PERSON_015",
+        "length_m": 168.1,
+        "samples": 114,
+        "max_slope_deg": 11.9,
+        "max_slope_at": [
+          48.2,
+          42.7
+        ],
+        "samples_in_water": 0,
+        "samples_in_negative_obstacle": 0,
+        "terrain_mix": {
+          "ROAD": 0.789,
+          "CONCRETE": 0.211
+        }
+      },
+      {
+        "route": "SAR_Route_04_Snow",
+        "target": "PERSON_014",
+        "length_m": 340.7,
+        "samples": 229,
+        "max_slope_deg": 18.6,
+        "max_slope_at": [
+          -87.5,
+          183.0
+        ],
+        "samples_in_water": 0,
+        "samples_in_negative_obstacle": 0,
+        "terrain_mix": {
+          "DIRT": 0.463,
+          "ROAD": 0.31,
+          "GRAVEL": 0.218,
+          "CONCRETE": 0.004,
+          "GRASS": 0.004
+        }
+      },
+      {
+        "route": "SAR_Route_05_AllTerrain",
+        "target": "TERRAIN_ADAPTATION",
+        "length_m": 569.6,
+        "samples": 381,
+        "max_slope_deg": 7.6,
+        "max_slope_at": [
+          3.4,
+          146.3
+        ],
+        "samples_in_water": 0,
+        "samples_in_negative_obstacle": 0,
+        "terrain_mix": {
+          "ROAD": 0.696,
+          "DIRT": 0.118,
+          "GRAVEL": 0.115,
+          "MUD": 0.026,
+          "RUBBLE": 0.024,
+          "GRASS": 0.013,
+          "CONCRETE": 0.005,
+          "SOIL": 0.003
+        }
+      }
+    ],
+    "summary": {
+      "total_checks": 50,
+      "passed": 50,
+      "failed": 0,
+      "warnings": 0,
+      "statistics": {
+        "base_objects": 40,
+        "buildings": 6,
+        "vehicles": 10,
+        "static_humans": 15,
+        "carried_loads": 1,
+        "dynamic_humans": 19,
+        "decoys": 12,
+        "dynamic_props": 77,
+        "dynamic_prop_clusters": 9,
+        "sensor_test_objects": 11,
+        "hazards": 32,
+        "trees": 891,
+        "bushes": 605,
+        "grass_patches": 94,
+        "fallen_trees": 52,
+        "rocks": 358,
+        "boulders": 24,
+        "rubble_pieces": 515,
+        "lighting_presets": 6,
+        "weather_presets": 6
+      },
+      "terrain_dominants": {
+        "WATER": 1,
+        "MUD": 4,
+        "SOIL": 3,
+        "GRASS": 6,
+        "SNOW": 3,
+        "GRAVEL": 4,
+        "RUBBLE": 3,
+        "ROCK": 4,
+        "CONCRETE": 3,
+        "SAND": 5
+      },
+      "hazard_types": {
+        "DITCH": 5,
+        "HOLE": 3,
+        "TRENCH": 2,
+        "RAVINE": 2,
+        "ROAD_WASHOUT": 2,
+        "COLLAPSED_GROUND": 1,
+        "CLIFF": 2,
+        "WATER": 2,
+        "RUBBLE": 4,
+        "STEEP_SLOPE": 3,
+        "BLOCKED_PATH": 3,
+        "DEAD_END": 3
+      },
+      "dynamic_obstacles": {
+        "keyframed_humans": 19,
+        "carried_loads": 1,
+        "physics_reactive_props": 77,
+        "motion_patterns": [
+          "CONVERGING",
+          "CROSSING",
+          "GROUP_CARRY",
+          "HEAD_ON",
+          "ORBIT",
+          "PATROL",
+          "ROAD_PATROL"
+        ]
+      }
+    }
+  },
+  "custom_property_contract": {
+    "human": [
+      "person_id",
+      "sar_type",
+      "dynamic",
+      "thermal_class",
+      "thermal_contrast",
+      "thermal_delta_k",
+      "victim_status",
+      "pose",
+      "occlusion",
+      "search_zone",
+      "sar_sector",
+      "detection_difficulty",
+      "height_m"
+    ],
+    "hazard": [
+      "hazard_id",
+      "hazard_type",
+      "severity",
+      "traversability",
+      "risk_level",
+      "search_zone"
+    ],
+    "terrain": [
+      "terrain_type",
+      "terrain_secondary",
+      "terrain_mix",
+      "traversability",
+      "traverse_cost",
+      "friction_mu",
+      "risk_level",
+      "thermal_class"
+    ],
+    "generic": [
+      "sar_object",
+      "semantic_class",
+      "thermal_class",
+      "collision",
+      "sar_sector"
+    ]
+  }
+}

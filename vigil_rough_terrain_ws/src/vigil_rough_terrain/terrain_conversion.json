@@ -1,0 +1,23 @@
+{
+  "source": "rocky_terrain_n4.zip",
+  "dimensions_metres": [
+    18.0,
+    18.0,
+    1.646118
+  ],
+  "xy_bounds_metres": [
+    -9.0,
+    9.0
+  ],
+  "minimum_z_metres": 0,
+  "scale_from_imported_gltf": 3.331634539984978,
+  "visual_triangles": 524288,
+  "collision_triangles": 52428,
+  "collision_note": "Decimated to 10% of source triangle count; small surface approximation.",
+  "sdf_mesh_scale": [
+    1.8,
+    1.8,
+    1.44
+  ],
+  "resize_note": "18 x 18 m footprint (0.72 x the original 25 m). Elevation halved on request: z scale 1.44 (= 0.36 x the original 4), so hills, ledges and cliffs are half the height of the 18 m version and slopes are gentler. Original mesh files unchanged."
+}

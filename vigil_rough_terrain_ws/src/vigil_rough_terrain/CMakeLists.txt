@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.8)
+project(vigil_rough_terrain)
+find_package(ament_cmake REQUIRED)
+install(DIRECTORY launch worlds models urdf meshes config docs test scripts dashboard DESTINATION share/${PROJECT_NAME})
+install(FILES ASSET_LICENSE.txt terrain_conversion.json DESTINATION share/${PROJECT_NAME})
+install(PROGRAMS scripts/drive.py scripts/comparison_driver.py scripts/make_four_wheel.py DESTINATION lib/${PROJECT_NAME})
+# Vision cliff detection + A-to-B navigation + dashboard (added)
+install(PROGRAMS scripts/terrain_mapper.py scripts/cliff_navigator.py scripts/ugv_dashboard.py
+                 scripts/make_test_worlds.py DESTINATION lib/${PROJECT_NAME})
+install(FILES scripts/terrain_core.py scripts/planner_core.py scripts/vision_overlay.py
+              scripts/ros_common.py scripts/scenarios.py DESTINATION lib/${PROJECT_NAME})
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  enable_testing()
+  add_test(NAME suspension_model_contract COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/model_contract.py)
+  # Offline ray-cast test of cliff detection + planning over all 10 scenarios (~4 min, no Gazebo).
+  add_test(NAME vision_nav_closed_loop COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/closed_loop_sim.py)
+  set_tests_properties(vision_nav_closed_loop PROPERTIES TIMEOUT 1200)
+endif()
+ament_package()

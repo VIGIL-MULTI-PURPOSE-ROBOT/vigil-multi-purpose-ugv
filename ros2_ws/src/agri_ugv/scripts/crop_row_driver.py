@@ -25,7 +25,7 @@ class CropRowDriver(Node):
         # Keep the five-times drivetrain capability, while using a safer
         # 1.20 m/s row speed for precise crop-centre tracking.
         self.speed = self.declare_parameter('cruise_speed_mps', 1.20).value
-        # The rover straddles a crop row with tyres at +/-0.50 m.  A 0.32 m
+        # The rover straddles a crop row with tyre centres at +/-0.436 to +/-0.466 m.  A 0.32 m
         # maximum centreline error still leaves 0.069 m between a tyre edge
         # and the nearest crop centreline (1.22 m row pitch, 0.071 m tyre
         # half-width).  The controller starts slowing much earlier.

@@ -1,0 +1,157 @@
+# =====================================================================
+# VIGIL vision-based cliff detection + A-to-B navigation parameters.
+# Shared by terrain_mapper.py, cliff_navigator.py and ugv_dashboard.py
+# ("/**" applies to every node).
+#
+# EVERY robot number below is derived from urdf/agri_ugv.urdf.xacro,
+# urdf/cad_geometry.xacro and the measured calibration in
+# docs/validation/flat.json. Frame: base_footprint (x forward, y left).
+# =====================================================================
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    robot:
+      # Outer footprint: front of L1/R1 tyre (x=+0.785) to rear of L4/R4 tyre
+      # (x=-0.746). Rocker pivot (-0.5697, ±0.30, -0.135) pitched 0.0628 rad.
+      length: 1.53
+      # Outer tyre faces: L1 centre y=0.466 + half tyre width 0.093 = 0.559.
+      width: 1.12
+      # base_footprint -> top of LiDAR (0.5872 + 0.497 + ~0.06 housing).
+      height: 1.14
+      # Ground-bearing wheelbase: wheel 1 (x=0.551) to wheel 3 (x=-0.273).
+      # Wheel 4 sits ~0.33 m above flat ground (step-climbing wheel).
+      wheelbase: 0.82
+      track_width: 0.90          # wheel-centre to wheel-centre (0.87-0.93)
+      # Measured settled chassis-box clearance on flat ground (flat.json).
+      ground_clearance: 0.3375
+      wheel_radius_front: 0.2346
+      wheel_radius_small: 0.1766
+      # Footprint rectangle centre in base_footprint (mid of -0.746..0.785).
+      footprint_center_x: 0.02
+      # Ground height relative to base_footprint origin when settled:
+      # chassis-box bottom is at +0.2854 in base_footprint, measured
+      # clearance is 0.3375 -> ground is 0.052 m below base_footprint.
+      ground_offset_z: -0.052
+      # Existing comparison_driver.py tilt limit; beyond this we stop.
+      max_tilt_deg: 38.0
+
+    camera:
+      # camera_mount (0.4672, 0, 0.0119) on base_link, base_link at +0.5872.
+      x: 0.4672
+      y: 0.0
+      # Height above base_footprint. Height above ground = 0.599+0.052=0.651.
+      z: 0.5991
+      # camera_mount rpy pitch 0.1745 rad = 10 deg DOWN.
+      pitch: 0.1745
+      horizontal_fov: 1.5184     # rad (87 deg); from simulation.xacro
+      width: 320
+      height: 240
+      depth_near: 0.2
+      depth_far: 15.0
+      # The lowest image row is 45.4 deg below horizontal -> nearest visible
+      # ground is ~1.11 m ahead of base_footprint (0.32 m ahead of the front
+      # tyre). Cells under the robot are only known from memory (the map).
+
+    terrain:
+      # Map (world frame, fixed). Rock terrain is 18 x 18 m (half height) centred at 0; the
+      # 32 m map also covers the test worlds (up to x = 13 m).
+      map_size: 32.0             # m (square)
+      map_origin_x: -16.0
+      map_origin_y: -16.0
+      resolution: 0.10           # m per cell
+      # --- Hazard thresholds (see docs/VISION_NAVIGATION.md) ---
+      # A drop/step larger than the SMALLEST wheel radius (0.1766 m) makes a
+      # wheel fall/strike instead of rolling over the edge. Ground clearance
+      # (0.3375 m) is larger, so the wheel radius is the limiting dimension.
+      max_safe_drop: 0.17        # a larger DROP is a HIGH CLIFF (hard obstacle, inflated)
+      max_safe_step: 0.17
+      # Steps up to max_climb_step are CLIMBABLE (cost, not obstacle): the leading
+      # wheel radius is 0.2346 m and the rocker-bogie pushes it up; still well below
+      # the 0.3375 m ground clearance. Higher = OBSTACLE.
+      max_climb_step: 0.23
+      # Measured max tilt in a successful traverse = 35 deg; driver trips at
+      # 38 deg. 25 deg leaves margin for side-slope roll + dynamics.
+      max_safe_slope_deg: 25.0
+      # Physical climbing limit. 25-33 deg = CLIMBABLE hill (slow, costly, allowed);
+      # >33 deg = STEEP (robot centre avoids it; only tried as a last-resort climb).
+      # Measured successful traverse peaked at 35 deg tilt; driver trips at 38 deg.
+      # 33 = 38 - 5 deg margin. A hidden descent is only a CLIFF if steeper than this.
+      max_climb_slope_deg: 33.0
+      # Above these the terrain is "UNEVEN" (yellow) but still drivable.
+      uneven_slope_deg: 10.0
+      uneven_step: 0.06
+      uneven_roughness: 0.03
+      # Extra clearance kept between the robot footprint and a hazard.
+      safety_margin: 0.15
+      # Only reason about ground inside this range (depth accuracy / latency).
+      cliff_detection_distance: 6.0
+      # Slope = plane fit over the robot's own contact patch: max(wheelbase
+      # 0.82, track 0.90) = 0.9 m. Body tilt follows this plane; features
+      # smaller than the patch are judged by the step/drop limits instead.
+      # (On the rock terrain a 0.5 m window flags rock faces: 23% of cells
+      # >25 deg; at 0.9 m the recorded A->B route peaks at 21 deg.)
+      slope_window: 0.9
+      # Minimum depth hits needed before a cell is trusted.
+      min_hits: 2
+      use_segmentation: true
+      publish_rate: 5.0          # Hz for grids/status (camera runs at 10 Hz)
+      pixel_stride: 2            # column/row stride for the edge scan
+
+    navigation:
+      # A = where the robot starts (spawn). B = goal. Default = existing
+      # comparison course end point B, scaled with the 18 x 18 m terrain.
+      goal_x: -3.024
+      goal_y: -2.16
+      goal_tolerance: 0.30       # same as comparison_driver.py
+      # If B itself lies within the turn-in-place radius (1.10 m) of a cliff/obstacle edge,
+      # the footprint cannot sit exactly on B without overhanging it: the closest safe
+      # point within this distance counts as reaching B.
+      goal_hazard_tolerance: 1.0
+      # 0.60 m/s (originally 0.18). drive.py allows up to 0.7 m/s and ramps at
+      # 0.5 m/s^2 -> 0.36 m to stop, + <=0.3 s camera/map latency (0.18 m).
+      cruise_speed: 0.60
+      max_angular: 0.60          # rad/s (originally 0.35) = drive.py limit
+      turn_in_place_error: 0.65  # rad, same as comparison_driver.py
+      lookahead: 1.3             # m, pure-pursuit lookahead (longer at higher speed)
+      planning_resolution: 0.20  # m, A* grid
+      unknown_cost: 1.5          # extra cost per unobserved cell (optimistic)
+      uneven_cost: 2.0           # extra cost per UNEVEN cell
+      proximity_cost: 6.0        # extra cost close to hazards
+      # Re-check the path this far ahead after every map update.
+      replanning_distance: 5.0
+      replan_period: 4.0         # s, periodic improvement replan
+      # Emergency stop if a raw hazard is inside the footprint this far ahead.
+      stop_distance: 1.00        # covers 0.36 m braking + 0.18 m latency at 0.60 m/s, with margin
+      start_delay: 6.0           # s of sim time to let the rover settle
+      progress_timeout: 40.0     # s without progress -> STUCK
+      # --- Never give up: escalation instead of "NO SAFE PATH -> stop" ---
+      # 1 local replan in the A-B corridor, 2 whole-map replan, 3 hill-climbing replan
+      # (STEEP allowed at steep_climb_cost), 4 CLIFF_AVOIDANCE heading search,
+      # 5 RECOVERY (reverse + turn). The mission ends only at B.
+      planning_corridor: 6.0     # m either side of the A-B line (step 1 only)
+      possible_drop_cost: 25.0   # extra cost per unconfirmed-drop cell
+      # Terrain as COST (not obstacle): per-cell extra cost
+      slope_cost: 1.0            # x (slope / max_climb_slope)^2 -> 1.0 at the climbing limit
+      roughness_cost: 1.0        # x roughness / uneven_roughness (capped at 3x)
+      climbable_cost: 0.5        # extra for CLIMBABLE cells (a 28 deg hill costs ~2.2x flat:
+                                 # a detour is only taken if it is shorter than that)
+      steep_climb_cost: 15.0     # STEEP cells in the hill-climbing fallback only
+      # Hill climbing
+      climb_display_deg: 15.0    # tilt / slope ahead above this -> state CLIMBING, slow down
+      climb_min_speed_factor: 0.45  # speed at the climbing limit = 0.45 x cruise
+      tilt_margin_deg: 5.0       # tilt >= max_tilt - margin (33 deg): replan another climb line
+      # CLIFF_AVOIDANCE heading search (when no route exists through known terrain)
+      explore_step: 2.5          # m per tried heading
+      goal_progress_weight: 3.0  # strongly prefer headings that get closer to B
+      revisit_weight: 0.4        # per second already spent near that spot
+      cliff_avoidance_display: 12.0  # s to show CLIFF_AVOIDANCE after a cliff-triggered detour
+      # Recovery (stuck / tilt limit / boxed in)
+      stuck_timeout: 10.0        # s commanding forward with < 0.25 m motion
+      blocked_timeout: 4.0       # s with a hazard right in front
+      recovery_reverse: 0.8      # m reversed (only over non-hazard ground)
+      recovery_turn_time: 2.5    # s turning towards the best heading
+
+    dashboard:
+      port: 8080
+      jpeg_quality: 80

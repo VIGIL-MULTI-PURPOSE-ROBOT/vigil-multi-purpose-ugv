@@ -1,0 +1,11 @@
+Model Information:
+* title:	Rocky Terrain n4
+* source:	https://sketchfab.com/3d-models/rocky-terrain-n4-95939b2b45d14c4b8858180b5497398a
+* author:	DarkPixel (https://sketchfab.com/darkpixel8)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Rocky Terrain n4" (https://sketchfab.com/3d-models/rocky-terrain-n4-95939b2b45d14c4b8858180b5497398a) by DarkPixel (https://sketchfab.com/darkpixel8) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

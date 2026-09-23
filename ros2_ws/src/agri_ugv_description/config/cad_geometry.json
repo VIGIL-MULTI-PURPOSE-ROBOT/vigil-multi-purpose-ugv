@@ -1,0 +1,495 @@
+{
+  "source": "/home/user/Downloads/full shhhh_activesuspension.stl",
+  "sha256": "660776500e243604f17f388921b051b83f0a0db94dda5d01ccfc34054a9ba37e",
+  "triangles": 557698,
+  "components": 90,
+  "units": "metres",
+  "cad_to_ros_rotation": [
+    [
+      0.0,
+      -1.0,
+      0.0
+    ],
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "offset_m": [
+    -0.5697,
+    0.511263443,
+    0.0
+  ],
+  "wheels": {
+    "R1": {
+      "origin_m": [
+        0.5630473754882813,
+        -0.4661631927421875,
+        -0.3536584930419922
+      ],
+      "radius_m": 0.23463,
+      "width_m": 0.18624755859375008,
+      "mass_kg": 35.2
+    },
+    "R2": {
+      "origin_m": [
+        0.10862937622070312,
+        -0.4357234649589844,
+        -0.4048180541992188
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.14051873779296886,
+      "mass_kg": 15.3
+    },
+    "R3": {
+      "origin_m": [
+        -0.25905623168945313,
+        -0.4357234649589844,
+        -0.40108868408203124
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.14051873779296886,
+      "mass_kg": 15.3
+    },
+    "R4": {
+      "origin_m": [
+        -0.5696730854034424,
+        -0.4357234649589844,
+        -0.13500421142578126
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.14051873779296886,
+      "mass_kg": 15.3
+    },
+    "L1": {
+      "origin_m": [
+        0.565627880859375,
+        0.4661631622382813,
+        -0.33979698181152346
+      ],
+      "radius_m": 0.23463,
+      "width_m": 0.18624752807617184,
+      "mass_kg": 35.2
+    },
+    "L2": {
+      "origin_m": [
+        0.11183723144531255,
+        0.4357234423228913,
+        -0.39652386474609375
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.1405187230110168,
+      "mass_kg": 15.3
+    },
+    "L3": {
+      "origin_m": [
+        -0.25581390686035155,
+        0.4357234423228913,
+        -0.39725863647460935
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.1405187230110168,
+      "mass_kg": 15.3
+    },
+    "L4": {
+      "origin_m": [
+        -0.5697122375488282,
+        0.4357234423228913,
+        -0.13498110961914062
+      ],
+      "radius_m": 0.17655,
+      "width_m": 0.1405187230110168,
+      "mass_kg": 15.3
+    }
+  },
+  "rocker_pivots_m": {
+    "R": [
+      -0.5697,
+      -0.3,
+      -0.135
+    ],
+    "L": [
+      -0.5697,
+      0.3,
+      -0.135
+    ]
+  },
+  "parts": [
+    {
+      "mesh": "cad_R1_tyre.stl",
+      "components": [
+        0
+      ],
+      "triangles": 14890,
+      "origin_m": [
+        0.5630473754882813,
+        -0.4661631927421875,
+        -0.3536584930419922
+      ],
+      "link": "R1_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_R1_hub.stl",
+      "components": [
+        1,
+        2
+      ],
+      "triangles": 20906,
+      "origin_m": [
+        0.5630473754882813,
+        -0.4661631927421875,
+        -0.3536584930419922
+      ],
+      "link": "R1_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_R2_tyre.stl",
+      "components": [
+        3
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        0.10862937622070312,
+        -0.4357234649589844,
+        -0.4048180541992188
+      ],
+      "link": "R2_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_R2_hub.stl",
+      "components": [
+        6,
+        9
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        0.10862937622070312,
+        -0.4357234649589844,
+        -0.4048180541992188
+      ],
+      "link": "R2_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_R3_tyre.stl",
+      "components": [
+        4
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        -0.25905623168945313,
+        -0.4357234649589844,
+        -0.40108868408203124
+      ],
+      "link": "R3_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_R3_hub.stl",
+      "components": [
+        7,
+        10
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        -0.25905623168945313,
+        -0.4357234649589844,
+        -0.40108868408203124
+      ],
+      "link": "R3_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_R4_tyre.stl",
+      "components": [
+        5
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        -0.5696730854034424,
+        -0.4357234649589844,
+        -0.13500421142578126
+      ],
+      "link": "R4_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_R4_hub.stl",
+      "components": [
+        8,
+        11
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        -0.5696730854034424,
+        -0.4357234649589844,
+        -0.13500421142578126
+      ],
+      "link": "R4_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_L1_tyre.stl",
+      "components": [
+        84
+      ],
+      "triangles": 14890,
+      "origin_m": [
+        0.565627880859375,
+        0.4661631622382813,
+        -0.33979698181152346
+      ],
+      "link": "L1_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_L1_hub.stl",
+      "components": [
+        83,
+        88
+      ],
+      "triangles": 20906,
+      "origin_m": [
+        0.565627880859375,
+        0.4661631622382813,
+        -0.33979698181152346
+      ],
+      "link": "L1_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_L2_tyre.stl",
+      "components": [
+        80
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        0.11183723144531255,
+        0.4357234423228913,
+        -0.39652386474609375
+      ],
+      "link": "L2_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_L2_hub.stl",
+      "components": [
+        77,
+        85
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        0.11183723144531255,
+        0.4357234423228913,
+        -0.39652386474609375
+      ],
+      "link": "L2_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_L3_tyre.stl",
+      "components": [
+        81
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        -0.25581390686035155,
+        0.4357234423228913,
+        -0.39725863647460935
+      ],
+      "link": "L3_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_L3_hub.stl",
+      "components": [
+        78,
+        86
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        -0.25581390686035155,
+        0.4357234423228913,
+        -0.39725863647460935
+      ],
+      "link": "L3_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_L4_tyre.stl",
+      "components": [
+        82
+      ],
+      "triangles": 13302,
+      "origin_m": [
+        -0.5697122375488282,
+        0.4357234423228913,
+        -0.13498110961914062
+      ],
+      "link": "L4_wheel",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_L4_hub.stl",
+      "components": [
+        79,
+        87
+      ],
+      "triangles": 19742,
+      "origin_m": [
+        -0.5697122375488282,
+        0.4357234423228913,
+        -0.13498110961914062
+      ],
+      "link": "L4_wheel",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_R_rocker.stl",
+      "components": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        20,
+        21,
+        23,
+        24
+      ],
+      "triangles": 5758,
+      "origin_m": [
+        -0.5697,
+        -0.3,
+        -0.135
+      ],
+      "link": "R_rocker_link",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_L_rocker.stl",
+      "components": [
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76
+      ],
+      "triangles": 5758,
+      "origin_m": [
+        -0.5697,
+        0.3,
+        -0.135
+      ],
+      "link": "L_rocker_link",
+      "material": "aluminum"
+    },
+    {
+      "mesh": "cad_camera.stl",
+      "components": [
+        29,
+        30
+      ],
+      "triangles": 27632,
+      "origin_m": [
+        0.4672,
+        0.0,
+        0.0119
+      ],
+      "link": "camera_link",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_lidar.stl",
+      "components": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "triangles": 170554,
+      "origin_m": [
+        -0.5865,
+        0.0,
+        0.497
+      ],
+      "link": "lidar_link",
+      "material": "rubber"
+    },
+    {
+      "mesh": "cad_body.stl",
+      "components": [
+        17,
+        19,
+        22,
+        25,
+        26,
+        27,
+        28,
+        45,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        89
+      ],
+      "triangles": 78140,
+      "origin_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "link": "base_link",
+      "material": "aluminum"
+    }
+  ],
+  "limitations": [
+    "STL has no kinematics, masses or materials.",
+    "Two open-chain rocker pivots inferred at the rear cross-shaft.",
+    "Hydraulic cylinder visuals follow their rocker; no closed-loop hydraulic dynamics.",
+    "As-exported left/right articulation and raised rear wheels retained.",
+    "Collision cylinders and box proxies approximate CAD surfaces."
+  ]
+}

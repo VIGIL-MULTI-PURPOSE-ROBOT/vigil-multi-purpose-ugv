@@ -1,4 +1,8 @@
-# Agricultural UGV: ROS 2 Jazzy + Gazebo Harmonic
+# VIGIL multipurpose UGV: agriculture application
+
+VIGIL is an eight-wheel multipurpose rover. This ROS 2 Jazzy and Gazebo
+Harmonic workspace implements and evaluates its agriculture role in a cotton
+farm; it does not limit the platform to agricultural use.
 
 ## Current workspace and default mission
 
@@ -77,7 +81,7 @@ export ROS_LOG_DIR="$PWD/log/checks"
 | Step | Implementation files under this workspace | Executable command | Expected result |
 |---|---|---|---|
 | 1. Environment | `src/agri_ugv_setup/` | `colcon build --symlink-install` then `ros2 run agri_ugv_setup check_environment.py` | Three packages build; installed dependencies pass. |
-| 2. Robot | `src/agri_ugv_description/urdf/`, `meshes/` | `ros2 launch agri_ugv_description display.launch.py` | Articulated provisional rover in RViz; eight wheels and ten simplified suspension joints. |
+| 2. Robot | `src/agri_ugv_description/urdf/`, `meshes/` | `ros2 launch agri_ugv_description display.launch.py` | Articulated provisional rover in RViz; eight CAD-positioned wheels and two inferred rocker joints. |
 | 3. World and sensors | `src/agri_ugv/worlds/`, `models/`, `config/bridge.yaml` | `./run.sh stage:=3` then `python3 tools/check_live.py --output reports/stage3_live.json` | Provided field; live RGB-D, 3D LiDAR, IMU and six encoders. |
 | 4. Visualization | `config/field.rviz`, `scripts/visualization.py` | `./run.sh stage:=4` then `python3 tools/check_tf.py --root base_footprint --seconds 15 --output reports/stage4_tf.json` | All eight wheel and sensor frames connected; rear poses used only for visualization. |
 | 5. Odometry | `scripts/odometry.py`, `config/ekf.yaml` | `./run.sh stage:=5` then `ros2 topic echo /odom --once` | Wheel/IMU EKF and odom transform. |
@@ -105,11 +109,14 @@ check_urdf /tmp/agri_ugv.urdf
   patches heightmap collision pose/friction, lighting and unsupported actor
   definitions. Existing worker meshes provide the moving obstacle. Farm assets
   were reused from the supplied archive's extracted directory.
-- The STL is an assembly mesh without joint axes/material properties. Body and
-  wheel meshes are CAD-derived; wheel spacing, open-chain suspension, inertia
-  approximations, cylinder anchors and standing angle are provisional. The shell
-  is 26.4 kg; an assumed payload yields 286.11 kg total. This is not a material-density
-  reconstruction or verification of the ten as-built CAD joints.
+- The STL is an assembly mesh without joint axes/material properties. All 90 components of the supplied
+  `full shhhh_activesuspension.stl` are retained as 21 articulated visual meshes.
+  Wheel locations and the raised rear-wheel stance follow the export. The two
+  rocker pivots are inferred from the rear cross-shaft; wheel axles are fixed to
+  each rocker. Inertia, cylinder anchors, joint dynamics and standing angle remain
+  provisional. The shell is 26.4 kg; assumed hardware/payload yields 286.11 kg total.
+  Cylinder visuals follow the rocker without a closed-loop hydraulic mechanism.
+  See [CAD update notes](CAD_UPDATE.md) for reproducibility and validation.
 - Wheel commands drive all eight joints. Only the first three wheels per side
   expose encoder feedback. Rear wheel transforms come from simulator poses for
   display only. EKF/RTAB-Map do not consume these poses; the separate row mission does use

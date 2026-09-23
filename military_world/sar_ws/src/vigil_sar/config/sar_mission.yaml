@@ -1,0 +1,349 @@
+# =====================================================================
+# VIGIL SAR UGV - ONE configuration file for the whole mission.
+#
+# Read by every node ("/**" = all nodes) AND by the launch files (camera
+# resolution / thermal mount go into the robot xacro, world.* and
+# human_thermal.* go into the generated military_sar.sdf).
+#
+# robot / camera / terrain / navigation: copied unchanged from
+#   vigil_rough_terrain/config/vision_nav.yaml (derived from the rover CAD),
+#   except the map extent (sized for military_world) and the noted perf keys.
+# Units: metres, seconds, radians unless the key name says _deg / _k.
+# =====================================================================
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    # ------------------------------------------------------------ world
+    world:
+      # Folder of the military_world project (contains gazebo_export/).
+      # Empty = auto-detect (this workspace lives inside military_world/sar_ws).
+      military_world_dir: ""
+      source_sdf: gazebo_export/military_world.sdf
+      metadata_file: sar_metadata.json          # buildings (mission-planning info, NOT ground truth)
+      generated_sdf: sar_ws/generated/military_sar.sdf
+      world_name: military_world
+      # --- SAR operational zone (1 Gazebo unit = 1 m). military_world is 300 x 300 m and already at
+      # true metre scale (person 1.74 m, car 4.4 x 1.8 m, ISO container 6.06 x 2.44 x 2.59 m, roads
+      # 4-6 m, doors 1.04 m - see scripts/scale_check.py), so NOTHING is rescaled. The rover works
+      # inside this zone: base + open field + rubble buildings + the urban block, 29 of the 37 people.
+      # It is the ONE place the working area is set: the terrain map, the planner, where B may be
+      # and the SAR search points all follow it. Scenery outside stays in the world, visible.
+      zone_x_min: -40.0
+      zone_x_max: 130.0
+      zone_y_min: -35.0
+      zone_y_max: 135.0
+      freeze_people_outside_zone: true   # walkers outside the zone stand still (they cannot be reached)
+      # Gazebo GUI: follow the rover (gz CameraTracking) so a 1.5 m rover is visible in a 300 m world
+      gui_follow_rover: true
+      gui_follow_offset: [-5.0, 0.0, 2.5]  # m, camera relative to the rover (behind and above)
+      # The rover suspension was validated at 1 ms (vigil_rough_terrain README).
+      # The exported world uses 10 ms. 1 ms keeps the springs stable but the
+      # 300 x 300 m world will run below real time; 0.002 is a faster compromise.
+      physics_step: 0.001
+      ambient_temperature_k: 293.15             # thermal camera background (world <atmosphere>)
+      label_ground: true                        # segmentation label 1 on terrain/roads (cliff void test)
+      add_building_humans: true                 # extra casualties inside URB_001/002/004
+      moving_people: true                       # keep sar::WaypointSystem walkers
+      people_controller: 1                      # 1 kinematic (cheap, default) | 2 contact-aware (sar_physics.py)
+      # A visual whose exported <temperature> IS the ambient temperature renders identically with or
+      # without its Thermal plugin, so the generated world drops those ~390 plugins: much less work
+      # for the Gazebo GUI (it loads every visual plugin as a system) and no warning flood - that
+      # load is what froze the GUI ("not responding / Force Quit"). Humans and every non-ambient
+      # temperature are untouched. false = keep the export exactly as it is.
+      drop_ambient_thermal_plugins: true
+      # The export gives each model one box collision from its mesh bounding box. For a shell that
+      # is badly wrong: SAR_Base_Fence became a solid 50 x 34 x 2 m block over the whole home base,
+      # with the robot start inside it - the rover hung in mid air, the depth camera read the real
+      # ground 0.66 m below as a HIGH CLIFF, and no path to B existed. Such boxes are replaced by
+      # the model's own mesh collision (exact posts, rails and the gate opening). false = leave the
+      # export's collisions alone.
+      # Physics engine settings, pinned so that they never depend on another switch (the export
+      # ships bullet/PGS; the kinematic-people path used to delete that block, so moving_people
+      # decided the collision detector). ode + Dantzig is what Gazebo ships and what the rover's
+      # suspension was validated with. The contact-aware people controller (people_controller: 2)
+      # keeps sar_physics.py's bullet/PGS choice.
+      collision_detector: ode      # ode | bullet | fcl | dart | "" = leave the export's setting
+      physics_solver: dantzig      # dantzig | pgs
+      fix_hull_collisions: true
+      hull_collision_area: 60.0    # m2; a wall/fence box with a bigger footprint is a hull, not a wall
+
+    # Point A = spawn. Default = SAR_ROBOT_START marker (0, -8), facing +Y.
+    spawn:
+      x: 0.0
+      y: -8.0
+      z: 0.30                      # apron top is 0.08 m; 0.80 made the rover free-fall onto its springs
+      yaw: 1.5708
+
+    # ------------------------------------------------------------ robot (unchanged)
+    robot:
+      length: 1.53
+      width: 1.12
+      height: 1.14
+      wheelbase: 0.82
+      track_width: 0.90
+      ground_clearance: 0.3375
+      wheel_radius_front: 0.2346
+      wheel_radius_small: 0.1766
+      footprint_center_x: 0.02
+      ground_offset_z: -0.052
+      max_tilt_deg: 38.0
+
+    # ------------------------------------------------------------ depth camera (unchanged)
+    # rgbd_camera used for terrain / cliff perception (320x240 is deliberate:
+    # the cliff edge scan is tuned for it and it keeps the loop real time).
+    camera:
+      x: 0.4672
+      y: 0.0
+      z: 0.5991
+      pitch: 0.1745
+      horizontal_fov: 1.5184
+      width: 320
+      height: 240
+      depth_near: 0.2
+      depth_far: 15.0
+
+    # ------------------------------------------------------------ 4K RGB display camera
+    # Same mount + horizontal FOV as the depth camera. Published on
+    # /camera/hd/image at full resolution. Algorithms never run on it at
+    # full size: the overlay is drawn at overlay_width and the dashboard
+    # downscales again. 3840x2160 RGB = 24.9 MB per frame, so the default
+    # rate is 5 Hz. Use 1920x1080 @ 10 Hz on a weak GPU.
+    rgb_camera:
+      width: 3840
+      height: 2160
+      fps: 5.0
+      overlay_width: 1920          # /vision/overlay resolution (dashboard main view)
+
+    # ------------------------------------------------------------ thermal camera
+    thermal_camera:
+      enabled: true
+      resolution_width: 320
+      resolution_height: 240
+      horizontal_fov: 1.0472       # rad (60 deg)
+      vertical_fov: 0.8076         # rad; informational - Gazebo derives it from hfov + aspect (checked at start)
+      update_rate: 10.0
+      mount_x: 0.52                # m forward of base_footprint (front of the body)
+      mount_y: 0.0
+      # 0.72 m = a small block on the front deck (the body top is at 0.64 m), the way the other
+      # sensors are mounted. Anything above ~0.75 m grows a visible mast on the front of the rover.
+      camera_height: 0.72          # m above ground
+      camera_pitch: 0.0            # rad, positive = down (0 looks straight into door openings)
+      near: 0.2
+      far: 120.0
+      detection_range: 30.0        # m; blobs estimated farther than this are ignored
+      temperature_threshold: 296.5 # K; lower edge of the human band (covered casualties are 297.65 K)
+      human_max_temperature: 311.0 # K; hotter = engine / generator / warm-case decoy, never human
+      minimum_human_size: 0.25     # m; smallest visible human extent (partly hidden in a doorway)
+      # Sensor noise, in K. It is added in software by thermal_human_detector.py, because a
+      # <noise> element on a thermal_camera segfaults the Gazebo server on gz-sensors 8 (Jazzy):
+      # it asks the wrong noise factory, gets a null pointer and dereferences it while the rover's
+      # sensors are being created. That was the "-11 / Force Quit" crash. Fixed upstream in
+      # gz-sensors #597; on a Gazebo that has that fix you can let Gazebo do it instead with
+      # noise_in_sdf: true plus the launch arg thermal_noise_sdf:=true.
+      noise_stddev: 0.0            # K
+      noise_in_sdf: false
+
+    # ------------------------------------------------------------ human detection pipeline
+    human_detection:
+      min_contrast_k: 1.5          # blob must be this much warmer than the scene background
+      min_pixels: 12               # after morphology
+      max_human_size: 2.3          # m, largest extent (standing 1.9 / lying 1.9 + margin)
+      max_aspect_ratio: 6.0
+      min_area_m2: 0.04
+      max_area_m2: 2.0
+      processing_rate: 5.0         # Hz (thermal frames are skipped in between)
+      depth_ray_step: 0.10         # m, ray march step into the depth image
+      assumed_human_extent: 1.0    # m, last-resort range prior when neither depth nor ground works
+      confirmation_frames: 4       # consecutive frames before HUMAN DETECTED (= sar.human_confirmation_frames)
+      miss_frames: 3               # frames a tentative track may miss before it is dropped
+      association_gate: 1.8        # m, detection -> track gate
+      merge_distance: 1.5          # m, two confirmed tracks closer than this are one human (triage casualties are 2.2 m apart)
+      min_peak_temperature: 301.0  # K; a normal human blob has >= 303 K skin/torso somewhere ...
+      covered_max_size: 1.9        # ... otherwise (covered casualty, 297.65 K) it must be <= 1.9 m
+      covered_max_area: 0.9        #     and <= 0.9 m2 (rejects a 300 K car body seen end-on)
+      covered_max_temperature: 299.5  # K; lukewarm blobs warmer than this are sun-warmed surfaces (27 C), not covered people
+      confirm_max_range_no_depth: 12.0  # m; beyond the 15 m depth range a ground-plane range is only trusted this close
+      position_smoothing: 0.3      # EMA weight of a new measurement
+
+    human_thermal:                 # written into the generated world, HUMAN models only
+      body_temperature: 305.15     # K torso (clothed core, 32 C)
+      head_temperature: 307.65     # K exposed skin (34.5 C)
+      limb_temperature: 303.65     # K clothed limbs (30.5 C)
+      covered_temperature: 297.65  # K LOW-contrast casualties (dust / snow covered)
+      thermal_contrast: 1.0        # scales (T - ambient) of every human; 1.0 = physically based table
+
+    # ------------------------------------------------------------ terrain (vision_nav.yaml)
+    terrain:
+      # The map covers exactly the operational zone (world.zone_*): origin = zone corner, size =
+      # the larger zone side. map_size / map_origin_x / map_origin_y here are only a fallback when
+      # no zone is configured.
+      resolution: 0.20             # 0.10 gave 2.9 M cells: every analysis, inflation and A* pass
+                                   # cost 4x more. 0.20 = 720 k cells, and the planner is that
+                                   # much quicker to answer after SET GOAL B.
+      max_safe_drop: 0.17
+      max_safe_step: 0.17
+      max_climb_step: 0.23
+      max_safe_slope_deg: 25.0
+      max_climb_slope_deg: 33.0
+      uneven_slope_deg: 10.0
+      uneven_step: 0.06
+      uneven_roughness: 0.03
+      safety_margin: 0.15
+      cliff_detection_distance: 6.0
+      slope_window: 0.9
+      min_hits: 2
+      use_segmentation: true
+      publish_rate: 5.0            # Hz depth processing
+      pixel_stride: 2
+      # --- performance keys (new; a 170 m map is 2.9 M cells) ---
+      analysis_window: 12.0        # m half-size re-classified around the camera each frame
+      grid_publish_rate: 2.0       # Hz (sim time) for the four OccupancyGrids. 2 Hz = the navigator's map
+                                   # is at most 0.5 s (1.5 m at 3 m/s) old: with 1 Hz a cliff seen at the
+                                   # 6 m cliff_detection_distance left too little room to brake from 3 m/s.
+                                   # Heaviest messages: back to 1.0 only if the real-time factor suffers.
+
+    # ------------------------------------------------------------ navigation (vision_nav.yaml)
+    # DRIVING AND PATH PLANNING = vigil_rough_terrain/config/vision_nav.yaml, value for value,
+    # except where marked SAR. That project's rover reliably crosses rough terrain, climbs, avoids
+    # cliffs and reaches B; the high-speed layer this copy had grown on top (a speed
+    # governor, 25 m lookahead, 0.6 m planning grid, 2 m stop distance) is what made it stop at every
+    # obstacle and fail to find routes the rover fits through. vigil_rough_terrain is only read.
+    navigation:
+      goal_x: 80.0                 # SAR: default B (Urban Street D); set it on the dashboard
+      goal_y: 40.0
+      goal_tolerance: 0.30         # same as vigil_rough_terrain (comparison_driver.py)
+      goal_hazard_tolerance: 1.0   # B next to a cliff/obstacle: closest safe point within this counts
+      # 0.60 m/s cruise. drive.py allows up to 0.7 m/s and ramps at 0.5 m/s2 -> 0.36 m to stop,
+      # + <= 0.3 s camera/map latency (0.18 m).
+      cruise_speed: 3.0            # m/s open-road maximum (= physics.yaml drive.max_linear). The drive
+                                   # reaches it at 1.0 m/s2 with a 3 m/s3 jerk limit (~3.3 s, ~5 m).
+      # --- clearance speed profile: clear distance ahead of the rover's own footprint along the
+      # path (planner path_clearance: CLIFF / OBSTACLE cells) -> target speed, linear in between.
+      # (two flat lists: ROS 2 parameters cannot hold a list of pairs)
+      clearance_distances: [0.5, 1.0, 2.0, 10.0]   # m clear ahead ...
+      clearance_speeds:    [0.3, 1.0, 2.0, 3.0]    # ... -> m/s (creep at 0.5 m; 1 m -> 1.0; 2 m -> 2.0;
+                                                   #    ~10 m open road -> 3.0)
+      min_clearance: 0.5           # m: below this NO forward command - turn to the replanned path,
+                                   # or reverse and reorient (never a standing stop)
+      clearance_horizon: 10.0      # m swept ahead along the path
+      max_angular: 1.0             # rad/s = drive.py limit (vigil_rough_terrain: 0.60)
+      heading_gain: 1.5            # yaw rate = gain x heading error (vigil_rough_terrain: 1.0) -
+                                   # turns in sooner instead of drifting wide first
+      turn_in_place_error: 1.0     # rad (57 deg; vigil_rough_terrain: 0.65). Below this the rover
+                                   # turns WHILE driving; only a sharper change stops it to rotate.
+      lookahead: 1.3               # m, pure-pursuit lookahead
+      planning_resolution: 0.20    # m, A* grid. Measured on this 170 m map: 0.14-0.5 s per plan.
+                                   # 0.6 m (the old value here) could not find a way through gaps of
+                                   # 1.6-2.0 m that the 1.12 m rover fits through, so B looked
+                                   # unreachable and the rover fell back to exploring.
+      unknown_cost: 1.5            # extra cost per unobserved cell (optimistic)
+      uneven_cost: 2.0             # extra cost per UNEVEN cell
+      proximity_cost: 6.0          # extra cost close to hazards
+      replanning_distance: 5.0     # m of path re-checked after every map update
+      replan_period: 4.0           # s, periodic improvement replan
+      # Emergency stop only if a raw hazard is inside the footprint this far ahead - and then it
+      # turns / replans / recovers, it does not simply stop. 1.0 m covers 0.36 m braking + 0.18 m
+      # latency at 0.60 m/s. (2.0 m here made the rover halt next to every wall and fence.)
+      stop_distance: 0.50          # m ahead of the real front on the current heading (= min_clearance)
+      reaction_time: 0.0           # s: the clearance profile already slows to 1 m/s by 1 m clear
+      steer_around: true           # hazard ahead but the path's direction is clear -> keep driving
+                                   # and steer onto the path (vigil_rough_terrain stopped first)
+      start_delay: 0.5             # SAR: s of settling at launch; SET GOAL B skips it entirely
+      autostart: false             # SAR: true = drive to the default B without any input
+      start_on_goal: true          # SAR: SET GOAL B on the map = drive there (no START press)
+      progress_timeout: 40.0       # s without progress -> STUCK
+      # --- Never give up: escalation instead of "NO SAFE PATH -> stop" ---
+      # 1 local replan in the A-B corridor, 2 whole-map replan, 3 hill-climbing replan
+      # (STEEP allowed at steep_climb_cost), 4 CLIFF_AVOIDANCE heading search,
+      # 5 RECOVERY (reverse + turn). The mission ends only at B.
+      planning_window_margin: 20.0 # SAR: every A* search stays inside the A-B bounding box + 20 m (and
+                                   # the operational zone) - no whole-map searches, no huge detours
+      max_expansions: 400000       # SAR: A* cell budget per search (~1-3 s worst case); then the next
+                                   # escalation step takes over
+      planning_corridor: 12.0      # SAR: m either side of the A-B line (6.0 on the 18 m terrain;
+                                   # military_world roads bend around buildings)
+      possible_drop_cost: 25.0     # extra cost per unconfirmed-drop cell
+      slope_cost: 1.0              # x (slope / max_climb_slope)^2
+      roughness_cost: 1.0          # x roughness / uneven_roughness (capped at 3x)
+      climbable_cost: 0.5          # extra for CLIMBABLE cells
+      steep_climb_cost: 15.0       # STEEP cells in the hill-climbing fallback only
+      climb_display_deg: 15.0      # tilt / slope ahead above this -> CLIMBING, slow down
+      climb_min_speed_factor: 0.30 # speed at the 33 deg climbing limit = 0.3 x 3.0 = 0.9 m/s (1.4 m/s on 28 deg):
+                                   # the wheelie margin shrinks with slope (scripts/rover_stability.py)
+      tilt_margin_deg: 5.0         # tilt >= max_tilt - margin: replan another climb line
+      explore_step: 2.5            # m per tried heading (CLIFF_AVOIDANCE)
+      goal_progress_weight: 3.0    # strongly prefer headings that get closer to B
+      revisit_weight: 0.4          # per second already spent near that spot
+      cliff_avoidance_display: 12.0
+      stuck_timeout: 10.0          # s commanding forward with < 0.25 m motion
+      blocked_timeout: 2.0         # s turning in front of a hazard without getting clear -> reverse + reorient
+      blocked_turn_timeout: 0.5    # s blocked with NOTHING to turn to -> reverse + reorient at once
+      min_replan_interval: 0.5     # s between hazard replans while blocked
+      recovery_reverse: 0.8        # m reversed (only over non-hazard ground)
+      recovery_turn_time: 2.5      # s turning towards the best heading
+      # --- SAR additions that do not change how the rover drives ---
+      slowdown_distance: 3.0       # m: inside this, APPROACHING_GOAL, speed ramps down (from 3 m/s the
+                                   # ramp asks <= 2 m/s2, what the drive brakes with) ...
+      goal_speed: 0.20             # ... to this at the tolerance edge, so it stops inside it
+      map_update_period: 0.30      # s between costmap rebuilds (the 170 m map is ~5x the terrain's)
+      hold_heading_tolerance: 0.08 # SAR scan: heading tolerance while turning to look
+      hold_max_angular: 0.50       # rad/s while scanning
+      tick_period: 0.05            # s, navigator loop (vigil_rough_terrain: 0.1)
+      max_lateral_accel: 3.0       # m/s2 in turns (grip 8.3, roll-over ~13): at 3 m/s -> 1.0 rad/s
+      lookahead_time: 0.8          # s: lookahead grows to 2.4 m at 3 m/s (1.3 m minimum)
+      brake_plan_decel: 1.5        # m/s2 used to plan the stop at B (drive max_decel 2.0: 25 % margin)
+                                   # -> braking for B starts ~3 m out from 3 m/s
+
+    # ------------------------------------------------------------ search and rescue
+    sar:
+      enabled: false                # SAR NEVER starts by itself; the dashboard switch starts it
+      # The SAR switch is accepted AT ANY TIME: at A, driving to B, near B, at B, stopped,
+      # replanning. (require_goal_reached is gone: SAR does not depend on B in any way.)
+      # START pauses A->B and runs the search; thermal detection runs the whole time.
+      restart_behavior: reset       # START after a STOP: reset = plan the search afresh from here |
+                                    # resume = carry on with the tasks still pending. Confirmed
+                                    # humans (H1, H2, ...) are never cleared either way.
+      stop_behavior: resume_b       # STOP: resume_b = give A->B back (drive on to B if it had not
+                                    # been reached when SAR started, else stay put) | hold = stay put.
+                                    # The operator's B is remembered and never overwritten.
+      region_mode: goal             # goal = square centred on B | box = region_* below | manual
+      region_center_x: 90.0         # box mode
+      region_center_y: 60.0
+      region_width: 70.0
+      region_height: 50.0
+      region_rotation_deg: 0.0
+      manual_points: ""             # manual mode: "x1,y1; x2,y2; ..." (world metres)
+      search_radius: 30.0           # goal mode: half-size of the square around B
+      search_points: 10
+      search_rows: 2                # 2 x 5 boustrophedon: P1..P5 then P6..P10 back
+      search_spacing: 0.0           # >0 overrides the column spacing (m)
+      search_speed: 1.50            # m/s between search points. NOT raised to 6: the thermal camera
+                                    # needs 4 consecutive frames on a human, and SAR is the mission.
+      search_point_tolerance: 1.5   # m, "arrived" at a search point
+      point_clearance: 2.5          # m kept between a search point and a building wall
+      scan_angles: 8                # headings per point scan (0,45,..315)
+      scan_dwell: 1.5               # s at each heading
+      skip_seen_sector: true        # skip headings the thermal camera already covered on arrival
+      building_search_distance: 25.0   # buildings closer than this to a search point are scanned
+      building_standoff: 7.0        # m from the wall for building observation points
+      building_standoff_min: 3.5    # tried when 7 m would be inside another building (urban canyon)
+      building_scan_speed: 0.50     # m/s near buildings (slow enough for the 4-frame confirmation)
+      building_scan_dwell: 3.0      # s looking at each face
+      building_sweep_deg: 25.0      # +/- sweep while facing a wall
+      buildings: auto               # auto = every building in metadata_file, or "ID1,ID2"
+      detection_range: 30.0         # = thermal_camera.detection_range
+      revisit_distance: 1.5         # m; a confirmed human re-seen within this is the same human
+      human_confirmation_frames: 4
+      confirm_dwell: 4.0            # s looking at an unconfirmed hot candidate (humans first)
+      confirm_cooldown: 120.0       # s before the same spot may interrupt the search again
+      max_confirms_per_task: 3      # interruptions per search leg (a warm object can never stall SAR)
+      search_timeout: 300.0         # s max per search point / building view before it is skipped
+      max_search_time: 2400.0       # s, whole SAR mission
+      final_scan: true              # full 360 deg scan at the last point
+
+    dashboard:
+      port: 8080
+      jpeg_quality: 80
+      thermal_width: 640            # thermal panel image width
+      map_png_period: 1.0           # s between map image encodes

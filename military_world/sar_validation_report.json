@@ -1,0 +1,425 @@
+{
+  "checks": [
+    {
+      "check": "extent_300x300",
+      "pass_": true,
+      "detail": "300 x 300 m"
+    },
+    {
+      "check": "start_pose_flat",
+      "pass_": true,
+      "detail": "1.23 deg"
+    },
+    {
+      "check": "start_pose_6m_clear_of_hazards",
+      "pass_": true,
+      "detail": "6 m radius"
+    },
+    {
+      "check": "start_faces_open_ground_25m",
+      "pass_": true,
+      "detail": "heading +Y"
+    },
+    {
+      "check": "route_SAR_Route_01_Disaster_no_water",
+      "pass_": true,
+      "detail": "0 samples in water"
+    },
+    {
+      "check": "route_SAR_Route_01_Disaster_slope_under_32deg",
+      "pass_": true,
+      "detail": "max 6.1 deg at (22, 121)"
+    },
+    {
+      "check": "route_SAR_Route_02_Mountain_no_water",
+      "pass_": true,
+      "detail": "0 samples in water"
+    },
+    {
+      "check": "route_SAR_Route_02_Mountain_slope_under_32deg",
+      "pass_": true,
+      "detail": "max 12.7 deg at (96, 211)"
+    },
+    {
+      "check": "route_SAR_Route_03_UrbanFlood_no_water",
+      "pass_": true,
+      "detail": "0 samples in water"
+    },
+    {
+      "check": "route_SAR_Route_03_UrbanFlood_slope_under_32deg",
+      "pass_": true,
+      "detail": "max 11.9 deg at (48, 43)"
+    },
+    {
+      "check": "route_SAR_Route_04_Snow_no_water",
+      "pass_": true,
+      "detail": "0 samples in water"
+    },
+    {
+      "check": "route_SAR_Route_04_Snow_slope_under_32deg",
+      "pass_": true,
+      "detail": "max 18.6 deg at (-88, 183)"
+    },
+    {
+      "check": "route_SAR_Route_05_AllTerrain_no_water",
+      "pass_": true,
+      "detail": "0 samples in water"
+    },
+    {
+      "check": "route_SAR_Route_05_AllTerrain_slope_under_32deg",
+      "pass_": true,
+      "detail": "max 7.6 deg at (3, 146)"
+    },
+    {
+      "check": "humans_total_20_plus",
+      "pass_": true,
+      "detail": "34"
+    },
+    {
+      "check": "static_humans_10_plus",
+      "pass_": true,
+      "detail": "15"
+    },
+    {
+      "check": "dynamic_humans_10_plus",
+      "pass_": true,
+      "detail": "19"
+    },
+    {
+      "check": "stationary_casualties_5_plus",
+      "pass_": true,
+      "detail": "11"
+    },
+    {
+      "check": "occluded_humans_5_plus",
+      "pass_": true,
+      "detail": "9"
+    },
+    {
+      "check": "thermal_targets_10_plus",
+      "pass_": true,
+      "detail": "34"
+    },
+    {
+      "check": "multi_person_cluster_3_to_5",
+      "pass_": true,
+      "detail": "{\"TRIAGE_01\": 4}"
+    },
+    {
+      "check": "ditches_5_plus",
+      "pass_": true,
+      "detail": "5"
+    },
+    {
+      "check": "holes_3_plus",
+      "pass_": true,
+      "detail": "3"
+    },
+    {
+      "check": "steep_slopes_3_plus",
+      "pass_": true,
+      "detail": "3"
+    },
+    {
+      "check": "rubble_zones_3_plus",
+      "pass_": true,
+      "detail": "4"
+    },
+    {
+      "check": "cliffs_2_plus",
+      "pass_": true,
+      "detail": "2"
+    },
+    {
+      "check": "water_boundaries_2_plus",
+      "pass_": true,
+      "detail": "2"
+    },
+    {
+      "check": "blocked_paths_2_plus",
+      "pass_": true,
+      "detail": "3"
+    },
+    {
+      "check": "buildings_3_to_6",
+      "pass_": true,
+      "detail": "6"
+    },
+    {
+      "check": "vehicles_5_plus",
+      "pass_": true,
+      "detail": "10"
+    },
+    {
+      "check": "human_heights_1p5_to_1p9",
+      "pass_": true,
+      "detail": "min 1.55 max 1.85"
+    },
+    {
+      "check": "door_width_realistic",
+      "pass_": true,
+      "detail": "1.05 m"
+    },
+    {
+      "check": "door_height_realistic",
+      "pass_": true,
+      "detail": "2.10 m"
+    },
+    {
+      "check": "road_widths_3_to_7m",
+      "pass_": true,
+      "detail": "min 3.0 max 6.0"
+    },
+    {
+      "check": "tree_heights_4_to_17m",
+      "pass_": true,
+      "detail": "min 4.3 max 14.8"
+    },
+    {
+      "check": "vehicle_sizes_realistic",
+      "pass_": true,
+      "detail": "4.4 - 7.2 m"
+    },
+    {
+      "check": "terrain_types_6_plus",
+      "pass_": true,
+      "detail": "{\"WATER\": 1, \"MUD\": 4, \"SOIL\": 3, \"GRASS\": 6, \"SNOW\": 3, \"GRAVEL\": 4, \"RUBBLE\": 3, \"ROCK\": 4, \"CONCRETE\": 3, \"SAND\": 5}"
+    },
+    {
+      "check": "no_large_perfectly_flat_areas",
+      "pass_": true,
+      "detail": "2 of 36 tiles with <0.15 m relief (base apron is expected)"
+    },
+    {
+      "check": "clearance_gates_narrow_and_wide",
+      "pass_": true,
+      "detail": "0.80 / 1.00 / 1.40 m gates built"
+    },
+    {
+      "check": "spawn_clearance_6m_radius",
+      "pass_": true,
+      "detail": "clear"
+    },
+    {
+      "check": "building_footprints_clear_of_carriageways",
+      "pass_": true,
+      "detail": "clear"
+    },
+    {
+      "check": "urban_canyon_gap_over_5m",
+      "pass_": true,
+      "detail": "7.53 m"
+    },
+    {
+      "check": "physics_reactive_props_30_plus",
+      "pass_": true,
+      "detail": "77"
+    },
+    {
+      "check": "dynamic_props_have_positive_mass_and_inertia",
+      "pass_": true,
+      "detail": "bad: none"
+    },
+    {
+      "check": "dynamic_props_not_in_water_or_voids",
+      "pass_": true,
+      "detail": "bad: none"
+    },
+    {
+      "check": "prop_clusters_mixed_exposure",
+      "pass_": true,
+      "detail": "2 of 9 clusters on a route corridor"
+    },
+    {
+      "check": "dynamic_obstacles_total_25_plus",
+      "pass_": true,
+      "detail": "97"
+    },
+    {
+      "check": "motion_patterns_5_plus",
+      "pass_": true,
+      "detail": "CONVERGING, CROSSING, GROUP_CARRY, HEAD_ON, ORBIT, PATROL, ROAD_PATROL"
+    },
+    {
+      "check": "ground_truth_not_in_export",
+      "pass_": true,
+      "detail": "leaked: none"
+    },
+    {
+      "check": "no_prebuilt_occupancy_grid",
+      "pass_": true,
+      "detail": "no navigation map, no occupancy grid, no pose oracle in the scene"
+    }
+  ],
+  "warnings": [],
+  "route_analysis": [
+    {
+      "route": "SAR_Route_01_Disaster",
+      "target": "PERSON_007",
+      "length_m": 151.8,
+      "samples": 103,
+      "max_slope_deg": 6.1,
+      "max_slope_at": [
+        22.2,
+        120.6
+      ],
+      "samples_in_water": 0,
+      "samples_in_negative_obstacle": 0,
+      "terrain_mix": {
+        "ROAD": 0.66,
+        "GRAVEL": 0.262,
+        "CONCRETE": 0.049,
+        "RUBBLE": 0.029
+      }
+    },
+    {
+      "route": "SAR_Route_02_Mountain",
+      "target": "PERSON_013",
+      "length_m": 343.3,
+      "samples": 230,
+      "max_slope_deg": 12.7,
+      "max_slope_at": [
+        96.3,
+        211.2
+      ],
+      "samples_in_water": 0,
+      "samples_in_negative_obstacle": 0,
+      "terrain_mix": {
+        "GRAVEL": 0.596,
+        "ROAD": 0.383,
+        "ROCK": 0.009,
+        "CONCRETE": 0.004,
+        "GRASS": 0.004,
+        "DIRT": 0.004
+      }
+    },
+    {
+      "route": "SAR_Route_03_UrbanFlood",
+      "target": "PERSON_015",
+      "length_m": 168.1,
+      "samples": 114,
+      "max_slope_deg": 11.9,
+      "max_slope_at": [
+        48.2,
+        42.7
+      ],
+      "samples_in_water": 0,
+      "samples_in_negative_obstacle": 0,
+      "terrain_mix": {
+        "ROAD": 0.789,
+        "CONCRETE": 0.211
+      }
+    },
+    {
+      "route": "SAR_Route_04_Snow",
+      "target": "PERSON_014",
+      "length_m": 340.7,
+      "samples": 229,
+      "max_slope_deg": 18.6,
+      "max_slope_at": [
+        -87.5,
+        183.0
+      ],
+      "samples_in_water": 0,
+      "samples_in_negative_obstacle": 0,
+      "terrain_mix": {
+        "DIRT": 0.463,
+        "ROAD": 0.31,
+        "GRAVEL": 0.218,
+        "CONCRETE": 0.004,
+        "GRASS": 0.004
+      }
+    },
+    {
+      "route": "SAR_Route_05_AllTerrain",
+      "target": "TERRAIN_ADAPTATION",
+      "length_m": 569.6,
+      "samples": 381,
+      "max_slope_deg": 7.6,
+      "max_slope_at": [
+        3.4,
+        146.3
+      ],
+      "samples_in_water": 0,
+      "samples_in_negative_obstacle": 0,
+      "terrain_mix": {
+        "ROAD": 0.696,
+        "DIRT": 0.118,
+        "GRAVEL": 0.115,
+        "MUD": 0.026,
+        "RUBBLE": 0.024,
+        "GRASS": 0.013,
+        "CONCRETE": 0.005,
+        "SOIL": 0.003
+      }
+    }
+  ],
+  "summary": {
+    "total_checks": 50,
+    "passed": 50,
+    "failed": 0,
+    "warnings": 0,
+    "statistics": {
+      "base_objects": 40,
+      "buildings": 6,
+      "vehicles": 10,
+      "static_humans": 15,
+      "carried_loads": 1,
+      "dynamic_humans": 19,
+      "decoys": 12,
+      "dynamic_props": 77,
+      "dynamic_prop_clusters": 9,
+      "sensor_test_objects": 11,
+      "hazards": 32,
+      "trees": 891,
+      "bushes": 605,
+      "grass_patches": 94,
+      "fallen_trees": 52,
+      "rocks": 358,
+      "boulders": 24,
+      "rubble_pieces": 515,
+      "lighting_presets": 6,
+      "weather_presets": 6
+    },
+    "terrain_dominants": {
+      "WATER": 1,
+      "MUD": 4,
+      "SOIL": 3,
+      "GRASS": 6,
+      "SNOW": 3,
+      "GRAVEL": 4,
+      "RUBBLE": 3,
+      "ROCK": 4,
+      "CONCRETE": 3,
+      "SAND": 5
+    },
+    "hazard_types": {
+      "DITCH": 5,
+      "HOLE": 3,
+      "TRENCH": 2,
+      "RAVINE": 2,
+      "ROAD_WASHOUT": 2,
+      "COLLAPSED_GROUND": 1,
+      "CLIFF": 2,
+      "WATER": 2,
+      "RUBBLE": 4,
+      "STEEP_SLOPE": 3,
+      "BLOCKED_PATH": 3,
+      "DEAD_END": 3
+    },
+    "dynamic_obstacles": {
+      "keyframed_humans": 19,
+      "carried_loads": 1,
+      "physics_reactive_props": 77,
+      "motion_patterns": [
+        "CONVERGING",
+        "CROSSING",
+        "GROUP_CARRY",
+        "HEAD_ON",
+        "ORBIT",
+        "PATROL",
+        "ROAD_PATROL"
+      ]
+    }
+  }
+}

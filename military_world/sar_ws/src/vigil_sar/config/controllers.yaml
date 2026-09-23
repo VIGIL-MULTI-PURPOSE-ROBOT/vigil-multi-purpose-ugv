@@ -1,0 +1,15 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+    wheel_controller:
+      type: velocity_controllers/JointGroupVelocityController   # as vigil_rough_terrain
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+wheel_controller:
+  ros__parameters:
+    joints: [L1_joint, L2_joint, L3_joint, L4_joint, R1_joint, R2_joint, R3_joint, R4_joint]
+joint_state_broadcaster:
+  ros__parameters:
+    joints: [L1_joint, L2_joint, L3_joint, L4_joint, R1_joint, R2_joint, R3_joint, R4_joint, L_rocker, R_rocker, L1_suspension, L2_suspension, L3_suspension, L4_suspension, R1_suspension, R2_suspension, R3_suspension, R4_suspension]
+    interfaces: [position, velocity]

@@ -1,0 +1,8 @@
+{
+  "pass": true,
+  "source_sha256": "660776500e243604f17f388921b051b83f0a0db94dda5d01ccfc34054a9ba37e",
+  "triangles_verified": 557698,
+  "max_coordinate_error_m": 5.9127807761072404e-08,
+  "wheel_axles": 8,
+  "rocker_joints": 2
+}

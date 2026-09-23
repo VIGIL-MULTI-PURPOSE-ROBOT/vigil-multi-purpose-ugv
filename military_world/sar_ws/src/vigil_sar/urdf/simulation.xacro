@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="controlled_wheel" params="name encoded">
+    <!-- velocity command interface, exactly as vigil_rough_terrain: drive.py sends wheel speeds.
+         (DART holds a commanded wheel speed with whatever torque it takes; the rover itself still
+         only moves through tyre-ground friction.) -->
+    <joint name="${name}_joint"><command_interface name="velocity"/>
+      <xacro:if value="${encoded}"><state_interface name="position"/><state_interface name="velocity"/></xacro:if>
+    </joint>
+  </xacro:macro>
+  <xacro:macro name="passive_carrier" params="side index">
+    <joint name="${side}${index}_suspension"><state_interface name="position"/><state_interface name="velocity"/></joint>
+  </xacro:macro>
+  <xacro:macro name="controlled_side" params="side">
+    <xacro:controlled_wheel name="${side}1" encoded="${True}"/><xacro:controlled_wheel name="${side}2" encoded="${True}"/>
+    <xacro:controlled_wheel name="${side}3" encoded="${True}"/><xacro:controlled_wheel name="${side}4" encoded="${True}"/>
+    <!-- Read-only interfaces: all suspension forces are integrated by DART. -->
+    <joint name="${side}_rocker"><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <xacro:passive_carrier side="${side}" index="1"/><xacro:passive_carrier side="${side}" index="2"/>
+    <xacro:passive_carrier side="${side}" index="3"/><xacro:passive_carrier side="${side}" index="4"/>
+  </xacro:macro>
+  <ros2_control name="AgriSimulation" type="system"><hardware><plugin>gz_ros2_control/GazeboSimSystem</plugin></hardware>
+    <xacro:controlled_side side="L"/><xacro:controlled_side side="R"/>
+  </ros2_control>
+  <gazebo><plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin"><parameters>$(arg controllers_file)</parameters><hold_joints>false</hold_joints></plugin></gazebo>
+  <gazebo><plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+    <topic>/encoders</topic><update_rate>50</update_rate>
+    <joint_name>L1_joint</joint_name><joint_name>L2_joint</joint_name><joint_name>L3_joint</joint_name>
+    <joint_name>R1_joint</joint_name><joint_name>R2_joint</joint_name><joint_name>R3_joint</joint_name>
+  </plugin></gazebo>
+  <gazebo><plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+    <publish_link_pose>true</publish_link_pose><publish_sensor_pose>false</publish_sensor_pose><publish_collision_pose>false</publish_collision_pose><publish_visual_pose>false</publish_visual_pose><use_pose_vector_msg>true</use_pose_vector_msg><update_frequency>30</update_frequency>
+  </plugin></gazebo>
+  <gazebo><plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+    <odom_frame>world</odom_frame><robot_base_frame>base_footprint</robot_base_frame><odom_topic>/sim/ground_truth</odom_topic><dimensions>3</dimensions><odom_publish_frequency>20</odom_publish_frequency>
+  </plugin></gazebo>
+  <!-- vigil_sar: lidar / rgbd can be switched off (launch lidar:=false / rgbd:=false) to find
+       which rendering sensor crashes Gazebo on a given PC (find_crash.sh). Default on. -->
+  <xacro:arg name="lidar" default="true"/>
+  <xacro:arg name="rgbd_camera" default="true"/>
+  <xacro:if value="$(arg lidar)">
+  <gazebo reference="lidar_link"><sensor name="lidar" type="gpu_lidar"><topic>/lidar</topic><gz_frame_id>lidar_link</gz_frame_id><update_rate>5</update_rate><always_on>true</always_on>
+    <lidar><scan><horizontal><samples>512</samples><resolution>1</resolution><min_angle>-${pi}</min_angle><max_angle>${pi}</max_angle></horizontal><vertical><samples>16</samples><resolution>1</resolution><min_angle>-0.45</min_angle><max_angle>0.30</max_angle></vertical></scan><range><min>0.3</min><max>25</max><resolution>0.01</resolution></range><noise><type>gaussian</type><stddev>0.01</stddev></noise></lidar>
+  </sensor></gazebo>
+  </xacro:if>
+
+  <xacro:if value="$(arg rgbd_camera)">
+  <gazebo reference="camera_link"><sensor name="rgbd" type="rgbd_camera"><topic>/camera</topic><gz_frame_id>camera_optical_frame</gz_frame_id><update_rate>10</update_rate><always_on>true</always_on>
+    <camera><horizontal_fov>1.5184</horizontal_fov><image><width>320</width><height>240</height><format>R8G8B8</format></image><clip><near>0.2</near><far>25</far></clip><depth_camera><clip><near>0.2</near><far>15</far></clip></depth_camera><optical_frame_id>camera_optical_frame</optical_frame_id></camera>
+  </sensor></gazebo>
+  </xacro:if>
+  <gazebo reference="imu_link"><sensor name="imu" type="imu"><topic>/imu/data</topic><gz_frame_id>imu_link</gz_frame_id><update_rate>100</update_rate><always_on>true</always_on><imu/></sensor></gazebo>
+  <gazebo reference="base_link"><light name="headlight" type="spot"><pose>0.45 0 0.04 0 0 0</pose><diffuse>1 0.95 0.85 1</diffuse><specular>0.1 0.1 0.1 1</specular><direction>1 0 -0.15</direction><intensity>0</intensity><attenuation><range>18</range><constant>0.2</constant><linear>0.02</linear><quadratic>0.002</quadratic></attenuation><spot><inner_angle>0.45</inner_angle><outer_angle>0.8</outer_angle><falloff>0.5</falloff></spot><cast_shadows>true</cast_shadows></light></gazebo>
+</robot>

@@ -1,0 +1,76 @@
+# =====================================================================
+# VIGIL SAR UGV - PHYSICS
+#
+# The rover is the vigil_rough_terrain rover, copied exactly (urdf/agri_ugv.urdf.xacro and
+# urdf/cad_geometry.xacro; vigil_rough_terrain_ws itself is only read). Its masses, friction,
+# suspension and wheel torque live in those URDF files, not here. This file holds what the launch
+# and drive.py need: the physics engine (Earth gravity) and the wheel drive.
+# =====================================================================
+/**:
+  ros__parameters:
+    physics:
+
+      # ---------------------------------------------------------------- engine
+      # Copied from vigil_rough_terrain (worlds/rock_terrain.sdf, worlds/test/*.sdf,
+      # models/rocky_terrain_n4/model.sdf). Compared 2026-09-23:
+      #                        vigil_rough_terrain        SAR before           SAR now
+      #   gravity              0 0 -9.81                  0 0 -9.81            0 0 -9.81
+      #   max_step_size        0.001                      0.001 (fast: 0.002)  0.001 (fast too)
+      #   real_time_factor     1                          1                    1
+      #   DART detector/solver (none set: defaults)       ode / dantzig        defaults
+      #   ground mu / mu2      1.0                        0.05 - 0.85          1.0
+      engine:
+        gravity: 9.81              # m/s2, Earth. Written into the generated world on every launch.
+        max_step_size: 0.001       # s, as vigil_rough_terrain (fast:=true no longer changes it)
+        collision_detector: default  # default = no <dart> block, DART's own choice (vigil_rough_terrain);
+                                     # or pin one: ode | bullet | fcl | dart
+        solver: default            # default (vigil_rough_terrain) | dantzig | pgs
+        ground_friction: 1.0       # mu = mu2 on terrain, roads, tracks, apron, bridge deck, as the
+                                   # vigil_rough_terrain ground. "export" keeps the per-tile values
+                                   # (gravel 0.55, sand 0.35, snow 0.30, mud 0.28, water 0.05).
+
+      # ---------------------------------------------------------------- wheel drive (drive.py)
+      # Wheel VELOCITY commands through velocity_controllers/JointGroupVelocityController (as
+      # vigil_rough_terrain). Gazebo holds each wheel at its commanded speed with up to
+      # wheel_torque_limit; the rover itself moves only through tyre-ground friction.
+      #
+      # Wheelie limit of THIS rover (scripts/rover_stability.py, from the URDF): centre of mass
+      # 0.33 m above the ground and 0.31 m ahead of the rearmost loaded wheel (wheel 3; wheel 4 is
+      # lifted in the CAD) -> the front lifts above 7.7 m/s2 on flat ground, 5.3 on 15 deg, 2.9 on
+      # 28 deg, 1.9 on a 33 deg climb. The old 8.0 m/s2 ramp was above even the flat-ground limit:
+      # the 2026-09-23 17:18 run reared up to 39 deg on the flat base apron.
+      drive:
+        mode: velocity
+        max_linear: 3.0            # m/s  open-road top speed (was 10)
+        max_accel: 1.0             # m/s2 speeding up: 1.9x below the wheelie limit on a 33 deg
+                                   #      climb, 7.7x on flat ground (was 8.0)
+        max_decel: 2.0             # m/s2 braking: 3.0 m/s -> 0 in ~1.5 s / ~2.6 m; nose-over is
+                                   #      only above 13 m/s2 (front wheel 0.52 m ahead of the COM)
+        max_jerk: 3.0              # m/s3 speeding up: the acceleration builds up over ~0.3 s, never a step
+        max_jerk_brake: 8.0        # m/s3 braking: full 2.0 m/s2 within 0.25 s (braking pitches the rover
+                                   #      onto its big front wheels - no wheelie risk - and a slow brake
+                                   #      build-up made it roll 0.4 m past B in the model)
+        max_angular: 1.0           # rad/s
+        ramp_angular: 3.0          # rad/s2 (was 6.0): 1.0 rad/s in 0.33 s - still no turn lag
+        max_wheel_accel: 25.0      # rad/s2 cap on any one wheel's speed change (1.0 m/s2 + full yaw
+                                   #      ramp needs ~17 rad/s2; this only catches a bad command)
+        skid_factor: 0.65          # m, yaw -> left/right wheel speed difference
+        wheel_torque_limit: 150.0  # N.m per wheel joint (effort limit; vigil_rough_terrain 400).
+                                   #      The most one tyre can pass to the ground is about
+                                   #      0.85 x 650 N x 0.235 m ~ 130 N.m, so 150 keeps every
+                                   #      turn and climb; 400 only allowed 2.7x larger torque spikes.
+
+      # ---------------------------------------------------------------- rover (reference only)
+      # What urdf/agri_ugv.urdf.xacro contains, for the offline model in test/skid_model.py.
+      rover:
+        mass: 291.5                # kg (links summed from the URDF: scripts/rover_stability.py)
+        length: 1.53               # m, outer tyre-to-tyre (URDF); = sar_mission.yaml robot.length
+        width: 1.12                # m                            ; = robot.width
+        wheelbase: 0.82            # m, front (wheel 1) to rear loaded (wheel 3) axle
+        track_width: 0.90          # m, wheel centre to wheel centre
+        wheel_radius_front: 0.23463  # m, wheel 1 (L1/R1). drive.py and sim.launch.py read these;
+        wheel_radius_small: 0.17655  # m, wheels 2-4.        a test checks them against the URDF
+        wheel_friction: 0.85       # mu1 = mu2 on every tyre
+        wheel_torque_limit: 150.0  # N.m per wheel joint (from drive.wheel_torque_limit)
+        rear_pair_lifted: true     # wheel 4 (L4/R4) sits at the rocker pivot height in the CAD
+                                   # export: the rover runs on six wheels, as vigil_rough_terrain does

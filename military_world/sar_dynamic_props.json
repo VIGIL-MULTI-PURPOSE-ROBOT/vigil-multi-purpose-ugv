@@ -1,0 +1,2398 @@
+{
+  "schema": "sar_dynamic_props/1.0",
+  "seed": 20260915,
+  "note": "Physics-reactive obstacles. These export as NON-STATIC SDF models with mass, inertia and surface parameters; Gazebo's solver produces all of their motion. Nothing here is keyframed. Blender's own rigid-body system does not export -- sar_physics_preview.py only arms a viewport preview.",
+  "kinds": {
+    "BARREL": {
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "mass": 21.0,
+      "mat": "MAT_RUSTMETAL",
+      "thermal": "THERMAL_METAL",
+      "mu": 0.45,
+      "restitution": 0.2,
+      "collision": "CYLINDER",
+      "note": "Part-full steel drum. Tips, then rolls.",
+      "inertia": [
+        1.7967249999999997,
+        1.7967249999999997,
+        0.8830499999999999
+      ]
+    },
+    "CRATE": {
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "mass": 14.0,
+      "mat": "MAT_WOOD",
+      "thermal": "THERMAL_WOOD",
+      "mu": 0.62,
+      "restitution": 0.1,
+      "collision": "BOX",
+      "note": "Supply crate. Slides and tumbles, does not roll.",
+      "inertia": [
+        0.7729166666666668,
+        0.7729166666666668,
+        0.84
+      ]
+    },
+    "PALLET": {
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "mass": 16.0,
+      "mat": "MAT_WOOD",
+      "thermal": "THERMAL_WOOD",
+      "mu": 0.58,
+      "restitution": 0.05,
+      "collision": "BOX",
+      "note": "Flat and low -- a genuine LiDAR ambiguity: the robot must decide whether to drive over it.",
+      "inertia": [
+        0.8794666666666667,
+        1.9461333333333333,
+        2.7733333333333334
+      ]
+    },
+    "CONE": {
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "mass": 4.5,
+      "mat": "MAT_RESCUE",
+      "thermal": "THERMAL_AMBIENT",
+      "mu": 0.7,
+      "restitution": 0.3,
+      "collision": "CYLINDER",
+      "note": "Traffic cone. Light enough to knock flat without stopping the robot -- tests whether contact is detected at all.",
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.081225
+      ]
+    },
+    "PANEL": {
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "mass": 9.0,
+      "mat": "MAT_METAL",
+      "thermal": "THERMAL_METAL",
+      "mu": 0.35,
+      "restitution": 0.15,
+      "collision": "BOX",
+      "note": "Loose sheet metal. Low friction, slides a long way.",
+      "inertia": [
+        0.609375,
+        1.4718749999999998,
+        2.0774999999999997
+      ]
+    },
+    "PIPE": {
+      "shape": "CYL_X",
+      "dims": [
+        0.12,
+        2.2
+      ],
+      "mass": 15.0,
+      "mat": "MAT_METAL",
+      "thermal": "THERMAL_METAL",
+      "mu": 0.3,
+      "restitution": 0.1,
+      "collision": "CYLINDER",
+      "note": "Loose pipe lying across the ground. Rolls perpendicular to its axis and not at all along it.",
+      "inertia": [
+        0.10799999999999998,
+        6.104,
+        6.104
+      ]
+    },
+    "JERRYCAN": {
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "mass": 6.5,
+      "mat": "MAT_RESCUE",
+      "thermal": "THERMAL_AMBIENT",
+      "mu": 0.55,
+      "restitution": 0.2,
+      "collision": "BOX",
+      "note": "Fuel can. Small enough to vanish under a bumper.",
+      "inertia": [
+        0.1272375,
+        0.17604166666666668,
+        0.08390416666666665
+      ]
+    },
+    "BIN": {
+      "shape": "BOX",
+      "dims": [
+        0.58,
+        0.52,
+        0.92
+      ],
+      "mass": 9.0,
+      "mat": "MAT_VEHICLE_B",
+      "thermal": "THERMAL_AMBIENT",
+      "mu": 0.5,
+      "restitution": 0.15,
+      "collision": "BOX",
+      "note": "Wheeled bin. Tall, light, topples easily.",
+      "inertia": [
+        0.8376,
+        0.8871000000000001,
+        0.4551
+      ]
+    }
+  },
+  "clusters": [
+    {
+      "id": "SAR_DynProps_BaseYard",
+      "center": [
+        -14.0,
+        -8.0
+      ],
+      "radius_m": 6.5,
+      "zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "exposure": "ADJACENT",
+      "note": "Staging yard on the apron. First movable things the robot sees, on flat ground where a failed push is unambiguous."
+    },
+    {
+      "id": "SAR_DynProps_BaseGate",
+      "center": [
+        1.5,
+        3.0
+      ],
+      "radius_m": 4.0,
+      "zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "exposure": "ON_ROUTE",
+      "note": "Cones narrowing the base gate. Directly on the exit path -- the robot meets these in the first ten metres of every run."
+    },
+    {
+      "id": "SAR_DynProps_StreetA",
+      "center": [
+        61.0,
+        44.0
+      ],
+      "radius_m": 7.0,
+      "zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "exposure": "ON_ROUTE",
+      "note": "Street furniture strewn across Urban Street A, the alternative when Street C is blocked by the overturned truck."
+    },
+    {
+      "id": "SAR_DynProps_Canyon",
+      "center": [
+        79.5,
+        50.0
+      ],
+      "radius_m": 2.8,
+      "zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "exposure": "ADJACENT",
+      "note": "Inside the 7.5 m canyon between URB_001 and URB_002. Narrows an already tight corridor, and the walls leave nowhere to swing wide -- the robot either pushes through or backs out."
+    },
+    {
+      "id": "SAR_DynProps_WarehouseYard",
+      "center": [
+        108.0,
+        40.0
+      ],
+      "radius_m": 5.0,
+      "zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "exposure": "ADJACENT",
+      "note": "Loading yard outside the warehouse roller door."
+    },
+    {
+      "id": "SAR_DynProps_RubbleEdge",
+      "center": [
+        14.0,
+        104.0
+      ],
+      "radius_m": 7.0,
+      "zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "exposure": "ADJACENT",
+      "note": "Loose pipe and sheet at the collapse-field margin, beside the rubble bypass. Rolling pipe on sloped debris is the nastiest case here: it moves after the robot has passed it."
+    },
+    {
+      "id": "SAR_DynProps_FloodBank",
+      "center": [
+        -96.0,
+        58.0
+      ],
+      "radius_m": 8.0,
+      "zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "exposure": "OFF_ROUTE",
+      "note": "Debris washed onto the flood plain. Scattered, low contrast against mud."
+    },
+    {
+      "id": "SAR_DynProps_DesertTrack",
+      "center": [
+        116.0,
+        104.0
+      ],
+      "radius_m": 6.0,
+      "zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "exposure": "ADJACENT",
+      "note": "Dropped stores beside the desert track. Sand gives low friction under both the prop and the robot."
+    },
+    {
+      "id": "SAR_DynProps_ForestStaging",
+      "center": [
+        -40.0,
+        162.0
+      ],
+      "radius_m": 5.0,
+      "zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "exposure": "ADJACENT",
+      "note": "Forward staging point on the forest track, under canopy shadow."
+    }
+  ],
+  "props": [
+    {
+      "name": "SAR_DynProps_BaseYard_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -16.81,
+        -4.62,
+        0.484
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -12.88,
+        -7.79,
+        0.478
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_BARREL_03",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -11.66,
+        -2.97,
+        0.486
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CONE_01",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -19.13,
+        -10.67,
+        0.402
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CONE_02",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -18.08,
+        -7.94,
+        0.412
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CRATE_01",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -17.17,
+        -9.56,
+        0.31
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CRATE_02",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -19.25,
+        -5.41,
+        0.312
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CRATE_03",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -9.16,
+        -3.97,
+        0.318
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_CRATE_04",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -11.62,
+        -12.8,
+        0.296
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_PALLET_01",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -14.06,
+        -7.77,
+        0.109
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_PALLET_02",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -14.88,
+        -12.26,
+        0.093
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseYard_PALLET_03",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_BaseYard",
+      "position": [
+        -20.14,
+        -8.52,
+        0.097
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        0.85,
+        6.2,
+        0.653
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        3.52,
+        2.1,
+        0.544
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_CONE_01",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        -1.6,
+        4.96,
+        0.55
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_CONE_02",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        1.99,
+        6.31,
+        0.555
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_CONE_03",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        1.34,
+        3.31,
+        0.547
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_BaseGate_CONE_04",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_BaseGate",
+      "position": [
+        1.5,
+        4.22,
+        0.553
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_HOME",
+      "sector": "BASE",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_BIN_01",
+      "kind": "BIN",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        55.58,
+        47.12,
+        0.595
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.8376,
+        0.8871,
+        0.4551
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.58,
+        0.52,
+        0.92
+      ],
+      "friction_mu": 0.5,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_BIN_02",
+      "kind": "BIN",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        63.84,
+        47.98,
+        0.512
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.8376,
+        0.8871,
+        0.4551
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.58,
+        0.52,
+        0.92
+      ],
+      "friction_mu": 0.5,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_BIN_03",
+      "kind": "BIN",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        54.91,
+        43.66,
+        0.647
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.8376,
+        0.8871,
+        0.4551
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.58,
+        0.52,
+        0.92
+      ],
+      "friction_mu": 0.5,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_CONE_01",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        66.3,
+        44.09,
+        0.381
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_CONE_02",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        55.3,
+        44.93,
+        0.54
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_CONE_03",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        61.48,
+        43.68,
+        0.494
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_CONE_04",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        58.02,
+        40.98,
+        0.478
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_PANEL_01",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        66.32,
+        41.71,
+        0.09
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_StreetA_PANEL_02",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_StreetA",
+      "position": [
+        62.97,
+        41.43,
+        0.111
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ON_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_Canyon_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_Canyon",
+      "position": [
+        77.51,
+        50.79,
+        0.47
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_Canyon_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_Canyon",
+      "position": [
+        80.26,
+        48.0,
+        0.489
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_Canyon_BARREL_03",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_Canyon",
+      "position": [
+        79.85,
+        50.33,
+        0.488
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_Canyon_PALLET_01",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_Canyon",
+      "position": [
+        78.12,
+        48.57,
+        0.117
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_Canyon_PALLET_02",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_Canyon",
+      "position": [
+        81.83,
+        51.29,
+        0.149
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        108.94,
+        39.75,
+        0.532
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        105.22,
+        37.82,
+        0.527
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_CRATE_01",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        107.6,
+        39.06,
+        0.349
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_CRATE_02",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        110.85,
+        36.31,
+        0.376
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_CRATE_03",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        104.34,
+        40.38,
+        0.373
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_CRATE_04",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        110.44,
+        43.93,
+        0.431
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_CRATE_05",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        106.09,
+        43.28,
+        0.401
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_PALLET_01",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        105.13,
+        43.4,
+        0.184
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_PALLET_02",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        112.31,
+        39.48,
+        0.167
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_PALLET_03",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        111.12,
+        40.33,
+        0.183
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_WarehouseYard_PALLET_04",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_WarehouseYard",
+      "position": [
+        105.2,
+        40.79,
+        0.174
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_C",
+      "sector": "URBAN",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        11.21,
+        104.16,
+        1.414
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        18.92,
+        107.4,
+        1.704
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PANEL_01",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        16.46,
+        104.37,
+        1.105
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PANEL_02",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        16.17,
+        107.95,
+        1.233
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PANEL_03",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        8.22,
+        105.25,
+        0.962
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PANEL_04",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        17.09,
+        102.55,
+        0.944
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PIPE_01",
+      "kind": "PIPE",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        19.45,
+        101.9,
+        1.069
+      ],
+      "mass_kg": 15.0,
+      "inertia": [
+        0.108,
+        6.104,
+        6.104
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_X",
+      "dims": [
+        0.12,
+        2.2
+      ],
+      "friction_mu": 0.3,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PIPE_02",
+      "kind": "PIPE",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        13.27,
+        109.09,
+        1.277
+      ],
+      "mass_kg": 15.0,
+      "inertia": [
+        0.108,
+        6.104,
+        6.104
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_X",
+      "dims": [
+        0.12,
+        2.2
+      ],
+      "friction_mu": 0.3,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PIPE_03",
+      "kind": "PIPE",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        11.01,
+        98.69,
+        1.015
+      ],
+      "mass_kg": 15.0,
+      "inertia": [
+        0.108,
+        6.104,
+        6.104
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_X",
+      "dims": [
+        0.12,
+        2.2
+      ],
+      "friction_mu": 0.3,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_RubbleEdge_PIPE_04",
+      "kind": "PIPE",
+      "cluster": "SAR_DynProps_RubbleEdge",
+      "position": [
+        20.89,
+        103.37,
+        1.07
+      ],
+      "mass_kg": 15.0,
+      "inertia": [
+        0.108,
+        6.104,
+        6.104
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_X",
+      "dims": [
+        0.12,
+        2.2
+      ],
+      "friction_mu": 0.3,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "RUBBLE",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -99.33,
+        57.26,
+        -0.155
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -99.1,
+        64.79,
+        -0.143
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_BARREL_03",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -97.49,
+        55.33,
+        -0.22
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_BARREL_04",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -100.64,
+        59.68,
+        -0.171
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_JERRYCAN_01",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -90.34,
+        57.87,
+        -0.677
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_JERRYCAN_02",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -93.14,
+        54.04,
+        -0.58
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_JERRYCAN_03",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -102.87,
+        54.9,
+        -0.337
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_JERRYCAN_04",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -94.75,
+        61.13,
+        -0.404
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_PANEL_01",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -93.16,
+        60.47,
+        -0.693
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_FloodBank_PANEL_02",
+      "kind": "PANEL",
+      "cluster": "SAR_DynProps_FloodBank",
+      "position": [
+        -102.74,
+        58.05,
+        -0.57
+      ],
+      "mass_kg": 9.0,
+      "inertia": [
+        0.60938,
+        1.47187,
+        2.0775
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.4,
+        0.9,
+        0.05
+      ],
+      "friction_mu": 0.35,
+      "restitution": 0.15,
+      "search_zone": "SAR_ZONE_F",
+      "sector": "FLOOD",
+      "route_exposure": "OFF_ROUTE"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_BARREL_01",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        110.52,
+        104.42,
+        -0.433
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_BARREL_02",
+      "kind": "BARREL",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        114.91,
+        99.98,
+        -0.131
+      ],
+      "mass_kg": 21.0,
+      "inertia": [
+        1.79672,
+        1.79672,
+        0.88305
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.29,
+        0.88
+      ],
+      "friction_mu": 0.45,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_CRATE_01",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        119.23,
+        106.78,
+        -0.423
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_CRATE_02",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        119.65,
+        102.23,
+        -0.268
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_JERRYCAN_01",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        116.49,
+        105.73,
+        -0.516
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_JERRYCAN_02",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        115.77,
+        101.75,
+        -0.324
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_DesertTrack_JERRYCAN_03",
+      "kind": "JERRYCAN",
+      "cluster": "SAR_DynProps_DesertTrack",
+      "position": [
+        115.28,
+        109.53,
+        -0.721
+      ],
+      "mass_kg": 6.5,
+      "inertia": [
+        0.12724,
+        0.17604,
+        0.0839
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.35,
+        0.18,
+        0.45
+      ],
+      "friction_mu": 0.55,
+      "restitution": 0.2,
+      "search_zone": "SAR_ZONE_E",
+      "sector": "DESERT",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_CONE_01",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -43.12,
+        164.78,
+        1.321
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_CONE_02",
+      "kind": "CONE",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -36.17,
+        161.36,
+        1.436
+      ],
+      "mass_kg": 4.5,
+      "inertia": [
+        0.25155,
+        0.25155,
+        0.08123
+      ],
+      "collision": "CYLINDER",
+      "shape": "CYL_Z",
+      "dims": [
+        0.19,
+        0.75
+      ],
+      "friction_mu": 0.7,
+      "restitution": 0.3,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_CRATE_01",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -40.0,
+        162.16,
+        1.293
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_CRATE_02",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -39.49,
+        165.68,
+        1.374
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_CRATE_03",
+      "kind": "CRATE",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -38.05,
+        158.82,
+        1.302
+      ],
+      "mass_kg": 14.0,
+      "inertia": [
+        0.77292,
+        0.77292,
+        0.84
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        0.6,
+        0.6,
+        0.55
+      ],
+      "friction_mu": 0.62,
+      "restitution": 0.1,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_PALLET_01",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -39.61,
+        163.44,
+        1.071
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    },
+    {
+      "name": "SAR_DynProps_ForestStaging_PALLET_02",
+      "kind": "PALLET",
+      "cluster": "SAR_DynProps_ForestStaging",
+      "position": [
+        -35.34,
+        162.02,
+        1.119
+      ],
+      "mass_kg": 16.0,
+      "inertia": [
+        0.87947,
+        1.94613,
+        2.77333
+      ],
+      "collision": "BOX",
+      "shape": "BOX",
+      "dims": [
+        1.2,
+        0.8,
+        0.14
+      ],
+      "friction_mu": 0.58,
+      "restitution": 0.05,
+      "search_zone": "SAR_ZONE_B",
+      "sector": "FOREST",
+      "route_exposure": "ADJACENT"
+    }
+  ]
+}

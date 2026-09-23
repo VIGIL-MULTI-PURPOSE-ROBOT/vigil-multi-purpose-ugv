@@ -1,4 +1,4 @@
-source: User-provided Fusion active-suspension notes; no joint-rich export attached
+source: full shhhh_activesuspension.stl (SHA256 660776500e243604f17f388921b051b83f0a0db94dda5d01ccfc34054a9ba37e)
 standing_angle_deg: -3.6
 travel_deg: 12.0
 hard_limits_deg:
@@ -15,5 +15,7 @@ cylinder:
   b_m: 0.52735
   theta_zero_deg: 71.041
   retracted_length_m: 0.4782
-geometry_limit: Link origins and 8 passive travel joints are still provisional; lumped
-  hardware distribution is approximate.
+geometry_limit: CAD visual geometry and axle locations imported in metres; two rocker
+  pivots inferred from the rear cross-shaft. Hydraulic cylinder visuals are rigid
+  parts of each rocker, not a closed-loop linkage. Masses and dynamics are assumed.
+geometry_manifest: agri_ugv_description/config/cad_geometry.json

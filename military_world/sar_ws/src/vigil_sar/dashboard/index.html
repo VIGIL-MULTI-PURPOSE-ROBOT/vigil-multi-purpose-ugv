@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIGIL UGV SAR Station</title>
+<style>
+  :root {
+    --bg: #0b0e12; --panel: #141920; --panel2: #1b2129; --line: #27303a;
+    --text: #d9e1ea; --muted: #7d8a99; --accent: #35d0ff;
+    --safe: #3cc850; --uneven: #ffc800; --warn: #ff7800; --danger: #ff3b3b; --info: #5aa9ff; --human: #ff3355;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px/1.35 "Inter", "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: #080a0d; }
+  header h1 { font-size: 15px; letter-spacing: .12em; margin: 0; font-weight: 800; white-space: nowrap; }
+  header h1 span { color: var(--accent); }
+  .pill { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: .05em; border: 1px solid currentColor; white-space: nowrap; }
+  .conn { margin-left: auto; color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+  .dot.on { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
+  /* The SAR switch is ALWAYS live: it is never greyed out, whatever the navigator is doing. */
+  #sarSwitch { font: 800 15px/1 system-ui; letter-spacing: .08em; padding: 9px 20px; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--human); background: #2a1219; color: #fff; min-width: 170px; }
+  #sarSwitch:hover { background: #3a0f18; box-shadow: 0 0 12px rgba(255,51,85,.45); }
+  #sarSwitch.active { border-color: #fff; background: #b3122f; color: #fff; box-shadow: 0 0 14px rgba(255,51,85,.6); }
+  #sarSwitch.pending { opacity: .75; }
+  #sarLive { font: 800 12px system-ui; letter-spacing: .08em; padding: 6px 10px; border-radius: 6px;
+    color: var(--human); border: 1px solid var(--human); display: none; }
+  #sarLive.on { display: inline-block; }
+  #startBtn { font: 800 13px system-ui; letter-spacing: .06em; padding: 8px 14px; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--safe); background: #10281a; color: var(--safe); }
+  #startBtn.running { border-color: var(--muted); color: var(--muted); background: #20262e; }
+  main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); grid-template-rows: minmax(0, 1.25fr) minmax(0, 0.9fr) auto;
+    gap: 10px; padding: 10px; height: calc(100% - 52px); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative; }
+  .panel h2 { margin: 0; padding: 7px 12px; font-size: 11px; letter-spacing: .14em; color: var(--muted); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .panel h2 .right { margin-left: auto; font-weight: 500; letter-spacing: 0; display: flex; gap: 6px; align-items: center; }
+  .imgwrap { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; min-height: 0; }
+  .imgwrap img { width: 100%; height: 100%; object-fit: contain; }
+  #thermalPanel.hot { border-color: var(--human); box-shadow: 0 0 0 1px var(--human), 0 0 18px rgba(255,51,85,.35); }
+  #thermalBanner { position: absolute; left: 12px; top: 38px; font: 800 18px system-ui; letter-spacing: .06em; padding: 4px 10px; border-radius: 6px;
+    background: rgba(0,0,0,.7); color: #9fd8a8; pointer-events: none; }
+  #thermalBanner.hot { color: #fff; background: rgba(200,20,50,.85); }
+  #mapwrap { flex: 1; position: relative; min-height: 0; }
+  #map { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+  #map.setgoal { cursor: crosshair; }
+  #popup { position: absolute; display: none; background: rgba(10,13,16,.95); border: 1px solid var(--human); border-radius: 8px; padding: 8px 10px;
+    font-size: 12px; pointer-events: none; min-width: 170px; z-index: 5; }
+  .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+  .kv.two { grid-template-columns: repeat(2, 1fr); }
+  .kv div { background: var(--panel); padding: 6px 10px; }
+  .kv b { display: block; font-size: 10px; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .kv span { font: 600 15px/1.3 "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .big { font: 800 20px/1.1 system-ui, sans-serif; letter-spacing: .04em; padding: 10px 12px; }
+  .reason { padding: 0 12px 8px; color: var(--muted); min-height: 28px; font-size: 12px; }
+  .bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1.15fr 1.5fr; gap: 10px; min-height: 0; max-height: 270px; }
+  .scroll { overflow-y: auto; flex: 1; min-height: 0; }
+  #events, #humanList { list-style: none; margin: 0; padding: 4px 0; }
+  #events li { padding: 3px 10px; border-left: 3px solid transparent; display: grid; grid-template-columns: 62px 1fr; gap: 6px; font-size: 12px; }
+  #events li .t { color: var(--muted); font-family: ui-monospace, monospace; }
+  #events li.human { background: rgba(255,51,85,.12); border-left-color: var(--human); font-weight: 700; }
+  #humanList li { padding: 6px 10px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 44px 1fr; gap: 8px; cursor: pointer; }
+  #humanList li:hover { background: var(--panel2); }
+  #humanList .hid { font: 800 18px system-ui; color: var(--human); }
+  #humanList .d { font: 12px ui-monospace, monospace; color: var(--text); }
+  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
+  button.on { border-color: var(--accent); color: var(--accent); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; padding: 5px 12px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .sarbig { font: 800 24px/1.1 system-ui; padding: 10px 12px 6px; letter-spacing: .04em; }
+  .pts { display: flex; gap: 4px; padding: 6px 12px 10px; flex-wrap: wrap; }
+  .pts span { width: 30px; text-align: center; padding: 3px 0; border-radius: 5px; font: 700 11px ui-monospace, monospace; background: #232a33; color: var(--muted); }
+  .pts span.active { background: var(--uneven); color: #111; }
+  .pts span.done { background: #1d4d2a; color: #9ff0b0; }
+  .pts span.skipped { background: #4d321d; color: #ffb070; }
+  #toast { position: fixed; left: 50%; top: 60px; transform: translateX(-50%); background: rgba(200,20,50,.95); color: #fff; font: 800 22px system-ui;
+    padding: 10px 24px; border-radius: 10px; letter-spacing: .06em; display: none; z-index: 10; box-shadow: 0 6px 30px rgba(0,0,0,.6); }
+  #toast.info { background: rgba(20,120,60,.95); }
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 1fr; height: auto; grid-template-rows: none; }
+    .bottom { grid-template-columns: 1fr; max-height: none; }
+    .imgwrap, #mapwrap { height: 340px; flex: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>VIGIL <span>UGV</span> SAR NAVIGATION</h1>
+  <div id="statePill" class="pill">---</div>
+  <div id="terrPill" class="pill">TERRAIN ---</div>
+  <div id="humansPill" class="pill" style="color:var(--muted)">HUMANS 0</div>
+  <button id="startBtn" title="Start the A -> B mission">START A→B</button>
+  <span id="sarLive">● SAR ACTIVE</span>
+  <button id="sarSwitch" title="Start search and rescue - available at any time">🔍 START SAR</button>
+  <div class="conn"><span id="rtf" title="simulation speed: sim seconds per real second"></span><div id="dot" class="dot"></div><span id="conn">connecting</span></div>
+</header>
+<div id="toast"></div>
+<main>
+  <section class="panel" style="grid-row: 1">
+    <h2>RGB CAMERA · <span id="rgbRes">4K</span> · PATH / TERRAIN / CLIFF OVERLAY
+      <span class="right"><span id="fps"></span><button id="fullBtn" title="open one full-resolution frame">4K frame</button></span></h2>
+    <div class="imgwrap"><img id="cam" alt="rgb camera"></div>
+  </section>
+  <section class="panel" style="grid-row: 1">
+    <h2>A → B MAP · SEARCH AREA
+      <span class="right"><button id="goalBtn" title="Click, then click on the map">SET GOAL B</button>
+        <button id="fitBtn" class="on">Auto-fit</button></span></h2>
+    <div id="mapwrap"><canvas id="map"></canvas><div id="popup"></div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <section class="panel" id="thermalPanel" style="grid-row: 2">
+    <h2>THERMAL CAMERA · <span id="thRes">320x240</span> · HUMAN HEAT DETECTION <span class="right" id="thInfo"></span></h2>
+    <div class="imgwrap"><img id="thermal" alt="thermal camera"></div>
+    <div id="thermalBanner">THERMAL: NO HUMAN DETECTED</div>
+  </section>
+  <section class="panel" style="grid-row: 2">
+    <h2>SAR STATUS <span class="right" id="sarTime">00:00:00</span></h2>
+    <div class="sarbig" id="sarState">SAR OFF</div>
+    <div class="kv">
+      <div><b>SEARCH POINT</b><span id="sarPoint">- / -</span></div>
+      <div><b>HUMANS FOUND</b><span id="sarHumans" style="color:var(--human)">0</span></div>
+      <div><b>BUILDING VIEWS</b><span id="sarBld">- / -</span></div>
+    </div>
+    <div class="pts" id="pts"></div>
+    <div class="reason" id="sarTask"></div>
+  </section>
+  <div class="bottom">
+    <section class="panel">
+      <h2>TERRAIN <span class="right" id="terrMs"></span></h2>
+      <div class="big" id="terr">---</div>
+      <div class="kv">
+        <div><b>EST. DROP</b><span id="drop">-</span></div>
+        <div><b>SLOPE AHEAD</b><span id="slope">-</span></div>
+        <div><b>SAFE DIST</b><span id="safe">-</span></div>
+      </div>
+      <div class="reason" id="limits"></div>
+    </section>
+    <section class="panel">
+      <h2>NAVIGATION</h2>
+      <div class="big" id="navState">---</div>
+      <div class="reason" id="navReason"></div>
+      <div class="kv">
+        <div><b>DIST TO GOAL</b><span id="gd">-</span></div>
+        <div><b>PATH</b><span id="pl">-</span></div>
+        <div><b>REPLANS</b><span id="replans">-</span></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>ROBOT</h2>
+      <div class="kv">
+        <div><b>X</b><span id="rx">-</span></div>
+        <div><b>Y</b><span id="ry">-</span></div>
+        <div><b>HEADING</b><span id="rh">-</span></div>
+        <div><b>SPEED</b><span id="sp">-</span></div>
+        <div><b>ROLL / PITCH</b><span id="rp">-</span></div>
+        <div><b>GOAL B</b><span id="gxy" style="font-size:13px">-</span></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>HUMANS DETECTED <span class="right" id="hCount"></span></h2>
+      <div class="scroll"><ul id="humanList"></ul></div>
+    </section>
+    <section class="panel">
+      <h2>EVENT LOG</h2>
+      <div class="scroll" id="evScroll"><ul id="events"></ul></div>
+    </section>
+  </div>
+</main>
+<script>
+const STATE_COLORS = {
+  'NAVIGATING': 'var(--safe)', 'APPROACHING_GOAL': '#7fe0ff', 'SAFE PATH FOUND': 'var(--safe)', 'GOAL REACHED': 'var(--accent)', 'GOAL_REACHED': 'var(--accent)',
+  'CLIFF DETECTED': 'var(--danger)', 'REPLANNING': 'var(--warn)', 'PATH UPDATED': 'var(--uneven)', 'WAITING': 'var(--muted)',
+  'NEW GOAL': 'var(--info)', 'CLIMBING': '#aa96ff', 'CLIFF_AVOIDANCE': 'var(--warn)', 'RECOVERY': 'var(--uneven)',
+  'READY - PRESS START': 'var(--uneven)', 'SAR SCAN HOLD': 'var(--human)'
+};
+const SAR_COLORS = { 'SAR OFF': 'var(--muted)', 'SAR READY': 'var(--uneven)', 'SAR ACTIVE': 'var(--human)', 'SEARCHING': '#ff8fa3',
+  'MOVING TO SEARCH POINT': 'var(--accent)', 'MOVING TO BUILDING': 'var(--accent)', 'SCANNING BUILDING': '#ff8fa3',
+  'CONFIRMING HUMAN': 'var(--warn)', 'HUMAN DETECTED': 'var(--human)', 'FINAL SCAN': '#ff8fa3', 'SAR COMPLETE': 'var(--safe)' };
+const TERR_COLORS = { 'SAFE': 'var(--safe)', 'UNEVEN': 'var(--uneven)', 'POSSIBLE DROP': 'var(--warn)', 'STEEP': '#aa6e3c',
+  'OBSTACLE': '#dd44dd', 'CLIMBABLE': '#aa96ff', 'HIGH CLIFF': 'var(--danger)', 'UNKNOWN': 'var(--muted)' };
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 2, u = '') => (v === undefined || v === null || Number.isNaN(v)) ? '-' : Number(v).toFixed(d) + u;
+const hms = s => { s = Math.max(0, Math.floor(s || 0)); return [s / 3600, (s % 3600) / 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
+let S = null, mapImg = new Image(), mapReady = false, view = null, autoFit = true, settingGoal = false, hover = null, focusHuman = null;
+let lastFrame = 0, lastFrameT = performance.now(), fps = 0, knownHumans = new Set(), firstState = true;
+
+// images: double-buffered polling (no flicker, works everywhere)
+function poller(imgId, url, key) {
+  let busy = false, last = -1;
+  setInterval(() => {
+    if (busy || (S && S[key] === last)) return;
+    busy = true; const i = new Image(), f = S ? S[key] : 0;
+    i.onload = () => { $(imgId).src = i.src; last = f; busy = false; };
+    i.onerror = () => { busy = false; };
+    i.src = url + '?f=' + f + '&t=' + Date.now();
+  }, 90);
+}
+poller('cam', '/camera.jpg', 'frame');
+poller('thermal', '/thermal.jpg', 'thermal_frame');
+setInterval(() => { const i = new Image(); i.onload = () => { mapImg = i; mapReady = true; }; i.src = '/map.png?t=' + Date.now(); }, 1500);
+
+async function poll() {
+  try {
+    const r = await fetch('/state.json', { cache: 'no-store' });
+    S = await r.json(); $('dot').classList.add('on'); $('conn').textContent = 'live'; update();
+  } catch (e) { $('dot').classList.remove('on'); $('conn').textContent = 'disconnected'; }
+}
+setInterval(poll, 250);
+
+function pill(el, text, color) { el.textContent = text; el.style.color = color; }
+let toastT = null;
+let sarPending = null;      // SAR click awaiting the server's confirmation
+function toast(text, info = false) {
+  const t = $('toast'); t.textContent = text; t.className = info ? 'info' : ''; t.style.display = 'block';
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', info ? 2500 : 6000);
+}
+
+function update() {
+  const n = S.nav || {}, t = S.terrain || {}, r = S.robot, sar = S.sar || {}, th = S.thermal || {};
+  const st = n.state || 'WAITING';
+  pill($('statePill'), st, STATE_COLORS[st] || 'var(--text)');
+  const tc = t.terrain || 'UNKNOWN';
+  pill($('terrPill'), 'TERRAIN ' + tc, TERR_COLORS[tc] || 'var(--text)');
+  const nh = (S.humans || []).length;
+  pill($('humansPill'), 'HUMANS ' + nh, nh ? 'var(--human)' : 'var(--muted)');
+  $('rgbRes').textContent = S.params.rgb; $('thRes').textContent = S.params.thermal;
+  // START / SAR controls
+  const started = n.started !== false;
+  $('startBtn').textContent = started ? 'RUNNING' : 'START A→B'; $('startBtn').classList.toggle('running', started);
+  const sw = $('sarSwitch'), sstate = sar.state || 'SAR OFF';
+  if (sarPending && Date.now() - sarPending.t > 4000) sarPending = null;          // server never answered
+  if (sarPending && !!sar.active === sarPending.want) sarPending = null;          // server confirmed
+  const shownActive = sarPending ? sarPending.want : !!sar.active;
+  sw.className = (shownActive ? 'active' : '') + (sarPending ? ' pending' : '');
+  sw.textContent = shownActive ? '🛑 STOP SAR' : '🔍 START SAR';
+  sw.title = shownActive ? 'stop the search (always available)' : 'start search and rescue now (always available)';
+  sw.disabled = false;                                                              // never locked
+  $('sarLive').classList.toggle('on', shownActive);
+  // thermal
+  const hot = !!th.human_detected && (th.age ?? 99) < 2;
+  $('thermalBanner').textContent = hot ? `THERMAL: HUMAN DETECTED (${th.count})` : 'THERMAL: NO HUMAN DETECTED';
+  $('thermalBanner').classList.toggle('hot', hot); $('thermalPanel').classList.toggle('hot', hot);
+  $('thInfo').textContent = th.background_k ? `bg ${(th.background_k - 273.15).toFixed(1)}°C · human band ${(S.params.thermal_band[0] - 273.15).toFixed(1)}–${(S.params.thermal_band[1] - 273.15).toFixed(1)}°C` : '';
+  // new humans -> toast
+  for (const h of (S.humans || [])) {
+    if (!knownHumans.has(h.human_id)) { knownHumans.add(h.human_id); if (!firstState) toast(`HUMAN DETECTED · ${h.human_id} · X ${h.x.toFixed(1)}  Y ${h.y.toFixed(1)}`); }
+  }
+  firstState = false;
+  // SAR status
+  const sc = SAR_COLORS[sstate] || 'var(--text)';
+  $('sarState').textContent = sstate; $('sarState').style.color = sc;
+  const tot = sar.search_points_total || 0;
+  const cur = sar.search_point || (tot && sar.search_points_done === tot ? tot : 0);
+  $('sarPoint').textContent = tot ? `${cur || '-'} / ${tot}` : '- / -';
+  $('sarHumans').textContent = nh;
+  $('sarBld').textContent = sar.building_views_total ? `${sar.building_views_done} / ${sar.building_views_total}` : '- / -';
+  $('sarTime').textContent = 'SEARCH TIME ' + hms(sar.search_time);
+  $('pts').innerHTML = (sar.search_points || []).map(p => {
+    const active = sar.current_task && sar.current_task.index === p.index && p.status === 'pending' && sar.active;
+    return `<span class="${active ? 'active' : p.status}" title="(${p.x}, ${p.y})${p.moved ? ' moved out of a building' : ''}">P${p.index}</span>`; }).join('');
+  const ct = sar.current_task;
+  $('sarTask').textContent = ct ? `${ct.label} · (${ct.x}, ${ct.y}) · ${ct.phase === 'scan' ? 'scanning' : 'driving'}` :
+    (sstate === 'SAR COMPLETE' ? `Search finished: ${nh} humans found, ${sar.search_points_done}/${tot} search points. START SAR runs it again.` :
+     'Press START SAR at any time - at A, on the way, or at B.');
+  // robot / nav / terrain
+  if (r) {
+    $('rx').textContent = fmt(r.x); $('ry').textContent = fmt(r.y); $('rh').textContent = fmt(r.heading, 0, '°');
+    $('rtf').textContent = (S.rtf == null) ? '' : ('sim ' + (S.rtf * 100).toFixed(0) + '% of real time  ·  ');
+    $('sp').textContent = fmt(r.speed, 2, ' m/s'); $('rp').textContent = fmt(r.roll, 0) + '° / ' + fmt(r.pitch, 0) + '°';
+  }
+  if (S.goal) $('gxy').textContent = `${fmt(S.goal[0], 1)}, ${fmt(S.goal[1], 1)}`;
+  $('gd').textContent = fmt(S.dist_to_b ?? n.dist_to_goal ?? n.distance_to_goal, 2, ' m'); $('pl').textContent = fmt(n.path_length, 1, ' m');
+  $('replans').textContent = (n.hazard_replans ?? '-') + ' / ' + (n.replans ?? '-');
+  $('navState').textContent = st; $('navState').style.color = STATE_COLORS[st] || 'var(--text)';
+  $('navReason').textContent = n.reason || '';
+  $('terr').textContent = tc; $('terr').style.color = TERR_COLORS[tc] || 'var(--text)';
+  $('drop').textContent = fmt(t.drop, 2, ' m'); $('drop').style.color = (t.drop > S.params.max_safe_drop) ? 'var(--danger)' : 'var(--text)';
+  $('slope').textContent = fmt(t.slope_ahead, 0, '°');
+  $('slope').style.color = (t.slope_ahead > S.params.max_climb_slope) ? 'var(--danger)' : (t.slope_ahead > S.params.max_safe_slope) ? '#aa96ff' : 'var(--text)';
+  $('safe').textContent = fmt(t.safe_distance, 1, ' m');
+  $('terrMs').textContent = t.processing_ms ? t.processing_ms + ' ms' : '';
+  $('limits').textContent = `cliff: drop > ${S.params.max_safe_drop} m · slope ≤ ${S.params.max_safe_slope}° (climb ≤ ${S.params.max_climb_slope}°) · footprint ${S.params.length}×${S.params.width} m`;
+  // humans list
+  $('hCount').textContent = nh ? nh + ' found' : '';
+  $('humanList').innerHTML = (S.humans || []).map(h => `<li data-h="${h.human_id}"><span class="hid">${h.human_id}</span><span class="d">
+    HUMAN DETECTED<br>X: ${h.x.toFixed(1)} &nbsp; Y: ${h.y.toFixed(1)}<br>Distance: ${h.distance.toFixed(1)} m · Conf: ${h.confidence.toFixed(2)}<br>
+    Time: ${hms(h.detected_at)} · ${(h.temperature - 273.15).toFixed(1)}°C</span></li>`).join('') ||
+    '<li style="grid-template-columns:1fr;color:var(--muted)">No humans detected yet.</li>';
+  document.querySelectorAll('#humanList li[data-h]').forEach(li => li.onclick = () => { focusHuman = li.dataset.h; autoFit = false; $('fitBtn').classList.remove('on'); });
+  // events (newest first)
+  const evs = (S.events || []).slice().reverse();
+  $('events').innerHTML = evs.map(e => `<li class="${/HUMAN .* DETECTED/.test(e.text) ? 'human' : ''}"><span class="t">${e.wall}</span><span>${e.text}</span></li>`).join('');
+  if (S.frame !== lastFrame) {
+    const now = performance.now(); fps = 0.8 * fps + 0.2 * (1000 * (S.frame - lastFrame) / Math.max(1, now - lastFrameT));
+    lastFrame = S.frame; lastFrameT = now; $('fps').textContent = fps.toFixed(1) + ' fps';
+  }
+  if (!$('legend').childElementCount && S.class_names) {
+    S.class_names.forEach((nm, k) => { if (k === 0) return; $('legend').insertAdjacentHTML('beforeend', `<span><i style="background:${S.class_colors[k]}"></i>${nm}</span>`); });
+    $('legend').insertAdjacentHTML('beforeend', '<span><i style="background:#35d0ff"></i>path</span><span><i style="background:#9aa3ad"></i>previous path</span>' +
+      '<span><i style="background:#ff3355;border-radius:50%"></i>human</span><span><i style="background:#ffc800"></i>search point</span><span><i style="border:1px solid #8fa0b3"></i>building</span>');
+  }
+}
+
+// ------------------------------------------------------------------- controls
+async function post(url, body) { try { await fetch(url, { method: 'POST', body: JSON.stringify(body) }); } catch (e) {} }
+$('startBtn').onclick = () => { post('/nav', { cmd: 'START' }); toast('A → B MISSION STARTED', true); };
+// SAR is a manual operator command: accepted in EVERY navigation state. No gate, no dialog.
+$('sarSwitch').onclick = () => {
+  const active = sarPending ? sarPending.want : !!((S && S.sar) || {}).active;
+  const want = !active;
+  sarPending = { want, t: Date.now() };
+  post('/sar', { cmd: want ? 'START' : 'STOP' });
+  toast(want ? 'SAR ACTIVATED' : 'SAR STOPPED', true);
+  if (S) update();
+};
+$('fullBtn').onclick = () => window.open('/camera4k.jpg?t=' + Date.now(), '_blank');
+
+// ------------------------------------------------------------------- map
+const cv = $('map'), ctx = cv.getContext('2d'), DPR = () => devicePixelRatio;
+function resize() { const r = cv.getBoundingClientRect(); cv.width = r.width * DPR(); cv.height = r.height * DPR(); }
+new ResizeObserver(resize).observe(cv);
+function targetView() {
+  const pts = [];
+  if (S.start) pts.push(S.start); if (S.goal) pts.push(S.goal); if (S.robot) pts.push([S.robot.x, S.robot.y]);
+  (S.path || []).forEach(p => pts.push(p)); (S.humans || []).forEach(h => pts.push([h.x, h.y]));
+  ((S.sar || {}).search_points || []).forEach(p => pts.push([p.x, p.y]));
+  if (focusHuman) { const h = (S.humans || []).find(h => h.human_id === focusHuman); if (h) return { x0: h.x - 12, y0: h.y - 12 * cv.height / cv.width, w: 24 }; }
+  if (!pts.length) return { x0: -20, y0: -20, w: 40 };
+  let x0 = Math.min(...pts.map(p => p[0])), x1 = Math.max(...pts.map(p => p[0]));
+  let y0 = Math.min(...pts.map(p => p[1])), y1 = Math.max(...pts.map(p => p[1]));
+  const m = 6, aspect = cv.width / cv.height;
+  let w = Math.max(x1 - x0 + 2 * m, (y1 - y0 + 2 * m) * aspect, 20);
+  return { x0: (x0 + x1) / 2 - w / 2, y0: (y0 + y1) / 2 - (w / aspect) / 2, w };
+}
+const W2C = (x, y) => { const s = cv.width / view.w; return [(x - view.x0) * s, cv.height - (y - view.y0) * s]; };
+const C2W = (px, py) => { const s = cv.width / view.w; return [px / s + view.x0, (cv.height - py) / s + view.y0]; };
+function line(pts, color, width, dash = []) {
+  if (!pts || pts.length < 2) return;
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width * DPR(); ctx.setLineDash(dash.map(d => d * DPR()));
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+  pts.forEach((p, i) => { const [a, b] = W2C(p[0], p[1]); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.stroke(); ctx.restore();
+}
+function disc(p, color, label, r = 9, textColor = '#0d1014') {
+  const [a, b] = W2C(p[0], p[1]), R = r * DPR();
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(a, b, R, 0, 7); ctx.fill();
+  ctx.fillStyle = textColor; ctx.font = `800 ${Math.round(r * 1.25) * DPR()}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, a, b + 0.5);
+}
+function tag(p, text, color, dy = -16) {
+  const [a, b] = W2C(p[0], p[1]); ctx.font = `700 ${11 * DPR()}px system-ui`; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  const tw = ctx.measureText(text).width; ctx.fillStyle = 'rgba(8,10,13,0.85)';
+  ctx.fillRect(a + 10 * DPR(), b + dy * DPR() - 12 * DPR(), tw + 8 * DPR(), 16 * DPR());
+  ctx.fillStyle = color; ctx.fillText(text, a + 14 * DPR(), b + dy * DPR());
+}
+function draw() {
+  requestAnimationFrame(draw);
+  if (!S || !cv.width) return;
+  const tv = targetView();
+  if (!view || autoFit || focusHuman) view = view ? { x0: view.x0 + (tv.x0 - view.x0) * 0.1, y0: view.y0 + (tv.y0 - view.y0) * 0.1, w: view.w + (tv.w - view.w) * 0.1 } : tv;
+  ctx.fillStyle = '#10141a'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (mapReady && S.map) {
+    const m = S.map, [a, b] = W2C(m.origin_x, m.origin_y + m.height * m.resolution), s = cv.width / view.w * m.resolution;
+    ctx.imageSmoothingEnabled = false; ctx.globalAlpha = 0.9; ctx.drawImage(mapImg, a, b, m.width * s, m.height * s); ctx.globalAlpha = 1;
+  }
+  const step = view.w > 120 ? 20 : view.w > 50 ? 10 : view.w > 20 ? 5 : 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+  for (let x = Math.floor(view.x0 / step) * step; x < view.x0 + view.w; x += step) { const [a] = W2C(x, 0); ctx.beginPath(); ctx.moveTo(a, 0); ctx.lineTo(a, cv.height); ctx.stroke(); }
+  const vh = view.w * cv.height / cv.width;
+  for (let y = Math.floor(view.y0 / step) * step; y < view.y0 + vh; y += step) { const [, b] = W2C(0, y); ctx.beginPath(); ctx.moveTo(0, b); ctx.lineTo(cv.width, b); ctx.stroke(); }
+  // buildings
+  for (const bd of (S.buildings || [])) {
+    const [a, b] = W2C(bd.x - bd.w / 2, bd.y + bd.d / 2), s = cv.width / view.w;
+    ctx.fillStyle = 'rgba(143,160,179,0.12)'; ctx.strokeStyle = 'rgba(170,185,200,0.8)'; ctx.lineWidth = 1.5 * DPR();
+    ctx.fillRect(a, b, bd.w * s, bd.d * s); ctx.strokeRect(a, b, bd.w * s, bd.d * s);
+    if (bd.w * s > 40 * DPR()) { ctx.fillStyle = 'rgba(200,210,220,0.8)'; ctx.font = `600 ${10 * DPR()}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText(bd.id.replace('SAR_Building_', ''), a + bd.w * s / 2, b + bd.d * s / 2); }
+  }
+  // search plan
+  const sar = S.sar || {};
+  for (const tk of (S.tasks || [])) if (tk.kind === 'building') {
+    const col = tk.status === 'done' ? '#3cc850' : tk.status === 'skipped' ? '#ff7800' : 'rgba(255,200,0,0.55)';
+    const [a, b] = W2C(tk.x, tk.y); ctx.strokeStyle = col; ctx.lineWidth = 1.5 * DPR(); ctx.beginPath(); ctx.arc(a, b, 4 * DPR(), 0, 7); ctx.stroke();
+  }
+  const sp = sar.search_points || [];
+  line(sp.map(p => [p.x, p.y]), 'rgba(255,200,0,0.35)', 1.5, [3, 5]);
+  for (const p of sp) {
+    const active = sar.current_task && sar.current_task.index === p.index && sar.active && p.status === 'pending';
+    const col = p.status === 'done' ? '#3cc850' : p.status === 'skipped' ? '#ff7800' : active ? '#ffc800' : 'rgba(255,200,0,0.6)';
+    disc([p.x, p.y], col, 'P' + p.index, 8);
+  }
+  if (S.start && S.goal) line([S.start, S.goal], 'rgba(255,255,255,0.15)', 1, [4, 6]);
+  line(S.trail, 'rgba(255,255,255,0.55)', 1.5, [1, 4]);
+  line(S.previous_path, 'rgba(160,168,176,0.9)', 2.5, [8, 6]);
+  if (S.path) { line(S.path, 'rgba(53,208,255,0.25)', 8); line(S.path, '#35d0ff', 2.5); }
+  if (S.start) disc(S.start, '#3cc850', 'A', 10);
+  if (S.goal) disc(S.goal, '#ff4fd8', 'B', 10);
+  // robot
+  if (S.robot) {
+    const r = S.robot, P = S.params, yaw = r.yaw, c = Math.cos(yaw), s = Math.sin(yaw), [ca, cb] = W2C(r.x, r.y);
+    const R = 30 * cv.width / view.w;   // thermal detection range fan (60 deg)
+    ctx.fillStyle = 'rgba(255,51,85,0.07)'; ctx.beginPath(); ctx.moveTo(ca, cb); ctx.arc(ca, cb, R, -yaw - 0.52, -yaw + 0.52); ctx.closePath(); ctx.fill();
+    const hl = P.length / 2, hw = P.width / 2, cx = P.footprint_center_x;
+    const corners = [[hl, hw], [hl, -hw], [-hl, -hw], [-hl, hw]].map(([u, v]) => [r.x + c * (u + cx) - s * v, r.y + s * (u + cx) + c * v]);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0d1014'; ctx.lineWidth = 1.5 * DPR();
+    ctx.beginPath(); corners.forEach((p, i) => { const [a, b] = W2C(p[0], p[1]); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    const tip = W2C(r.x + c * (hl + 2.0), r.y + s * (hl + 2.0));
+    ctx.strokeStyle = '#ffc800'; ctx.lineWidth = 3 * DPR(); ctx.beginPath(); ctx.moveTo(ca, cb); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
+    if (view.w > 60) disc([r.x, r.y], '#ffffff', '', 5);
+  }
+  // tentative candidates, then confirmed humans (always on top, never removed)
+  for (const t of (S.tentative || [])) { const [a, b] = W2C(t.x, t.y); ctx.strokeStyle = '#ff8fa3'; ctx.lineWidth = 2 * DPR(); ctx.setLineDash([3 * DPR(), 3 * DPR()]);
+    ctx.beginPath(); ctx.arc(a, b, 8 * DPR(), 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+  for (const h of (S.humans || [])) {
+    const [a, b] = W2C(h.x, h.y); ctx.fillStyle = 'rgba(255,51,85,0.25)'; ctx.beginPath(); ctx.arc(a, b, 16 * DPR(), 0, 7); ctx.fill();
+    disc([h.x, h.y], '#ff3355', h.human_id, 11, '#fff');
+    tag([h.x, h.y], `${h.human_id}  X ${h.x.toFixed(1)}  Y ${h.y.toFixed(1)}`, '#ff8fa3');
+  }
+  // scale bar
+  const px = cv.width / view.w, len = step;
+  ctx.strokeStyle = '#d9e1ea'; ctx.lineWidth = 2 * DPR();
+  ctx.beginPath(); ctx.moveTo(12 * DPR(), cv.height - 14 * DPR()); ctx.lineTo(12 * DPR() + len * px, cv.height - 14 * DPR()); ctx.stroke();
+  ctx.fillStyle = '#d9e1ea'; ctx.font = `${11 * DPR()}px system-ui`; ctx.textAlign = 'left'; ctx.fillText(len + ' m', 12 * DPR(), cv.height - 20 * DPR());
+  if (settingGoal) { ctx.fillStyle = '#35d0ff'; ctx.font = `700 ${12 * DPR()}px system-ui`; ctx.fillText('click on the map to place goal B', 12 * DPR(), 18 * DPR()); }
+}
+requestAnimationFrame(draw);
+
+$('fitBtn').onclick = () => { autoFit = !autoFit; focusHuman = null; $('fitBtn').classList.toggle('on', autoFit); };
+$('goalBtn').onclick = () => { settingGoal = !settingGoal; $('goalBtn').classList.toggle('on', settingGoal); cv.classList.toggle('setgoal', settingGoal); };
+let drag = null;
+cv.addEventListener('mousedown', ev => { if (!settingGoal) drag = { x: ev.clientX, y: ev.clientY, v: { ...view }, moved: false }; });
+window.addEventListener('mouseup', () => { setTimeout(() => drag = null, 0); });
+cv.addEventListener('mousemove', ev => {
+  const r = cv.getBoundingClientRect(), px = (ev.clientX - r.left) * DPR(), py = (ev.clientY - r.top) * DPR();
+  if (drag && ev.buttons) {
+    const s = cv.width / view.w, dx = (ev.clientX - drag.x) * DPR() / s, dy = (ev.clientY - drag.y) * DPR() / s;
+    if (Math.abs(dx) + Math.abs(dy) > 0.2) { drag.moved = true; autoFit = false; focusHuman = null; $('fitBtn').classList.remove('on'); view = { x0: drag.v.x0 - dx, y0: drag.v.y0 + dy, w: drag.v.w }; }
+  }
+  // human marker popup
+  const pop = $('popup'); if (!S || !view) return;
+  const h = (S.humans || []).find(h => { const [a, b] = W2C(h.x, h.y); return Math.hypot(a - px, b - py) < 14 * DPR(); });
+  if (h) {
+    pop.style.display = 'block'; pop.style.left = (px / DPR() + 14) + 'px'; pop.style.top = (py / DPR() + 10) + 'px';
+    pop.innerHTML = `<b style="color:#ff3355;font-size:15px">${h.human_id}</b> · HUMAN DETECTED<br>X: ${h.x.toFixed(2)} &nbsp; Y: ${h.y.toFixed(2)} &nbsp; Z: ${h.z.toFixed(2)}<br>` +
+      `Distance at detection: ${h.distance.toFixed(1)} m<br>Confidence: ${h.confidence.toFixed(2)}<br>Detected: ${hms(h.detected_at)} sim · seen ${h.sightings}×<br>Temperature: ${(h.temperature - 273.15).toFixed(1)} °C`;
+  } else pop.style.display = 'none';
+});
+cv.addEventListener('click', async ev => {
+  if (!settingGoal || !view) return;
+  const r = cv.getBoundingClientRect();
+  const [x, y] = C2W((ev.clientX - r.left) * DPR(), (ev.clientY - r.top) * DPR());
+  await post('/goal', { x, y }); toast(`GOAL B = (${x.toFixed(1)}, ${y.toFixed(1)})`, true);
+  settingGoal = false; $('goalBtn').classList.remove('on'); cv.classList.remove('setgoal');
+});
+cv.addEventListener('wheel', ev => { ev.preventDefault(); autoFit = false; focusHuman = null; $('fitBtn').classList.remove('on');
+  const f = ev.deltaY > 0 ? 1.15 : 1 / 1.15, r = cv.getBoundingClientRect();
+  const [wx, wy] = C2W((ev.clientX - r.left) * DPR(), (ev.clientY - r.top) * DPR());
+  view = { x0: wx - (wx - view.x0) * f, y0: wy - (wy - view.y0) * f, w: view.w * f }; }, { passive: false });
+</script>
+</body>
+</html>

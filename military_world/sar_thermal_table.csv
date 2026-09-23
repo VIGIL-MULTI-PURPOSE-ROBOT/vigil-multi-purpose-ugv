@@ -1,0 +1,33 @@
+thermal_class,apparent_temp_c,emissivity,opaque_in_lwir,notes
+THERMAL_HUMAN_HEAD,34.5,0.98,yes,exposed skin
+THERMAL_HUMAN_TORSO,32.0,0.97,yes,clothed core
+THERMAL_HUMAN_LIMB,30.5,0.97,yes,clothed limb
+THERMAL_HUMAN_COVERED,24.5,0.95,yes,jacket/debris/snow covered
+THERMAL_VEHICLE_ENGINE,62.0,0.9,yes,recently run engine bay
+THERMAL_VEHICLE_BODY,27.0,0.88,yes,sun-loaded panel
+THERMAL_VEHICLE_COLD,15.0,0.88,yes,long-cold wreck
+THERMAL_GENERATOR,74.0,0.92,yes,running generator -- decoy
+THERMAL_EQUIPMENT_WARM,41.0,0.93,yes,powered comms case -- decoy
+THERMAL_CONCRETE,22.0,0.92,yes,
+THERMAL_METAL,17.0,0.25,yes,"low emissivity, reflective"
+THERMAL_WOOD,18.5,0.9,yes,
+THERMAL_ROCK,14.0,0.93,yes,cold rock mass
+THERMAL_SOIL,19.0,0.94,yes,
+THERMAL_SAND,27.5,0.93,yes,high diurnal swing
+THERMAL_VEGETATION,20.0,0.96,yes,transpiring canopy
+THERMAL_WATER,11.5,0.96,yes,
+THERMAL_SNOW,-1.5,0.98,yes,
+THERMAL_AMBIENT,20.0,0.92,yes,inert object at air temp
+
+# human contrast class,surface_class,delta_T_K_vs_background
+HIGH,THERMAL_HUMAN_TORSO,12.0
+MEDIUM,THERMAL_HUMAN_TORSO,6.5
+LOW,THERMAL_HUMAN_COVERED,2.5
+
+# lighting preset,ambient_air_temp_c,note
+DAY,22.0,"Reference condition. RGB easy, thermal contrast modest."
+CLOUDY,17.0,"Flat light, weak shadows, low texture contrast."
+SUNSET,19.0,"Long shadows, strong glare, worst case for RGB exposure. Terrain still holds residual heat."
+LOW_LIGHT,13.0,"Civil twilight. RGB degrading, thermal improving."
+NIGHT,9.0,"Base floodlights on, everything else near-dark. Human-to-background delta T is largest here: this is where thermal earns its place. Not pitch black -- the point is fusion, not sensor failure."
+FOG,12.0,Visual range ~35 m. LiDAR degrades with the model you choose in Gazebo; Blender volumetrics do not export.

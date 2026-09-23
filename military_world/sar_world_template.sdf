@@ -1,0 +1,756 @@
+<?xml version="1.0" ?>
+<sdf version="1.10">
+  <world name="military_world">
+    <!-- Generated skeleton. Meshes come from export_gazebo.py. -->
+    <!-- NON-WEAPONISED search-and-rescue training range. -->
+    <physics name="default" type="dart">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal"/>
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.36 0.50 0.74 1</background>
+      <grid>false</grid>
+      <!-- FOG preset: uncomment and tune per sar_metadata.json -->
+      <!-- <fog><type>linear</type><density>0.02</density>
+           <start>5</start><end>35</end></fog> -->
+    </scene>
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 120 0 0 0</pose>
+      <diffuse>1.0 0.97 0.92 1</diffuse>
+      <specular>0.25 0.25 0.25 1</specular>
+      <direction>-0.5 0.35 -0.78</direction>
+    </light>
+
+    <!-- ================= TERRAIN ================= -->
+    <!-- One static model per tile. Visual mesh == collision mesh:
+         decimating the collision copy would heal the holes and
+         ditches, which is the one thing we must not do. -->
+    <model name="SAR_Terrain_00_00"><static>true</static>
+      <pose>-125.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.05</mu><mu2>0.05</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_00_01"><static>true</static>
+      <pose>-125.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.28</mu><mu2>0.28</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_00_02"><static>true</static>
+      <pose>-125.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.28</mu><mu2>0.28</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_00_03"><static>true</static>
+      <pose>-125.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.62</mu><mu2>0.62</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_00_04"><static>true</static>
+      <pose>-125.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_00_05"><static>true</static>
+      <pose>-125.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_00_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_00_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.30</mu><mu2>0.30</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_00"><static>true</static>
+      <pose>-75.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.55</mu><mu2>0.55</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_01"><static>true</static>
+      <pose>-75.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.28</mu><mu2>0.28</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_02"><static>true</static>
+      <pose>-75.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.28</mu><mu2>0.28</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_03"><static>true</static>
+      <pose>-75.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.62</mu><mu2>0.62</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_04"><static>true</static>
+      <pose>-75.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.62</mu><mu2>0.62</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_01_05"><static>true</static>
+      <pose>-75.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_01_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_01_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.30</mu><mu2>0.30</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_00"><static>true</static>
+      <pose>-25.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.55</mu><mu2>0.55</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_01"><static>true</static>
+      <pose>-25.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_02"><static>true</static>
+      <pose>-25.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_03"><static>true</static>
+      <pose>-25.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.60</mu><mu2>0.60</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_04"><static>true</static>
+      <pose>-25.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_02_05"><static>true</static>
+      <pose>-25.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_02_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_02_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.30</mu><mu2>0.30</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_00"><static>true</static>
+      <pose>25.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.55</mu><mu2>0.55</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_01"><static>true</static>
+      <pose>25.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_02"><static>true</static>
+      <pose>25.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.60</mu><mu2>0.60</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_03"><static>true</static>
+      <pose>25.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.60</mu><mu2>0.60</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_04"><static>true</static>
+      <pose>25.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.65</mu><mu2>0.65</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_03_05"><static>true</static>
+      <pose>25.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_03_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_03_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.70</mu><mu2>0.70</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_00"><static>true</static>
+      <pose>75.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.55</mu><mu2>0.55</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_01"><static>true</static>
+      <pose>75.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.82</mu><mu2>0.82</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_02"><static>true</static>
+      <pose>75.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_03"><static>true</static>
+      <pose>75.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_04"><static>true</static>
+      <pose>75.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.70</mu><mu2>0.70</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_04_05"><static>true</static>
+      <pose>75.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_04_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_04_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.70</mu><mu2>0.70</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_00"><static>true</static>
+      <pose>125.000 -15.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_00.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_00.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.82</mu><mu2>0.82</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_01"><static>true</static>
+      <pose>125.000 35.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_01.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_01.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.82</mu><mu2>0.82</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_02"><static>true</static>
+      <pose>125.000 85.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_02.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_02.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_03"><static>true</static>
+      <pose>125.000 135.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_03.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_03.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_04"><static>true</static>
+      <pose>125.000 185.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_04.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_04.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+    <model name="SAR_Terrain_05_05"><static>true</static>
+      <pose>125.000 235.000 0 0 0 0</pose>
+      <link name="link">
+        <visual name="v"><geometry><mesh><uri>meshes/SAR_Terrain_05_05.glb</uri></mesh></geometry></visual>
+        <collision name="c"><geometry><mesh><uri>meshes/SAR_Terrain_05_05.glb</uri></mesh></geometry>
+          <surface><friction><ode><mu>0.70</mu><mu2>0.70</mu2></ode></friction></surface>
+        </collision>
+      </link>
+    </model>
+
+    <!-- ============== DYNAMIC HUMANS ============== -->
+    <!-- Bounded, seeded, reproducible. Positions are NOT
+         published to ROS: perception has to find them. -->
+    <actor name="SAR_DynamicPerson_016">
+      <!-- PERSON_016  thermal_contrast=HIGH  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_016.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-14.000 66.000 0.089 0 0 0.3218</pose></waypoint>
+        <waypoint><time>10.12</time><pose>-2.000 70.000 0.249 0 0 0.3218</pose></waypoint>
+        <waypoint><time>20.24</time><pose>10.000 74.000 0.598 0 0 -0.3805</pose></waypoint>
+        <waypoint><time>28.85</time><pose>20.000 70.000 0.846 0 0 -2.6779</pose></waypoint>
+        <waypoint><time>39.59</time><pose>8.000 64.000 0.443 0 0 3.0509</pose></waypoint>
+        <waypoint><time>57.26</time><pose>-14.000 66.000 0.089 0 0 0.0000</pose></waypoint>
+        <waypoint><time>57.26</time><pose>-14.000 66.000 0.089 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_017">
+      <!-- PERSON_017  thermal_contrast=MEDIUM  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_017.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-34.000 44.000 0.356 0 0 0.7854</pose></waypoint>
+        <waypoint><time>17.41</time><pose>-26.000 52.000 0.412 0 0 2.0344</pose></waypoint>
+        <waypoint><time>31.17</time><pose>-30.000 60.000 0.271 0 0 -2.7611</pose></waypoint>
+        <waypoint><time>47.74</time><pose>-40.000 56.000 0.003 0 0 -1.1071</pose></waypoint>
+        <waypoint><time>68.38</time><pose>-34.000 44.000 0.356 0 0 0.0000</pose></waypoint>
+        <waypoint><time>68.38</time><pose>-34.000 44.000 0.356 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_018">
+      <!-- PERSON_018  thermal_contrast=MEDIUM  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_018.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>24.000 150.000 0.902 0 0 0.6947</pose></waypoint>
+        <waypoint><time>8.44</time><pose>36.000 160.000 1.157 0 0 2.4469</pose></waypoint>
+        <waypoint><time>16.89</time><pose>24.000 170.000 0.667 0 0 -2.7367</pose></waypoint>
+        <waypoint><time>25.12</time><pose>10.000 164.000 0.402 0 0 -0.7854</pose></waypoint>
+        <waypoint><time>35.82</time><pose>24.000 150.000 0.902 0 0 0.0000</pose></waypoint>
+        <waypoint><time>35.82</time><pose>24.000 150.000 0.902 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_019">
+      <!-- PERSON_019  thermal_contrast=HIGH  zone=SAR_ZONE_B -->
+      <skin><filename>meshes/SAR_DynamicPerson_019.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-30.000 157.000 1.030 0 0 2.8706</pose></waypoint>
+        <waypoint><time>19.66</time><pose>-48.000 162.000 0.831 0 0 2.7828</pose></waypoint>
+        <waypoint><time>37.65</time><pose>-64.000 168.000 0.347 0 0 -0.3588</pose></waypoint>
+        <waypoint><time>55.64</time><pose>-48.000 162.000 0.831 0 0 -0.2709</pose></waypoint>
+        <waypoint><time>75.30</time><pose>-30.000 157.000 1.030 0 0 0.0000</pose></waypoint>
+        <waypoint><time>75.30</time><pose>-30.000 157.000 1.030 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_020">
+      <!-- PERSON_020  thermal_contrast=MEDIUM  zone=SAR_ZONE_B -->
+      <skin><filename>meshes/SAR_DynamicPerson_020.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-84.000 150.000 0.199 0 0 2.3562</pose></waypoint>
+        <waypoint><time>14.14</time><pose>-92.000 158.000 0.189 0 0 0.9273</pose></waypoint>
+        <waypoint><time>26.64</time><pose>-86.000 166.000 -0.069 0 0 -0.6747</pose></waypoint>
+        <waypoint><time>42.65</time><pose>-76.000 158.000 0.231 0 0 -2.3562</pose></waypoint>
+        <waypoint><time>56.79</time><pose>-84.000 150.000 0.199 0 0 0.0000</pose></waypoint>
+        <waypoint><time>56.79</time><pose>-84.000 150.000 0.199 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_021">
+      <!-- PERSON_021  thermal_contrast=HIGH  zone=SAR_ZONE_C -->
+      <skin><filename>meshes/SAR_DynamicPerson_021.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>60.000 30.000 0.182 0 0 1.5208</pose></waypoint>
+        <waypoint><time>14.83</time><pose>61.000 50.000 0.097 0 0 1.5208</pose></waypoint>
+        <waypoint><time>29.67</time><pose>62.000 70.000 0.116 0 0 -1.6208</pose></waypoint>
+        <waypoint><time>44.50</time><pose>61.000 50.000 0.097 0 0 -1.6208</pose></waypoint>
+        <waypoint><time>59.33</time><pose>60.000 30.000 0.182 0 0 0.0000</pose></waypoint>
+        <waypoint><time>59.33</time><pose>60.000 30.000 0.182 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_022">
+      <!-- PERSON_022  thermal_contrast=MEDIUM  zone=SAR_ZONE_C -->
+      <skin><filename>meshes/SAR_DynamicPerson_022.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>56.000 62.000 0.070 0 0 0.0907</pose></waypoint>
+        <waypoint><time>19.21</time><pose>78.000 64.000 0.080 0 0 0.0907</pose></waypoint>
+        <waypoint><time>38.42</time><pose>100.000 66.000 0.079 0 0 -3.0509</pose></waypoint>
+        <waypoint><time>57.63</time><pose>78.000 64.000 0.080 0 0 -3.0509</pose></waypoint>
+        <waypoint><time>76.84</time><pose>56.000 62.000 0.070 0 0 0.0000</pose></waypoint>
+        <waypoint><time>76.84</time><pose>56.000 62.000 0.070 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_023">
+      <!-- PERSON_023  thermal_contrast=HIGH  zone=SAR_ZONE_C -->
+      <skin><filename>meshes/SAR_DynamicPerson_023.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>90.000 66.000 0.081 0 0 0.1974</pose></waypoint>
+        <waypoint><time>7.28</time><pose>95.000 67.000 0.056 0 0 1.8925</pose></waypoint>
+        <waypoint><time>16.32</time><pose>93.000 73.000 -0.069 0 0 -2.7611</pose></waypoint>
+        <waypoint><time>24.01</time><pose>88.000 71.000 -0.039 0 0 -1.1903</pose></waypoint>
+        <waypoint><time>31.71</time><pose>90.000 66.000 0.081 0 0 0.0000</pose></waypoint>
+        <waypoint><time>31.71</time><pose>90.000 66.000 0.081 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_024">
+      <!-- PERSON_024  thermal_contrast=MEDIUM  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_024.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>4.000 22.000 0.349 0 0 1.3909</pose></waypoint>
+        <waypoint><time>15.42</time><pose>8.000 44.000 0.477 0 0 1.3734</pose></waypoint>
+        <waypoint><time>29.49</time><pose>12.000 64.000 0.535 0 0 -1.7682</pose></waypoint>
+        <waypoint><time>43.55</time><pose>8.000 44.000 0.477 0 0 -1.7506</pose></waypoint>
+        <waypoint><time>58.97</time><pose>4.000 22.000 0.349 0 0 0.0000</pose></waypoint>
+        <waypoint><time>58.97</time><pose>4.000 22.000 0.349 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_025">
+      <!-- PERSON_025  thermal_contrast=MEDIUM  zone=SAR_ZONE_B -->
+      <skin><filename>meshes/SAR_DynamicPerson_025.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>18.000 100.000 0.912 0 0 0.7854</pose></waypoint>
+        <waypoint><time>15.08</time><pose>26.000 108.000 0.965 0 0 1.8925</pose></waypoint>
+        <waypoint><time>31.95</time><pose>22.000 120.000 1.223 0 0 -2.4669</pose></waypoint>
+        <waypoint><time>49.03</time><pose>12.000 112.000 1.146 0 0 -1.1071</pose></waypoint>
+        <waypoint><time>66.91</time><pose>18.000 100.000 0.912 0 0 0.0000</pose></waypoint>
+        <waypoint><time>66.91</time><pose>18.000 100.000 0.912 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_026">
+      <!-- PERSON_026  thermal_contrast=LOW  zone=SAR_ZONE_F -->
+      <skin><filename>meshes/SAR_DynamicPerson_026.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-98.000 54.000 -0.679 0 0 2.2143</pose></waypoint>
+        <waypoint><time>11.76</time><pose>-104.000 62.000 -0.519 0 0 2.2143</pose></waypoint>
+        <waypoint><time>23.53</time><pose>-110.000 70.000 -0.899 0 0 -0.9273</pose></waypoint>
+        <waypoint><time>35.29</time><pose>-104.000 62.000 -0.519 0 0 -0.9273</pose></waypoint>
+        <waypoint><time>47.06</time><pose>-98.000 54.000 -0.679 0 0 0.0000</pose></waypoint>
+        <waypoint><time>47.06</time><pose>-98.000 54.000 -0.679 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_027">
+      <!-- PERSON_027  thermal_contrast=HIGH  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_027.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>5.000 26.000 0.403 0 0 1.4353</pose></waypoint>
+        <waypoint><time>17.08</time><pose>8.000 48.000 0.471 0 0 1.3909</pose></waypoint>
+        <waypoint><time>34.28</time><pose>12.000 70.000 0.546 0 0 -1.7506</pose></waypoint>
+        <waypoint><time>51.48</time><pose>8.000 48.000 0.471 0 0 -1.7063</pose></waypoint>
+        <waypoint><time>68.56</time><pose>5.000 26.000 0.403 0 0 0.0000</pose></waypoint>
+        <waypoint><time>68.56</time><pose>5.000 26.000 0.403 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_028">
+      <!-- PERSON_028  thermal_contrast=MEDIUM  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_028.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-26.000 56.000 0.360 0 0 0.4324</pose></waypoint>
+        <waypoint><time>13.02</time><pose>-13.000 62.000 0.149 0 0 0.4324</pose></waypoint>
+        <waypoint><time>26.03</time><pose>0.000 68.000 0.225 0 0 -2.7092</pose></waypoint>
+        <waypoint><time>39.05</time><pose>-13.000 62.000 0.149 0 0 -2.7092</pose></waypoint>
+        <waypoint><time>52.06</time><pose>-26.000 56.000 0.360 0 0 0.0000</pose></waypoint>
+        <waypoint><time>52.06</time><pose>-26.000 56.000 0.360 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_029">
+      <!-- PERSON_029  thermal_contrast=MEDIUM  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_029.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>16.000 82.000 0.830 0 0 -2.4150</pose></waypoint>
+        <waypoint><time>8.30</time><pose>7.000 74.000 0.560 0 0 -2.4330</pose></waypoint>
+        <waypoint><time>14.66</time><pose>0.000 68.000 0.225 0 0 0.7086</pose></waypoint>
+        <waypoint><time>21.02</time><pose>7.000 74.000 0.560 0 0 0.7266</pose></waypoint>
+        <waypoint><time>29.33</time><pose>16.000 82.000 0.830 0 0 0.0000</pose></waypoint>
+        <waypoint><time>29.33</time><pose>16.000 82.000 0.830 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_030">
+      <!-- PERSON_030  thermal_contrast=HIGH  zone=SAR_ZONE_B -->
+      <skin><filename>meshes/SAR_DynamicPerson_030.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>38.000 110.000 0.480 0 0 2.6224</pose></waypoint>
+        <waypoint><time>15.36</time><pose>24.000 118.000 1.035 0 0 -2.2455</pose></waypoint>
+        <waypoint><time>27.55</time><pose>16.000 108.000 1.195 0 0 -0.3588</pose></waypoint>
+        <waypoint><time>43.83</time><pose>32.000 102.000 0.713 0 0 0.9273</pose></waypoint>
+        <waypoint><time>53.35</time><pose>38.000 110.000 0.480 0 0 0.0000</pose></waypoint>
+        <waypoint><time>53.35</time><pose>38.000 110.000 0.480 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_031">
+      <!-- PERSON_031  thermal_contrast=HIGH  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_031.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-7.000 38.000 0.513 0 0 1.3258</pose></waypoint>
+        <waypoint><time>17.36</time><pose>-3.000 54.000 0.174 0 0 1.2120</pose></waypoint>
+        <waypoint><time>35.35</time><pose>3.000 70.000 0.304 0 0 -1.9296</pose></waypoint>
+        <waypoint><time>53.34</time><pose>-3.000 54.000 0.174 0 0 -1.8158</pose></waypoint>
+        <waypoint><time>70.70</time><pose>-7.000 38.000 0.513 0 0 0.0000</pose></waypoint>
+        <waypoint><time>70.70</time><pose>-7.000 38.000 0.513 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_032">
+      <!-- PERSON_032  thermal_contrast=HIGH  zone=SAR_ZONE_A -->
+      <skin><filename>meshes/SAR_DynamicPerson_032.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>-7.000 38.000 0.513 0 0 1.3258</pose></waypoint>
+        <waypoint><time>17.36</time><pose>-3.000 54.000 0.174 0 0 1.2120</pose></waypoint>
+        <waypoint><time>35.35</time><pose>3.000 70.000 0.304 0 0 -1.9296</pose></waypoint>
+        <waypoint><time>53.34</time><pose>-3.000 54.000 0.174 0 0 -1.8158</pose></waypoint>
+        <waypoint><time>70.70</time><pose>-7.000 38.000 0.513 0 0 0.0000</pose></waypoint>
+        <waypoint><time>70.70</time><pose>-7.000 38.000 0.513 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_033">
+      <!-- PERSON_033  thermal_contrast=MEDIUM  zone=SAR_ZONE_C -->
+      <skin><filename>meshes/SAR_DynamicPerson_033.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>89.000 60.000 0.089 0 0 -0.8380</pose></waypoint>
+        <waypoint><time>11.21</time><pose>98.000 50.000 0.094 0 0 -2.3036</pose></waypoint>
+        <waypoint><time>22.42</time><pose>89.000 40.000 0.053 0 0 2.3036</pose></waypoint>
+        <waypoint><time>33.63</time><pose>80.000 50.000 0.028 0 0 0.8380</pose></waypoint>
+        <waypoint><time>44.85</time><pose>89.000 60.000 0.089 0 0 0.0000</pose></waypoint>
+        <waypoint><time>44.85</time><pose>89.000 60.000 0.089 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name="SAR_DynamicPerson_034">
+      <!-- PERSON_034  thermal_contrast=MEDIUM  zone=SAR_ZONE_E -->
+      <skin><filename>meshes/SAR_DynamicPerson_034.glb</filename></skin>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+        <waypoint><time>0.00</time><pose>112.000 96.000 -0.513 0 0 1.1659</pose></waypoint>
+        <waypoint><time>16.92</time><pose>118.000 110.000 -0.860 0 0 1.9757</pose></waypoint>
+        <waypoint><time>33.85</time><pose>112.000 124.000 -1.567 0 0 -2.0899</pose></waypoint>
+        <waypoint><time>51.76</time><pose>104.000 110.000 -1.311 0 0 -1.0517</pose></waypoint>
+        <waypoint><time>69.68</time><pose>112.000 96.000 -0.513 0 0 0.0000</pose></waypoint>
+        <waypoint><time>69.68</time><pose>112.000 96.000 -0.513 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!-- ========= PHYSICS-REACTIVE DYNAMIC PROPS ========= -->
+    <!-- Non-static bodies with mass and inertia. No trajectory,
+         no script: they move only when something pushes them. -->
+    <include><uri>model://SAR_DynProps_BaseYard_BARREL_01</uri><name>SAR_DynProps_BaseYard_BARREL_01</name><pose>-16.810 -4.620 0.484 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_BARREL_02</uri><name>SAR_DynProps_BaseYard_BARREL_02</name><pose>-12.880 -7.790 0.478 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_BARREL_03</uri><name>SAR_DynProps_BaseYard_BARREL_03</name><pose>-11.660 -2.970 0.486 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CONE_01</uri><name>SAR_DynProps_BaseYard_CONE_01</name><pose>-19.130 -10.670 0.402 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CONE_02</uri><name>SAR_DynProps_BaseYard_CONE_02</name><pose>-18.080 -7.940 0.412 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CRATE_01</uri><name>SAR_DynProps_BaseYard_CRATE_01</name><pose>-17.170 -9.560 0.310 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CRATE_02</uri><name>SAR_DynProps_BaseYard_CRATE_02</name><pose>-19.250 -5.410 0.312 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CRATE_03</uri><name>SAR_DynProps_BaseYard_CRATE_03</name><pose>-9.160 -3.970 0.318 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_CRATE_04</uri><name>SAR_DynProps_BaseYard_CRATE_04</name><pose>-11.620 -12.800 0.296 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_PALLET_01</uri><name>SAR_DynProps_BaseYard_PALLET_01</name><pose>-14.060 -7.770 0.109 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_PALLET_02</uri><name>SAR_DynProps_BaseYard_PALLET_02</name><pose>-14.880 -12.260 0.093 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseYard_PALLET_03</uri><name>SAR_DynProps_BaseYard_PALLET_03</name><pose>-20.140 -8.520 0.097 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_BARREL_01</uri><name>SAR_DynProps_BaseGate_BARREL_01</name><pose>0.850 6.200 0.653 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_BARREL_02</uri><name>SAR_DynProps_BaseGate_BARREL_02</name><pose>3.520 2.100 0.544 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_CONE_01</uri><name>SAR_DynProps_BaseGate_CONE_01</name><pose>-1.600 4.960 0.550 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_CONE_02</uri><name>SAR_DynProps_BaseGate_CONE_02</name><pose>1.990 6.310 0.555 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_CONE_03</uri><name>SAR_DynProps_BaseGate_CONE_03</name><pose>1.340 3.310 0.547 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_BaseGate_CONE_04</uri><name>SAR_DynProps_BaseGate_CONE_04</name><pose>1.500 4.220 0.553 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_BIN_01</uri><name>SAR_DynProps_StreetA_BIN_01</name><pose>55.580 47.120 0.595 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_BIN_02</uri><name>SAR_DynProps_StreetA_BIN_02</name><pose>63.840 47.980 0.512 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_BIN_03</uri><name>SAR_DynProps_StreetA_BIN_03</name><pose>54.910 43.660 0.647 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_CONE_01</uri><name>SAR_DynProps_StreetA_CONE_01</name><pose>66.300 44.090 0.381 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_CONE_02</uri><name>SAR_DynProps_StreetA_CONE_02</name><pose>55.300 44.930 0.540 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_CONE_03</uri><name>SAR_DynProps_StreetA_CONE_03</name><pose>61.480 43.680 0.494 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_CONE_04</uri><name>SAR_DynProps_StreetA_CONE_04</name><pose>58.020 40.980 0.478 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_PANEL_01</uri><name>SAR_DynProps_StreetA_PANEL_01</name><pose>66.320 41.710 0.090 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_StreetA_PANEL_02</uri><name>SAR_DynProps_StreetA_PANEL_02</name><pose>62.970 41.430 0.111 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_Canyon_BARREL_01</uri><name>SAR_DynProps_Canyon_BARREL_01</name><pose>77.510 50.790 0.470 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_Canyon_BARREL_02</uri><name>SAR_DynProps_Canyon_BARREL_02</name><pose>80.260 48.000 0.489 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_Canyon_BARREL_03</uri><name>SAR_DynProps_Canyon_BARREL_03</name><pose>79.850 50.330 0.488 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_Canyon_PALLET_01</uri><name>SAR_DynProps_Canyon_PALLET_01</name><pose>78.120 48.570 0.117 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_Canyon_PALLET_02</uri><name>SAR_DynProps_Canyon_PALLET_02</name><pose>81.830 51.290 0.149 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_BARREL_01</uri><name>SAR_DynProps_WarehouseYard_BARREL_01</name><pose>108.940 39.750 0.532 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_BARREL_02</uri><name>SAR_DynProps_WarehouseYard_BARREL_02</name><pose>105.220 37.820 0.527 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_CRATE_01</uri><name>SAR_DynProps_WarehouseYard_CRATE_01</name><pose>107.600 39.060 0.349 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_CRATE_02</uri><name>SAR_DynProps_WarehouseYard_CRATE_02</name><pose>110.850 36.310 0.376 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_CRATE_03</uri><name>SAR_DynProps_WarehouseYard_CRATE_03</name><pose>104.340 40.380 0.373 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_CRATE_04</uri><name>SAR_DynProps_WarehouseYard_CRATE_04</name><pose>110.440 43.930 0.431 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_CRATE_05</uri><name>SAR_DynProps_WarehouseYard_CRATE_05</name><pose>106.090 43.280 0.401 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_PALLET_01</uri><name>SAR_DynProps_WarehouseYard_PALLET_01</name><pose>105.130 43.400 0.184 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_PALLET_02</uri><name>SAR_DynProps_WarehouseYard_PALLET_02</name><pose>112.310 39.480 0.167 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_PALLET_03</uri><name>SAR_DynProps_WarehouseYard_PALLET_03</name><pose>111.120 40.330 0.183 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_WarehouseYard_PALLET_04</uri><name>SAR_DynProps_WarehouseYard_PALLET_04</name><pose>105.200 40.790 0.174 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_BARREL_01</uri><name>SAR_DynProps_RubbleEdge_BARREL_01</name><pose>11.210 104.160 1.414 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_BARREL_02</uri><name>SAR_DynProps_RubbleEdge_BARREL_02</name><pose>18.920 107.400 1.704 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PANEL_01</uri><name>SAR_DynProps_RubbleEdge_PANEL_01</name><pose>16.460 104.370 1.105 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PANEL_02</uri><name>SAR_DynProps_RubbleEdge_PANEL_02</name><pose>16.170 107.950 1.233 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PANEL_03</uri><name>SAR_DynProps_RubbleEdge_PANEL_03</name><pose>8.220 105.250 0.962 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PANEL_04</uri><name>SAR_DynProps_RubbleEdge_PANEL_04</name><pose>17.090 102.550 0.944 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PIPE_01</uri><name>SAR_DynProps_RubbleEdge_PIPE_01</name><pose>19.450 101.900 1.069 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PIPE_02</uri><name>SAR_DynProps_RubbleEdge_PIPE_02</name><pose>13.270 109.090 1.277 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PIPE_03</uri><name>SAR_DynProps_RubbleEdge_PIPE_03</name><pose>11.010 98.690 1.015 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_RubbleEdge_PIPE_04</uri><name>SAR_DynProps_RubbleEdge_PIPE_04</name><pose>20.890 103.370 1.070 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_BARREL_01</uri><name>SAR_DynProps_FloodBank_BARREL_01</name><pose>-99.330 57.260 -0.155 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_BARREL_02</uri><name>SAR_DynProps_FloodBank_BARREL_02</name><pose>-99.100 64.790 -0.143 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_BARREL_03</uri><name>SAR_DynProps_FloodBank_BARREL_03</name><pose>-97.490 55.330 -0.220 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_BARREL_04</uri><name>SAR_DynProps_FloodBank_BARREL_04</name><pose>-100.640 59.680 -0.171 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_JERRYCAN_01</uri><name>SAR_DynProps_FloodBank_JERRYCAN_01</name><pose>-90.340 57.870 -0.677 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_JERRYCAN_02</uri><name>SAR_DynProps_FloodBank_JERRYCAN_02</name><pose>-93.140 54.040 -0.580 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_JERRYCAN_03</uri><name>SAR_DynProps_FloodBank_JERRYCAN_03</name><pose>-102.870 54.900 -0.337 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_JERRYCAN_04</uri><name>SAR_DynProps_FloodBank_JERRYCAN_04</name><pose>-94.750 61.130 -0.404 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_PANEL_01</uri><name>SAR_DynProps_FloodBank_PANEL_01</name><pose>-93.160 60.470 -0.693 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_FloodBank_PANEL_02</uri><name>SAR_DynProps_FloodBank_PANEL_02</name><pose>-102.740 58.050 -0.570 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_BARREL_01</uri><name>SAR_DynProps_DesertTrack_BARREL_01</name><pose>110.520 104.420 -0.433 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_BARREL_02</uri><name>SAR_DynProps_DesertTrack_BARREL_02</name><pose>114.910 99.980 -0.131 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_CRATE_01</uri><name>SAR_DynProps_DesertTrack_CRATE_01</name><pose>119.230 106.780 -0.423 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_CRATE_02</uri><name>SAR_DynProps_DesertTrack_CRATE_02</name><pose>119.650 102.230 -0.268 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_JERRYCAN_01</uri><name>SAR_DynProps_DesertTrack_JERRYCAN_01</name><pose>116.490 105.730 -0.516 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_JERRYCAN_02</uri><name>SAR_DynProps_DesertTrack_JERRYCAN_02</name><pose>115.770 101.750 -0.324 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_DesertTrack_JERRYCAN_03</uri><name>SAR_DynProps_DesertTrack_JERRYCAN_03</name><pose>115.280 109.530 -0.721 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_CONE_01</uri><name>SAR_DynProps_ForestStaging_CONE_01</name><pose>-43.120 164.780 1.321 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_CONE_02</uri><name>SAR_DynProps_ForestStaging_CONE_02</name><pose>-36.170 161.360 1.436 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_CRATE_01</uri><name>SAR_DynProps_ForestStaging_CRATE_01</name><pose>-40.000 162.160 1.293 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_CRATE_02</uri><name>SAR_DynProps_ForestStaging_CRATE_02</name><pose>-39.490 165.680 1.374 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_CRATE_03</uri><name>SAR_DynProps_ForestStaging_CRATE_03</name><pose>-38.050 158.820 1.302 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_PALLET_01</uri><name>SAR_DynProps_ForestStaging_PALLET_01</name><pose>-39.610 163.440 1.071 0 0 0</pose></include>
+    <include><uri>model://SAR_DynProps_ForestStaging_PALLET_02</uri><name>SAR_DynProps_ForestStaging_PALLET_02</name><pose>-35.340 162.020 1.119 0 0 0</pose></include>
+
+    <!-- Static geometry: run export_gazebo.py, then include the
+         generated models/ here. Ground truth is NOT exported. -->
+  </world>
+</sdf>

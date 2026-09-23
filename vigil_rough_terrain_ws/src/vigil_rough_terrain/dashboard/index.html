@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIGIL UGV Navigation</title>
+<style>
+  :root {
+    --bg: #0d1014; --panel: #151a20; --panel2: #1b2129; --line: #27303a;
+    --text: #d9e1ea; --muted: #7d8a99; --accent: #35d0ff;
+    --safe: #3cc850; --uneven: #ffc800; --warn: #ff7800; --danger: #ff3b3b; --info: #5aa9ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px/1.35 "Inter", "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+    border-bottom: 1px solid var(--line); background: #0a0d10; }
+  header h1 { font-size: 15px; letter-spacing: .12em; margin: 0; font-weight: 700; }
+  header h1 span { color: var(--accent); }
+  .pill { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: .06em;
+    border: 1px solid currentColor; }
+  .conn { margin-left: auto; color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+  .dot.on { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
+  main { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto; gap: 12px; padding: 12px; height: calc(100% - 46px); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    display: flex; flex-direction: column; min-height: 0; }
+  .panel h2 { margin: 0; padding: 8px 12px; font-size: 11px; letter-spacing: .14em; color: var(--muted);
+    border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .panel h2 .right { margin-left: auto; font-weight: 500; letter-spacing: 0; }
+  #camwrap { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; min-height: 0; }
+  #cam { width: 100%; height: 100%; object-fit: contain; }
+  #mapwrap { flex: 1; position: relative; min-height: 0; }
+  #map { position: absolute; inset: 0; width: 100%; height: 100%; cursor: default; }
+  #map.setgoal { cursor: crosshair; }
+  .right-col { display: grid; grid-template-rows: minmax(0, 1.4fr) auto; gap: 12px; min-height: 0; }
+  .bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 12px; }
+  .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+  .kv div { background: var(--panel); padding: 7px 10px; }
+  .kv b { display: block; font-size: 10px; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .kv span { font: 600 16px/1.3 "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .big { font: 800 22px/1.1 system-ui, sans-serif; letter-spacing: .04em; padding: 12px; }
+  .reason { padding: 0 12px 10px; color: var(--muted); min-height: 30px; }
+  #events { list-style: none; margin: 0; padding: 4px 0; overflow-y: auto; max-height: 160px; }
+  #events li { padding: 4px 12px; border-left: 3px solid transparent; display: grid;
+    grid-template-columns: 52px 150px 1fr; gap: 8px; font-size: 12px; }
+  #events li .t { color: var(--muted); font-family: ui-monospace, monospace; }
+  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+    padding: 3px 9px; font-size: 11px; cursor: pointer; }
+  button.on { border-color: var(--accent); color: var(--accent); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; padding: 6px 12px; border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  @media (max-width: 1000px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .right-col, .bottom { grid-template-columns: 1fr; }
+    #mapwrap { height: 380px; flex: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>VIGIL <span>UGV</span> NAVIGATION</h1>
+  <div id="statePill" class="pill">---</div>
+  <div id="terrPill" class="pill">TERRAIN ---</div>
+  <div class="conn"><div id="dot" class="dot"></div><span id="conn">connecting</span></div>
+</header>
+<main>
+  <section class="panel">
+    <h2>CAMERA · RGB + DEPTH VISION OVERLAY <span class="right" id="fps"></span></h2>
+    <div id="camwrap"><img id="cam" alt="camera"></div>
+  </section>
+  <div class="right-col">
+    <section class="panel">
+      <h2>A → B MAP <span class="right"><button id="goalBtn" title="Click, then click on the map">Set goal B</button>
+        <button id="fitBtn" class="on">Auto-fit</button></span></h2>
+      <div id="mapwrap"><canvas id="map"></canvas></div>
+      <div class="legend" id="legend"></div>
+    </section>
+    <section class="panel">
+      <h2>ROBOT STATUS</h2>
+      <div class="kv">
+        <div><b>POSITION X</b><span id="rx">-</span></div>
+        <div><b>POSITION Y</b><span id="ry">-</span></div>
+        <div><b>HEADING</b><span id="rh">-</span></div>
+        <div><b>GOAL X</b><span id="gx">-</span></div>
+        <div><b>GOAL Y</b><span id="gy">-</span></div>
+        <div><b>DIST TO GOAL</b><span id="gd">-</span></div>
+        <div><b>SPEED</b><span id="sp">-</span></div>
+        <div><b>ROLL / PITCH</b><span id="rp">-</span></div>
+        <div><b>PATH LENGTH</b><span id="pl">-</span></div>
+      </div>
+    </section>
+  </div>
+  <div class="bottom">
+    <section class="panel">
+      <h2>TERRAIN STATUS <span class="right" id="terrMs"></span></h2>
+      <div class="big" id="terr">---</div>
+      <div class="kv">
+        <div><b>EST. DROP</b><span id="drop">-</span></div>
+        <div><b>SLOPE AHEAD</b><span id="slope">-</span></div>
+        <div><b>SAFE DISTANCE</b><span id="safe">-</span></div>
+      </div>
+      <div class="reason" id="limits"></div>
+    </section>
+    <section class="panel">
+      <h2>NAVIGATION STATE</h2>
+      <div class="big" id="navState">---</div>
+      <div class="reason" id="navReason"></div>
+      <div class="kv">
+        <div><b>DECISION</b><span id="decision" style="font-size:13px">-</span></div>
+        <div><b>REPLANS (HAZARD)</b><span id="replans">-</span></div>
+        <div><b>PATH</b><span id="pathv" style="font-size:13px">-</span></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>WHY DID THE PATH CHANGE? · EVENT LOG</h2>
+      <ul id="events"></ul>
+    </section>
+  </div>
+</main>
+<script>
+const STATE_COLORS = {
+  'NAVIGATING': 'var(--safe)', 'SAFE PATH FOUND': 'var(--safe)', 'GOAL REACHED': 'var(--accent)',
+  'CLIFF DETECTED': 'var(--danger)', 'NO SAFE PATH': 'var(--danger)', 'EMERGENCY STOP': 'var(--danger)',
+  'REPLANNING': 'var(--warn)', 'PATH UPDATED': 'var(--uneven)', 'WAITING': 'var(--muted)', 'NEW GOAL': 'var(--info)',
+  'CLIMBING': '#aa96ff', 'CLIFF_AVOIDANCE': 'var(--warn)', 'RECOVERY': 'var(--uneven)', 'GOAL_REACHED': 'var(--accent)'
+};
+const TERR_COLORS = { 'SAFE': 'var(--safe)', 'UNEVEN': 'var(--uneven)', 'POSSIBLE DROP': 'var(--warn)',
+  'STEEP': '#aa6e3c', 'OBSTACLE': '#dd44dd', 'CLIMBABLE': '#aa96ff', 'HIGH CLIFF': 'var(--danger)', 'UNKNOWN': 'var(--muted)' };
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 2, u = '') => (v === undefined || v === null || Number.isNaN(v)) ? '-' : Number(v).toFixed(d) + u;
+let S = null, mapImg = new Image(), mapReady = false, view = null, autoFit = true, settingGoal = false;
+let lastFrame = 0, lastFrameT = performance.now(), fps = 0;
+
+mapImg.onload = () => { mapReady = true; };
+// Camera: double-buffered polling of /camera.jpg (works in every browser, no flicker).
+let camBusy = false, camFrame = -1;
+function pollCam() {
+  if (camBusy || (S && S.frame === camFrame)) return;
+  camBusy = true; const i = new Image(), f = S ? S.frame : 0;
+  i.onload = () => { $('cam').src = i.src; camFrame = f; camBusy = false; };
+  i.onerror = () => { camBusy = false; };
+  i.src = '/camera.jpg?f=' + f + '&t=' + Date.now();
+}
+setInterval(pollCam, 80);
+function refreshMap() { const i = new Image(); i.onload = () => { mapImg = i; mapReady = true; }; i.src = '/map.png?t=' + Date.now(); }
+setInterval(refreshMap, 1000);
+
+async function poll() {
+  try {
+    const r = await fetch('/state.json', { cache: 'no-store' });
+    S = await r.json();
+    $('dot').classList.add('on'); $('conn').textContent = 'live';
+    update();
+  } catch (e) { $('dot').classList.remove('on'); $('conn').textContent = 'disconnected'; }
+}
+setInterval(poll, 200);
+
+function pill(el, text, color) { el.textContent = text; el.style.color = color; }
+
+function update() {
+  const n = S.nav || {}, t = S.terrain || {}, r = S.robot;
+  const st = n.state || 'WAITING';
+  pill($('statePill'), st, STATE_COLORS[st] || 'var(--text)');
+  const tc = t.terrain || 'UNKNOWN';
+  pill($('terrPill'), 'TERRAIN ' + tc, TERR_COLORS[tc] || 'var(--text)');
+  $('navState').textContent = st; $('navState').style.color = STATE_COLORS[st] || 'var(--text)';
+  $('terr').textContent = tc; $('terr').style.color = TERR_COLORS[tc] || 'var(--text)';
+  if (r) {
+    $('rx').textContent = fmt(r.x); $('ry').textContent = fmt(r.y);
+    $('rh').textContent = fmt(r.heading, 0, '°'); $('sp').textContent = fmt(r.speed, 2, ' m/s');
+    $('rp').textContent = fmt(r.roll, 0) + '° / ' + fmt(r.pitch, 0) + '°';
+  }
+  if (S.goal) { $('gx').textContent = fmt(S.goal[0]); $('gy').textContent = fmt(S.goal[1]); }
+  $('gd').textContent = fmt(n.distance_to_goal, 2, ' m');
+  $('pl').textContent = fmt(n.path_length, 1, ' m');
+  $('drop').textContent = fmt(t.drop, 2, ' m');
+  $('drop').style.color = (t.drop > S.params.max_safe_drop) ? 'var(--danger)' : 'var(--text)';
+  $('slope').textContent = fmt(t.slope_ahead, 0, '°');
+  $('slope').style.color = (t.slope_ahead > S.params.max_climb_slope) ? 'var(--danger)' : (t.slope_ahead > S.params.max_safe_slope) ? '#aa96ff' : 'var(--text)';
+  $('safe').textContent = fmt(t.safe_distance, 1, ' m');
+  $('terrMs').textContent = t.processing_ms ? t.processing_ms + ' ms/frame' : '';
+  $('limits').textContent = `limits: cliff drop > ${S.params.max_safe_drop} m · slope ≤ ${S.params.max_safe_slope}° (climb ≤ ${S.params.max_climb_slope}°) · ` +
+    `footprint ${S.params.length}×${S.params.width} m · inflation ${S.params.inflation} m`;
+  const ev = (n.events || [])[0];
+  $('navReason').textContent = ev ? ev.msg : '';
+  $('decision').textContent = decision(n, t);
+  $('replans').textContent = (n.hazard_replans ?? '-') + ' (' + (n.replans ?? '-') + ' total)';
+  $('pathv').textContent = S.previous_path ? 'UPDATED (v' + n.path_version + ')' : (S.path ? 'ORIGINAL' : 'NONE');
+  $('pathv').style.color = S.previous_path ? 'var(--uneven)' : 'var(--text)';
+  const ul = $('events'); ul.innerHTML = '';
+  for (const e of (n.events || [])) {
+    const li = document.createElement('li');
+    li.style.borderLeftColor = STATE_COLORS[e.state] || 'var(--line)';
+    li.innerHTML = `<span class="t">${e.t.toFixed(1)}s</span><b style="color:${STATE_COLORS[e.state] || 'var(--text)'}">${e.state}</b><span>${e.msg}</span>`;
+    ul.appendChild(li);
+  }
+  if (S.frame !== lastFrame) {
+    const now = performance.now(); fps = 0.8 * fps + 0.2 * (1000 * (S.frame - lastFrame) / Math.max(1, now - lastFrameT));
+    lastFrame = S.frame; lastFrameT = now; $('fps').textContent = fps.toFixed(1) + ' fps';
+  }
+  if (!$('legend').childElementCount && S.class_names) {
+    S.class_names.forEach((nm, k) => { if (k === 0) return;
+      $('legend').insertAdjacentHTML('beforeend', `<span><i style="background:${S.class_colors[k]}"></i>${nm}</span>`); });
+    $('legend').insertAdjacentHTML('beforeend', '<span><i style="background:#35d0ff"></i>current path</span>' +
+      '<span><i style="background:#9aa3ad"></i>previous path</span>');
+  }
+}
+
+function decision(n, t) {
+  const st = n.state || '';
+  if (st === 'GOAL_REACHED' || st === 'GOAL REACHED') return 'STOP · AT GOAL';
+  if (st === 'CLIMBING') return 'CLIMB · ' + fmt(n.climb_slope, 0, '°') + ' · SLOW';
+  if (st === 'CLIFF_AVOIDANCE') return 'SEARCH ROUTE TO B';
+  if (st === 'RECOVERY') return 'RECOVER · REPLAN';
+  if (st === 'NO SAFE PATH' || st === 'EMERGENCY STOP') return 'STOP SAFELY';
+  if (st === 'CLIFF DETECTED' || st === 'REPLANNING') return 'AVOID · REPLAN';
+  if (st === 'WAITING') return 'SETTLING';
+  if (Math.abs(n.cmd_v || 0) < 1e-3 && Math.abs(n.cmd_w || 0) > 1e-3) return 'TURN IN PLACE';
+  if (t.terrain === 'UNEVEN') return 'CONTINUE · UNEVEN OK';
+  return 'CONTINUE';
+}
+
+// ------------------------------------------------------------------- map
+const cv = $('map'), ctx = cv.getContext('2d');
+function resize() { const r = cv.getBoundingClientRect(); cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio; }
+new ResizeObserver(resize).observe(cv);
+
+function targetView() {
+  const pts = [];
+  if (S.start) pts.push(S.start); if (S.goal) pts.push(S.goal); if (S.robot) pts.push([S.robot.x, S.robot.y]);
+  (S.path || []).forEach(p => pts.push(p));
+  if (!pts.length) return { x0: -16, y0: -16, w: 32 };
+  let x0 = Math.min(...pts.map(p => p[0])), x1 = Math.max(...pts.map(p => p[0]));
+  let y0 = Math.min(...pts.map(p => p[1])), y1 = Math.max(...pts.map(p => p[1]));
+  const m = 3.5, aspect = cv.width / cv.height;
+  let w = Math.max(x1 - x0 + 2 * m, (y1 - y0 + 2 * m) * aspect, 8);
+  return { x0: (x0 + x1) / 2 - w / 2, y0: (y0 + y1) / 2 - (w / aspect) / 2, w };
+}
+function W2C(x, y) { const s = cv.width / view.w; return [(x - view.x0) * s, cv.height - (y - view.y0) * s]; }
+function C2W(px, py) { const s = cv.width / view.w; return [px / s + view.x0, (cv.height - py) / s + view.y0]; }
+
+function line(pts, color, width, dash = []) {
+  if (!pts || pts.length < 2) return;
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width * devicePixelRatio; ctx.setLineDash(dash.map(d => d * devicePixelRatio));
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+  pts.forEach((p, i) => { const [a, b] = W2C(p[0], p[1]); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); });
+  ctx.stroke(); ctx.restore();
+}
+function marker(p, color, label) {
+  const [a, b] = W2C(p[0], p[1]), r = 9 * devicePixelRatio;
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(a, b, r, 0, 7); ctx.fill();
+  ctx.fillStyle = '#0d1014'; ctx.font = `800 ${12 * devicePixelRatio}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, a, b + 0.5);
+}
+
+function draw() {
+  requestAnimationFrame(draw);
+  if (!S || !cv.width) return;
+  const tv = targetView();
+  if (!view || autoFit) view = view ? { x0: view.x0 + (tv.x0 - view.x0) * 0.1, y0: view.y0 + (tv.y0 - view.y0) * 0.1, w: view.w + (tv.w - view.w) * 0.1 } : tv;
+  ctx.fillStyle = '#12161b'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (mapReady && S.map) {
+    const m = S.map, [a, b] = W2C(m.origin_x, m.origin_y + m.height * m.resolution);
+    const s = cv.width / view.w * m.resolution;
+    ctx.imageSmoothingEnabled = false; ctx.globalAlpha = 0.9;
+    ctx.drawImage(mapImg, a, b, m.width * s, m.height * s); ctx.globalAlpha = 1;
+  }
+  // 1 m grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+  for (let x = Math.floor(view.x0); x < view.x0 + view.w; x++) { const [a] = W2C(x, 0); ctx.beginPath(); ctx.moveTo(a, 0); ctx.lineTo(a, cv.height); ctx.stroke(); }
+  const vh = view.w * cv.height / cv.width;
+  for (let y = Math.floor(view.y0); y < view.y0 + vh; y++) { const [, b] = W2C(0, y); ctx.beginPath(); ctx.moveTo(0, b); ctx.lineTo(cv.width, b); ctx.stroke(); }
+  // straight A-B reference, trail, previous path, current path
+  if (S.start && S.goal) line([S.start, S.goal], 'rgba(255,255,255,0.18)', 1, [4, 6]);
+  line(S.trail, 'rgba(255,255,255,0.55)', 1.5, [1, 4]);
+  line(S.previous_path, 'rgba(160,168,176,0.9)', 2.5, [8, 6]);
+  if (S.path) { line(S.path, 'rgba(53,208,255,0.25)', 9); line(S.path, '#35d0ff', 3); }
+  const n = S.nav || {};
+  if (n.last_block && S.previous_path) {
+    const [a, b] = W2C(n.last_block[0], n.last_block[1]), k = 7 * devicePixelRatio;
+    ctx.strokeStyle = '#ff3b3b'; ctx.lineWidth = 3 * devicePixelRatio;
+    ctx.beginPath(); ctx.moveTo(a - k, b - k); ctx.lineTo(a + k, b + k); ctx.moveTo(a + k, b - k); ctx.lineTo(a - k, b + k); ctx.stroke();
+    ctx.font = `700 ${11 * devicePixelRatio}px system-ui`; ctx.textAlign = 'left';
+    const txt = n.last_block[2] + ' blocked old path', tw = ctx.measureText(txt).width;
+    ctx.fillStyle = 'rgba(10,13,16,0.85)'; ctx.fillRect(a + k + 2, b - k - 13 * devicePixelRatio, tw + 8, 17 * devicePixelRatio);
+    ctx.fillStyle = '#ff5b5b'; ctx.fillText(txt, a + k + 6, b - k);
+  }
+  if (S.start) marker(S.start, '#3cc850', 'A');
+  if (S.goal) marker(S.goal, '#ff4fd8', 'B');
+  if (S.robot) {
+    const r = S.robot, P = S.params, yaw = r.yaw, c = Math.cos(yaw), s = Math.sin(yaw);
+    // detection fan (87 deg HFOV, cliff_detection_distance)
+    const [ca, cb] = W2C(r.x, r.y), R = P.detection * cv.width / view.w;
+    ctx.fillStyle = 'rgba(53,208,255,0.06)'; ctx.beginPath(); ctx.moveTo(ca, cb);
+    ctx.arc(ca, cb, R, -yaw - 0.76, -yaw + 0.76); ctx.closePath(); ctx.fill();
+    // footprint rectangle
+    const hl = P.length / 2, hw = P.width / 2, cx = P.footprint_center_x;
+    const corners = [[hl, hw], [hl, -hw], [-hl, -hw], [-hl, hw]].map(([u, v]) => [r.x + c * (u + cx) - s * v, r.y + s * (u + cx) + c * v]);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.strokeStyle = '#0d1014'; ctx.lineWidth = 1.5 * devicePixelRatio;
+    ctx.beginPath(); corners.forEach((p, i) => { const [a, b] = W2C(p[0], p[1]); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    const tip = W2C(r.x + c * (hl + 0.6), r.y + s * (hl + 0.6));
+    ctx.strokeStyle = '#ffc800'; ctx.lineWidth = 3 * devicePixelRatio; ctx.beginPath(); ctx.moveTo(ca, cb); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
+  }
+  // scale bar
+  const px = cv.width / view.w, len = view.w > 20 ? 5 : 2;
+  ctx.strokeStyle = '#d9e1ea'; ctx.lineWidth = 2 * devicePixelRatio;
+  ctx.beginPath(); ctx.moveTo(12 * devicePixelRatio, cv.height - 14 * devicePixelRatio); ctx.lineTo(12 * devicePixelRatio + len * px, cv.height - 14 * devicePixelRatio); ctx.stroke();
+  ctx.fillStyle = '#d9e1ea'; ctx.font = `${11 * devicePixelRatio}px system-ui`; ctx.textAlign = 'left';
+  ctx.fillText(len + ' m', 12 * devicePixelRatio, cv.height - 20 * devicePixelRatio);
+  if (settingGoal) { ctx.fillStyle = '#35d0ff'; ctx.fillText('click to place goal B', 12 * devicePixelRatio, 18 * devicePixelRatio); }
+}
+requestAnimationFrame(draw);
+
+$('fitBtn').onclick = () => { autoFit = !autoFit; $('fitBtn').classList.toggle('on', autoFit); };
+$('goalBtn').onclick = () => { settingGoal = !settingGoal; $('goalBtn').classList.toggle('on', settingGoal); cv.classList.toggle('setgoal', settingGoal); };
+cv.addEventListener('click', async ev => {
+  if (!settingGoal || !view) return;
+  const r = cv.getBoundingClientRect();
+  const [x, y] = C2W((ev.clientX - r.left) * devicePixelRatio, (ev.clientY - r.top) * devicePixelRatio);
+  await fetch('/goal', { method: 'POST', body: JSON.stringify({ x, y }) });
+  settingGoal = false; $('goalBtn').classList.remove('on'); cv.classList.remove('setgoal');
+});
+cv.addEventListener('wheel', ev => { ev.preventDefault(); autoFit = false; $('fitBtn').classList.remove('on');
+  const f = ev.deltaY > 0 ? 1.15 : 1 / 1.15, r = cv.getBoundingClientRect();
+  const [wx, wy] = C2W((ev.clientX - r.left) * devicePixelRatio, (ev.clientY - r.top) * devicePixelRatio);
+  view = { x0: wx - (wx - view.x0) * f, y0: wy - (wy - view.y0) * f, w: view.w * f }; }, { passive: false });
+</script>
+</body>
+</html>

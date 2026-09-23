@@ -4,5 +4,6 @@
   "driven_wheels": 8,
   "encoder_wheels": 6,
   "rear_encoder_interfaces": false,
-  "provisional_suspension_joints": 10
+  "inferred_rocker_joints": 2,
+  "cad_fixed_axles": 8
 }

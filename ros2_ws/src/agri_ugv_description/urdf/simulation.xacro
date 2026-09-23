@@ -11,10 +11,6 @@
     <joint name="${side}_rocker"><command_interface name="effort"/>
       <state_interface name="position"><param name="initial_value">${standing}</param></state_interface><state_interface name="velocity"/><state_interface name="effort"/>
     </joint>
-    <joint name="${side}1_suspension"><state_interface name="position"/><state_interface name="velocity"/></joint>
-    <joint name="${side}2_suspension"><state_interface name="position"/><state_interface name="velocity"/></joint>
-    <joint name="${side}3_suspension"><state_interface name="position"/><state_interface name="velocity"/></joint>
-    <joint name="${side}4_suspension"><state_interface name="position"/><state_interface name="velocity"/></joint>
   </xacro:macro>
   <ros2_control name="AgriSimulation" type="system"><hardware><plugin>gz_ros2_control/GazeboSimSystem</plugin></hardware>
     <xacro:controlled_side side="L"/><xacro:controlled_side side="R"/>

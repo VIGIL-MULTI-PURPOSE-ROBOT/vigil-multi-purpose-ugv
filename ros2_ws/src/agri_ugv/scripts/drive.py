@@ -31,6 +31,8 @@ class Drive(Node):
         target[1]=np.clip(target[1],-abs(target[0])/self.turn_radius,abs(target[0])/self.turn_radius)
         self.current+=np.clip(target-self.current,[-.04,-.04],[.04,.04])
         v,w=self.current;w=np.clip(w,-abs(v)/self.turn_radius,abs(v)/self.turn_radius)
+        # Existing effective skid-steer half-track calibration (0.65 m);
+        # physical CAD wheel centres are at +/-0.436 and +/-0.466 m.
         wheels=[]
         for side in [1,-1]:
             wheels.extend([(v-side*w*.65)/r for r in [.23463,.17655,.17655,.17655]])

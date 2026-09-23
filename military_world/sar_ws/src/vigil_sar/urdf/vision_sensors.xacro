@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- Optional vision sensors, included only with xacro arg vision_sensors:=true.
+     A semantic segmentation camera with exactly the same mount, FOV, resolution
+     and rate as the existing rgbd_camera, so its pixels line up 1:1 with the
+     RGB and depth images. Labels come from gz-sim-label-system plugins in the
+     world (0 = unlabelled / sky, 1 = ground, 2 = rock; see make_test_worlds.py).
+     Gazebo publishes /camera/segmentation/labels_map and /colored_map. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="segmentation_camera" default="true"/>
+  <xacro:arg name="hd_camera" default="true"/>
+  <xacro:if value="$(arg segmentation_camera)">
+  <gazebo reference="camera_link">
+    <sensor name="segmentation" type="segmentation">
+      <topic>/camera/segmentation</topic>
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <camera>
+        <segmentation_type>semantic</segmentation_type>
+        <horizontal_fov>1.5184</horizontal_fov>
+        <image><width>320</width><height>240</height></image>
+        <clip><near>0.2</near><far>25</far></clip>
+        <optical_frame_id>camera_optical_frame</optical_frame_id>
+      </camera>
+    </sensor>
+  </gazebo>
+  </xacro:if>
+  <!-- High-resolution RGB display camera: same mount and horizontal FOV as the 320x240
+       rgbd_camera. vigil_sar: default 3840x2160 (4K, 16:9) from config/sar_mission.yaml
+       rgb_camera.*; with the same horizontal FOV a 16:9 frame covers the central rows of the
+       4:3 depth image (vision_overlay.py crops accordingly).
+       Only used for the dashboard overlay; cliff detection still runs on the depth camera.
+       Size/rate from xacro args hd_width / hd_height / hd_rate (launch: camera_width, ...). -->
+  <xacro:arg name="hd_width" default="3840"/>
+  <xacro:arg name="hd_height" default="2160"/>
+  <xacro:arg name="hd_rate" default="5"/>
+  <xacro:if value="$(arg hd_camera)">
+  <gazebo reference="camera_link">
+    <sensor name="hd_camera" type="camera">
+      <topic>/camera/hd/image</topic>
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <update_rate>$(arg hd_rate)</update_rate>
+      <always_on>true</always_on>
+      <camera>
+        <horizontal_fov>1.5184</horizontal_fov>
+        <image><width>$(arg hd_width)</width><height>$(arg hd_height)</height><format>R8G8B8</format></image>
+        <clip><near>0.2</near><far>60</far></clip>
+        <optical_frame_id>camera_optical_frame</optical_frame_id>
+      </camera>
+    </sensor>
+  </gazebo>
+  </xacro:if>
+</robot>

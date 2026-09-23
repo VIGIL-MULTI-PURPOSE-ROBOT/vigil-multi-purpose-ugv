@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="cad_visual" params="part material:=aluminum pitch:=0">
+    <visual>
+      <origin rpy="0 ${pitch} 0" />
+      <geometry>
+        <mesh filename="package://vigil_rough_terrain/meshes/cad_${part}.stl" />
+      </geometry>
+      <material name="${material}" />
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="cad_L_wheels">
+    <xacro:wheel side="L" index="1" xyz="1.135327881 0.166163162 -0.204796982" radius="0.23463" width="0.18624752807617184" mass="35.2" />
+    <xacro:wheel side="L" index="2" xyz="0.681537231 0.135723442 -0.261523865" radius="0.17655" width="0.1405187230110168" mass="15.3" />
+    <xacro:wheel side="L" index="3" xyz="0.313886093 0.135723442 -0.262258636" radius="0.17655" width="0.1405187230110168" mass="15.3" />
+    <xacro:wheel side="L" index="4" xyz="-0.000012238 0.135723442 0.000018890" radius="0.17655" width="0.1405187230110168" mass="15.3" />
+  </xacro:macro>
+  <xacro:macro name="cad_R_wheels">
+    <xacro:wheel side="R" index="1" xyz="1.132747375 -0.166163193 -0.218658493" radius="0.23463" width="0.18624755859375008" mass="35.2" />
+    <xacro:wheel side="R" index="2" xyz="0.678329376 -0.135723465 -0.269818054" radius="0.17655" width="0.14051873779296886" mass="15.3" />
+    <xacro:wheel side="R" index="3" xyz="0.310643768 -0.135723465 -0.266088684" radius="0.17655" width="0.14051873779296886" mass="15.3" />
+    <xacro:wheel side="R" index="4" xyz="0.000026915 -0.135723465 -0.000004211" radius="0.17655" width="0.14051873779296886" mass="15.3" />
+  </xacro:macro>
+</robot>

@@ -34,6 +34,7 @@ class WheelOdometry(Node):
         if dt>.5:return
         left=np.array([rates['L'+str(i)+'_joint']*r for i,r in [(1,.23463),(2,.17655),(3,.17655)]])
         right=np.array([rates['R'+str(i)+'_joint']*r for i,r in [(1,.23463),(2,.17655),(3,.17655)]])
+        # 1.3 m is the retained effective skid-steer track, not CAD width.
         v=float((np.median(left)+np.median(right))/2);w=float((np.median(right)-np.median(left))/1.3)
         slip=float(np.var(left)+np.var(right)+(w-self.gyro)**2)
         self.x+=v*math.cos(self.yaw+w*dt/2)*dt;self.y+=v*math.sin(self.yaw+w*dt/2)*dt;self.yaw+=w*dt
