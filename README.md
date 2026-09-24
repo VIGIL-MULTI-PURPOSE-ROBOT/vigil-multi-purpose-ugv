@@ -165,7 +165,7 @@ and `diagnosis/` (test logs).
 
 ## 3. Install on your computer
 
-**You need:** Ubuntu 24.04, ROS 2 **Jazzy** and Gazebo **Harmonic**. A dedicated GPU is strongly
+**You need:** Ubuntu 24.03, ROS 2 **Jazzy** and Gazebo **Harmonic**. A dedicated GPU is strongly
 recommended, because the SAR world is large. Keep several GB of disk free: the agriculture SLAM
 maps grow, and its disk guard stops the run below 1 GB free.
 
