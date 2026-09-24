@@ -6,7 +6,9 @@
          15 rad/s (2.65 m/s); sim.launch.py raises it to what config/physics.yaml drive.max_linear
          needs. Default 15 = the original.
        * the wheel joint torque (effort) limit is an argument: sim.launch.py passes
-         physics.drive.wheel_torque_limit (150 N.m). Default 400 = the original. -->
+         physics.drive.wheel_torque_limit (150 N.m). Default 400 = the original.
+       * collision proxies (urdf/collision_proxies.xacro) for body parts that were visual only:
+         rear body, full body width, rear tower, mast, LiDAR, thermal mast / camera (no mass change). -->
 <robot name="agri_ugv" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="simulation" default="false"/>
   <xacro:arg name="wheel_max_rad_s" default="15"/>
@@ -14,6 +16,7 @@
   <xacro:arg name="standing_angle" default="-0.06283185307179587"/>
   <xacro:arg name="controllers_file" default="$(find vigil_sar)/config/controllers.yaml"/>
   <xacro:include filename="$(find vigil_sar)/urdf/cad_geometry.xacro"/>
+  <xacro:include filename="$(find vigil_sar)/urdf/collision_proxies.xacro"/>
   <xacro:property name="standing" value="$(arg standing_angle)"/>
   <material name="aluminum"><color rgba="0.65 0.67 0.70 1"/></material>
   <material name="rubber"><color rgba="0.07 0.07 0.08 1"/></material>
@@ -33,6 +36,7 @@
     </inertial>
     <xacro:cad_visual part="body"/>
     <collision><origin xyz="-0.0753 0 -0.1264"/><geometry><box size="1.0737 0.5 0.3523"/></geometry></collision>
+    <xacro:body_collision_proxies/>  <!-- vigil_sar: rear body, sides, tower, mast (collision only) -->
   </link>
   <joint name="body_reference" type="fixed"><parent link="base_footprint"/><child link="base_link"/><origin xyz="0 0 0.5872"/></joint>
   <link name="payload"><xacro:inertia mass="65.71" x="0.85" y="0.40" z="0.22"/></link>
@@ -98,7 +102,8 @@
   <joint name="camera_mount" type="fixed"><parent link="base_link"/><child link="camera_link"/><origin xyz="0.4672 0 0.0119" rpy="0 0.1745 0"/></joint>
   <link name="camera_optical_frame"/>
   <joint name="camera_optical_joint" type="fixed"><parent link="camera_link"/><child link="camera_optical_frame"/><origin rpy="${-pi/2} 0 ${-pi/2}"/></joint>
-  <link name="lidar_link"><xacro:inertia mass="0.8" x="0.07" y="0.07" z="0.06"/><xacro:cad_visual part="lidar" material="rubber"/></link>
+  <link name="lidar_link"><xacro:inertia mass="0.8" x="0.07" y="0.07" z="0.06"/><xacro:cad_visual part="lidar" material="rubber"/>
+    <collision name="lidar_collision"><origin xyz="-0.013 0 -0.012"/><geometry><cylinder radius="0.05" length="0.056"/></geometry></collision></link>
   <joint name="lidar_mount" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="-0.5865 0 0.497"/></joint>
   <link name="imu_link"><xacro:inertia mass="0.05" x="0.03" y="0.03" z="0.01"/></link>
   <joint name="imu_mount" type="fixed"><parent link="base_link"/><child link="imu_link"/><origin xyz="-0.0753 0 -0.1264"/></joint>

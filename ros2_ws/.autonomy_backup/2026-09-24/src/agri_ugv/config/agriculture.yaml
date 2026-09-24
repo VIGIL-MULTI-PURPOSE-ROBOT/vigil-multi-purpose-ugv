@@ -1,0 +1,159 @@
+# VIGIL agriculture configuration - ONE file for the field, the row mission, obstacle avoidance,
+# the simulated soil-moisture sensor + map, and the crop/weed/human perception.
+# Read by crop_row_driver.py, agri_obstacles.py, agri_moisture_sensor.py, agri_moisture_map.py,
+# agri_vision.py and agri_dashboard.py. Units: metres, seconds, percent.
+
+field:
+  # How the number of crop rows is found:
+  #   world      - read the crop rows (row_XX_seg links) from the world model below   (default)
+  #   dimensions - number_of_rows = round(field_width / row_spacing) + 1
+  #   fixed      - use total_rows
+  auto_row_detection: world
+  world_model: models/vigil_cotton_farm/model.sdf     # relative to the agri_ugv package
+  total_rows: 23              # used only with auto_row_detection: fixed
+  first_row_y: -13.418        # world y of crop row 1 (rows run along world +x)
+  row_spacing: 1.22           # distance between crop-row centre lines
+  field_width: 26.84          # first to last row centre line (dimensions mode)
+  crop_area_start: -13.9      # world x of the first plants of every row
+  crop_area_end: 14.4         # world x of the last plants of every row
+  field_length: 28.3          # crop_area_end - crop_area_start (informational)
+  field_margin: 0.8           # vegetation this far outside the planted block still counts as "field"
+
+mission:
+  # A row is COMPLETE when the robot centre is row_end_tolerance past the last plant of that row.
+  row_end_tolerance: 0.4
+  # Headland U-turn points (previous behaviour: west -14.5, east 17.0)
+  headland_start_margin: 0.6  # turn point = crop_area_start - this   (west end)
+  headland_end_margin: 2.6    # turn point = crop_area_end + this     (east end)
+  cruise_speed_mps: 1.20      # existing row speed
+  headland_turn_speed_mps: 0.45
+  headland_turn_radius_m: 0.85  # commanded (the skid-steer turns ~0.61 m on soil)
+  max_cross_track_m: 0.36
+  progress_rate_hz: 5.0
+
+obstacles:
+  enabled: true
+  obstacle_detection_range: 12.0   # LiDAR + depth points farther than this are ignored
+  obstacle_min_height: 0.30        # lower things (small rocks, clods, weeds) are driven over
+  crop_max_height: 1.00            # crop-row band points below this are crop, not obstacles
+  cluster_cell: 0.30
+  min_points: 4
+  track_gate: 1.0                  # association distance for tracking
+  track_timeout: 3.0               # drop a track not seen this long while in sensor range
+  memory_timeout: 120.0            # remember static obstacles out of sensor range this long
+  dynamic_speed: 0.20              # faster than this = moving obstacle
+  robot_half_width: 0.55           # tyres at +-0.45 m (+ tyre width)
+  robot_half_length: 0.85
+  corridor_margin: 0.20            # extra clearance each side of the robot
+  obstacle_avoidance_distance: 5.0 # obstacles closer than this ahead are acted on
+  stop_distance: 1.20              # never closer than this (robot front to obstacle)
+  hazard_stop_distance: 1.20       # reach of the existing depth-camera emergency stop while avoiding
+  yield_timeout: 12.0              # wait this long for a moving obstacle before going around it
+  detour_speed_mps: 0.60
+  detour_transition: 4.0           # length of each lateral move to the neighbouring row line
+  detour_pass_clearance: 1.0       # keep this far past the obstacle before moving back
+  allow_outside_rows: true         # the first/last row may detour one row spacing outside the field
+  headland_wait: 8.0               # wait for a moving obstacle in the turn area before a reverse U-turn
+  row_end_zone: 2.5              # an obstacle in the last 2.5 m of a row that reaches past the last plant ends the row there
+  retry_period: 3.0
+  predict_horizon: 3.0             # seconds of predicted motion checked for moving obstacles
+
+moisture:
+  enabled: true
+  update_rate: 2.0         # sensor readings per second
+  sensing_radius: 0.05     # probe footprint (the reading averages the field over this radius)
+  noise: 0.8               # measurement noise (standard deviation, % moisture)
+  min_moisture: 18.0
+  max_moisture: 78.0
+  seed: 42                 # same seed -> same moisture field; change it for another field
+  correlation_length: 6.0  # size of wet / dry patches (m)
+  probe_x: -0.10           # probe position on the robot (base_footprint frame; fallback if TF missing)
+  probe_y: 0.30            #   between the crop row and the left tyre: over soil, not over plants
+  map_resolution: 0.25
+  interpolation_radius: 1.20   # cells farther than this from every sample stay UNKNOWN
+  coverage_radius: 0.95        # a cell counts as surveyed when a sample is this close
+  complete_threshold: 99.0     # % surveyed area for MOISTURE MAP COMPLETE
+  low_threshold: 30.0          # below = DRY
+  high_threshold: 60.0         # above = WET
+  event_distance: 15.0         # log a MOISTURE SAMPLE event every this many metres driven
+  event_change: 6.0            # ... or when the reading changes by this much (at most every 6 m)
+  map_publish_rate: 1.0
+
+camera:
+  # Fallback only: the node reads base_footprint -> camera_optical_frame from TF.
+  # (URDF: base_link 0.5872 m above base_footprint, camera at x 0.4672 z 0.0119, pitched 10 deg down)
+  x: 0.4672
+  y: 0.0
+  z: 0.5991
+  pitch_down_deg: 10.0
+  min_depth: 0.25
+  max_depth: 12.0
+
+performance:
+  process_rate_hz: 4.0      # vision frames per second (camera runs at 10 Hz)
+  overlay_width: 640        # dashboard overlay size (the camera itself is 320 x 240)
+
+vegetation:
+  # Pixel segmentation only (which pixels are plants). Classification uses much more (below).
+  # Normalised excess green (2g - r - b) / (r + g + b) is brightness-independent (shadows, dusk).
+  exg_min: 0.10
+  hue_min: 25               # OpenCV hue, 0..180
+  hue_max: 95
+  saturation_min: 40
+  value_min: 18
+
+crop:
+  # MAIN CROP = plants on a known row line. Nothing inside the row band can ever be a weed.
+  row_position_tolerance: 0.30    # |lateral offset| <= this -> row band (crop canopy)
+  guard_band: 0.12                # between tolerance and tolerance+guard -> UNKNOWN, never weed
+  plant_spacing: 0.30             # along-row spacing used to count individual plants
+  plant_gap: 0.12                 # an along-row gap this long separates two plants
+  min_height: 0.05                # a crop plant must stand at least this high
+  crop_confidence_threshold: 0.60 # below -> UNKNOWN
+  count_range: 6.0                # crops are counted only this close (reliable depth)
+  min_points: 12
+
+weed:
+  # A WEED needs ALL of these; any failure -> UNKNOWN (never a forced weed).
+  weed_confidence_threshold: 0.65
+  minimum_weed_size: 0.04          # ground footprint diameter
+  maximum_weed_size: 0.60
+  max_height: 0.45                 # taller vegetation between rows -> UNKNOWN
+  root_max_height: 0.10            # lowest point must touch the ground (not overhanging crop leaves)
+  min_pixels: 6
+  max_range: 7.0
+  crop_similarity_max: 0.75        # looks too much like the learned crop -> UNKNOWN
+  temporal_confirmation_frames: 3  # consecutive weed frames before W# is reported
+
+human:
+  min_height: 1.3                  # (a person cut off by the top of the image may be shorter)
+  max_height: 2.2
+  min_width: 0.28                  # fence posts and poles are thinner
+  max_width: 1.30
+  min_aspect: 1.8                  # height / width
+  max_vegetation_fraction: 0.35    # a person is not green foliage
+  min_pixels: 25
+  confidence_threshold: 0.55
+  temporal_confirmation_frames: 4
+  active_seconds: 6.0              # "HUMAN DETECTED" stays up this long after the last sighting
+
+objects:
+  crop_max_height: 1.0             # non-green crop parts (cotton bolls) on the row lines are not objects
+  min_height: 0.15                 # non-vegetation standing this high above the ground
+  max_range: 12.0
+  cell: 0.25                       # world grid used to group object points
+  min_pixels: 15
+  temporal_confirmation_frames: 3
+
+tracking:
+  crop_radius: 0.18                # same plant if closer (along the row)
+  weed_radius: 0.30
+  unknown_radius: 0.30
+  human_radius: 1.2
+  object_radius: 1.0
+  max_tracks: 30000
+
+dashboard:
+  port: 8080
+  jpeg_quality: 80
+  max_events: 200

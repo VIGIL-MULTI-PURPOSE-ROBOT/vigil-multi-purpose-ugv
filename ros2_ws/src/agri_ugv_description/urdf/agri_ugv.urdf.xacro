@@ -67,5 +67,13 @@
   <joint name="lidar_mount" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="-0.5865 0 0.497"/></joint>
   <link name="imu_link"><xacro:inertia mass="0.05" x="0.03" y="0.03" z="0.01"/></link>
   <joint name="imu_mount" type="fixed"><parent link="base_link"/><child link="imu_link"/><origin xyz="-0.0753 0 -0.1264"/></joint>
+  <!-- Simulated soil-moisture probe (agri_moisture_sensor.py). Visual only (no mass, no collision):
+       under the chassis between the crop row and the left tyre, so it reads soil, not plants.
+       The link origin is the probe tip, ~4 cm above the ground. -->
+  <link name="moisture_probe_link">
+    <visual><origin xyz="0 0 0.125"/><geometry><cylinder radius="0.012" length="0.25"/></geometry><material name="aluminum"/></visual>
+    <visual><origin xyz="0 0 0.01"/><geometry><sphere radius="0.02"/></geometry><material name="rubber"/></visual>
+  </link>
+  <joint name="moisture_probe_mount" type="fixed"><parent link="base_link"/><child link="moisture_probe_link"/><origin xyz="-0.10 0.30 -0.55"/></joint>
   <xacro:if value="$(arg simulation)"><xacro:include filename="$(find agri_ugv_description)/urdf/simulation.xacro"/></xacro:if>
 </robot>

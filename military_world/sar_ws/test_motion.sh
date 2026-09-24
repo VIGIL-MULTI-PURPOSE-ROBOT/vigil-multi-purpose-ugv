@@ -12,6 +12,9 @@
 # Scenarios (--scenarios): flat_road, moderate_slope, steep_hill, obstacle, cliff_front - each its
 #   own small world with the navigator driving A->B (reach B, no wheelie, <= 3.0 m/s, <= 1 m/s2,
 #   no standing stop, clearance speed profile, never into the wall / pit)
+#   + people: human_block (the test drives INTO a standing person: the contact must stop the rover),
+#   human_standing, human_crossing (navigator: never touch the person, keep distance, reach B)
+#   bash test_motion.sh --scenario human_block --scenario human_standing --scenario human_crossing
 # Phase 2 (military_world, full mission, headless - slow: the big world runs below real time):
 #   TEST 7 SAR at A  TEST 5 reach B  TEST 8 SAR while driving  TEST 9 SAR near B
 #   TEST 6 no overshoot  TEST 10 SAR after B  TEST 11 SAR again after STOP
@@ -141,8 +144,10 @@ if [[ $SCEN -eq 1 ]]; then
         world_file:="$SDIR/$NAME.sdf" spawn_x:="$SX" spawn_y:="$SY" spawn_z:="$SZ" \
         rgbd:=true segmentation:=true lidar:=false hd_camera:=false thermal:=false \
       ) > "$OUT/scenario_${NAME}_launch.log" 2>&1 &
+    DRIVE=$(python3 -c "import json;print(json.load(open('$SDIR/scenarios.json'))['$NAME'].get('drive','navigator'))")
     if wait_ready "$OUT/scenario_${NAME}_launch.log" 180; then
-      ( ros2 launch vigil_sar navigation.launch.py ) > "$OUT/scenario_${NAME}_nav.log" 2>&1 &
+      # human_block: the probe itself drives into the person (no navigator, no avoidance)
+      [[ "$DRIVE" == "probe" ]] || ( ros2 launch vigil_sar navigation.launch.py ) > "$OUT/scenario_${NAME}_nav.log" 2>&1 &
       $PROBE --phase scenario --scenario "$NAME" --meta "$SDIR/scenarios.json" --config "$CONFIG" 2>&1 | tee -a "$LOG"
       [[ ${PIPESTATUS[0]} -eq 0 ]] || RESULT=1
       grep -a "cliff_navigator.*state " "$OUT/scenario_${NAME}_nav.log" | tail -12 | sed 's/^/    nav: /' | tee -a "$LOG"

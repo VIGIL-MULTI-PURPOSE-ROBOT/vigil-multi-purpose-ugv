@@ -1,6 +1,14 @@
 #!/usr/bin/python3
 """Gazebo test worlds for the drive / navigation scenarios (flat road, moderate slope, steep climb,
-obstacle, cliff) - used by test_motion.sh --scenarios.
+obstacle, cliff, and the PEOPLE scenarios) - used by test_motion.sh --scenarios.
+
+People scenarios (real military_world person meshes and the SAME primitive collision body and
+contact-aware walking controller as the SAR world - build_sar_world.primitive_collisions and the
+sar::WaypointSystem controller 2):
+  human_block     a standing person 5 m ahead; the TEST drives straight at them (no navigator):
+                  the rover must be stopped by the contact, never pass through
+  human_standing  a standing person on the A-B line; the navigator must keep its distance and reach B
+  human_crossing  a person walking back and forth across the A-B line; no contact, reach B
 
     python3 scenario_worlds.py OUT_DIR            # writes OUT_DIR/<name>.sdf + OUT_DIR/scenarios.json
     python3 scenario_worlds.py --list
@@ -11,10 +19,15 @@ A = (0, -8) facing +y (config spawn), so rough-terrain (x, y) -> (-y, x - 8). Ph
 and vigil_rough_terrain: Earth gravity, DART defaults, 1 ms step, ground friction mu 1.0. Every
 surface carries segmentation label 1 (ground) or 2 (obstacle) for the cliff "void" test.
 """
+import copy
 import json
 import math
+import os
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 A = (0.0, -8.0)            # spawn (config/sar_mission.yaml spawn), heading +y
 CLIFF_H = 1.5
@@ -80,6 +93,107 @@ SCENARIOS = {
         pit_box=(3.5, 6.5, -1.6, 1.6), expect=dict(reach=True, min_z=CLIFF_H - 0.3)),
 }
 
+# people (rough frame, like the objects): kind 'static' stands still, 'walker' walks between a and b
+SCENARIOS.update({
+    'human_block': dict(
+        desc='Standing person 5 m straight ahead; the test drives INTO them at 0.8 m/s (no navigator): the '
+             'rover must be stopped by the real contact and never pass through the person.',
+        objects=[], spawn_z=0.0, goal=(12.0, 0.0), slope_deg=0.0, max_time=25.0, drive='probe',
+        people=[dict(name='person_1', kind='static', at=(5.0, 0.0))], expect=dict(blocked=True)),
+    'human_standing': dict(
+        desc='Standing person on the A-B line 8 m ahead: detect, keep the human safety distance, go round, reach B.',
+        objects=[], spawn_z=0.0, goal=(15.0, 0.0), slope_deg=0.0, max_time=150.0,
+        people=[dict(name='person_1', kind='static', at=(8.0, 0.0))], expect=dict(reach=True, min_gap=1.0)),
+    'human_crossing': dict(
+        desc='Person walking back and forth across the A-B line (1.2 m/s, 7 m ahead): predict, yield or go '
+             'round, never touch them, reach B.',
+        objects=[], spawn_z=0.0, goal=(15.0, 0.0), slope_deg=0.0, max_time=180.0,
+        people=[dict(name='walker_1', kind='walker', a=(7.0, 7.0), b=(7.0, -7.0), speed=1.2)],
+        expect=dict(reach=True, min_gap=0.5)),
+})
+PERSON_RADIUS = 0.30          # m, for the probe's footprint-gap measurement (trunk + arms)
+
+
+def person_models(people, mw=None):
+    """Person models for a scenario, from the military_world export (StaticPerson_009, standing), with
+    the SAR world's primitive collision body; walkers get the contact-aware sar::WaypointSystem."""
+    if not people:
+        return ''
+    from sar_paths import find_military_world
+    from build_sar_world import primitive_collisions, set_temperature
+    mw = mw or find_military_world(os.environ.get('MILITARY_WORLD_DIR', ''))
+    src = mw / 'gazebo_export/military_world.sdf'
+    world = ET.parse(src).getroot().find('world')
+    tpl = world.find("model[@name='SAR_StaticPerson_009']")
+    out = []
+    for person in people:
+        m = copy.deepcopy(tpl)
+        m.set('name', person['name'])
+        for plug in m.findall('plugin'):
+            m.remove(plug)
+        for uri in m.iter('uri'):
+            if uri.text and uri.text.startswith('meshes/'):
+                uri.text = 'file://' + str((src.parent / uri.text).resolve())
+        for v in m.iter('visual'):
+            set_temperature(v, 305.15)
+        link = m.find('link')
+        primitive_collisions(link)
+        # stand the person ON the ground: lowest point of the primitive body -> 5 mm above z = 0
+        low = math.inf
+        for col in link.findall('collision'):
+            cx, cy, cz, r, pch, _ = [float(v) for v in col.findtext('pose').split()]
+            g = col.find('geometry')[0]
+            if g.tag == 'sphere':
+                low = min(low, cz - float(g.findtext('radius')))
+            else:
+                L, R = float(g.findtext('length')), float(g.findtext('radius'))
+                tilt = math.acos(max(-1.0, min(1.0, math.cos(r) * math.cos(pch))))
+                low = min(low, cz - 0.5 * L * math.cos(tilt) - R * math.sin(tilt))
+        base_z = 0.005 - low
+        x, y = to_sar(*(person['at'] if person['kind'] == 'static' else person['a']))
+        m.find('pose').text = f'{x:.3f} {y:.3f} {base_z:.3f} 0 0 0'
+        lab = ET.SubElement(m, 'plugin', filename='gz-sim-label-system', name='gz::sim::systems::Label')
+        ET.SubElement(lab, 'label').text = '10'
+        odo = ET.SubElement(m, 'plugin', filename='gz-sim-odometry-publisher-system',
+                            name='gz::sim::systems::OdometryPublisher')
+        for k, v in (('odom_frame', 'world'), ('robot_base_frame', person['name']), ('dimensions', '3'),
+                     ('odom_topic', f"/scenario/{person['name']}/odometry"), ('odom_publish_frequency', '30')):
+            ET.SubElement(odo, k).text = v
+        if person['kind'] == 'static':
+            m.find('static').text = 'true'
+        else:
+            m.find('static').text = 'false'
+            ET.SubElement(link, 'gravity').text = 'true'
+            inertial = ET.SubElement(link, 'inertial')
+            ET.SubElement(inertial, 'mass').text = '75'
+            ET.SubElement(inertial, 'pose').text = '0 0 0.85 0 0 0'
+            ine = ET.SubElement(inertial, 'inertia')
+            for k, v in (('ixx', 20), ('iyy', 20), ('izz', 4), ('ixy', 0), ('ixz', 0), ('iyz', 0)):
+                ET.SubElement(ine, k).text = str(v)
+            for col in link.findall('collision'):
+                surf = ET.SubElement(col, 'surface')
+                fr = ET.SubElement(ET.SubElement(surf, 'friction'), 'ode')
+                ET.SubElement(fr, 'mu').text = '0.08'
+                ET.SubElement(fr, 'mu2').text = '0.08'
+            ax, ay = to_sar(*person['a'])
+            bx, by = to_sar(*person['b'])
+            d = math.hypot(bx - ax, by - ay)
+            leg = d / float(person['speed'])
+            yaw = math.atan2(by - ay, bx - ax)
+            plug = ET.SubElement(m, 'plugin', filename='sar-waypoint-system', name='sar::WaypointSystem')
+            ET.SubElement(plug, 'offset').text = '0 0 0'
+            for t, (px, py, pyaw) in ((0.0, (ax, ay, yaw)), (leg, (bx, by, yaw)), (leg + 1.0, (bx, by, yaw + math.pi)),
+                                      (2 * leg + 1.0, (ax, ay, yaw + math.pi)), (2 * leg + 2.0, (ax, ay, yaw))):
+                wp = ET.SubElement(plug, 'waypoint')
+                ET.SubElement(wp, 'time').text = f'{t:.3f}'
+                ET.SubElement(wp, 'pose').text = f'{px:.3f} {py:.3f} {base_z:.3f} 0 0 {pyaw:.4f}'
+            for k, v in (('controller_version', '2'), ('mass', '75'), ('carried', 'false'),
+                         ('cruise_speed', f"{float(person['speed']):g}")):
+                ET.SubElement(plug, k).text = v
+        out.append('    ' + ET.tostring(m, encoding='unicode') + '\n')
+    return ''.join(out)
+
+
 HEADER = """<?xml version="1.0"?>
 <!-- GENERATED by vigil_sar scripts/scenario_worlds.py - scenario '{name}': {desc} -->
 <sdf version="1.9">
@@ -134,6 +248,7 @@ def world_sdf(name, sc):
         colour = '0.55 0.47 0.40' if o['label'] == 1 else '0.35 0.36 0.40'
         out.append(BOX.format(name=f'block_{k}', x=X, y=Y, z=z, sx=sx, sy=sy, sz=sz, pitch=o['pitch'],
                               yaw=math.pi / 2, c=colour, label=o['label']))
+    out.append(person_models(sc.get('people')))
     gx, gy = to_sar(*sc['goal'])
     out.append(f"""    <model name="goal_B"><static>true</static><pose>{gx:.3f} {gy:.3f} {goal_height(sc) + 0.02:.3f} 0 0 0</pose>
       <link name="link"><visual name="v"><geometry><cylinder><radius>0.25</radius><length>0.02</length></cylinder></geometry>
@@ -163,6 +278,14 @@ def describe(name, sc):
     for key in ('obstacle_box', 'pit_box'):
         if key in sc:
             d[key] = box_to_sar(sc[key])
+    d['drive'] = sc.get('drive', 'navigator')
+    d['people'] = []
+    for person in sc.get('people', []):
+        e = dict(name=person['name'], kind=person['kind'], radius=PERSON_RADIUS,
+                 odometry=f"/scenario/{person['name']}/odometry")
+        if person['kind'] == 'static':
+            e['at'] = list(to_sar(*person['at']))
+        d['people'].append(e)
     return d
 
 

@@ -44,6 +44,16 @@
         max_linear: 3.0            # m/s  open-road top speed (was 10)
         max_accel: 1.0             # m/s2 speeding up: 1.9x below the wheelie limit on a 33 deg
                                    #      climb, 7.7x on flat ground (was 8.0)
+        # ACCELERATION + on the dashboard: speeding-up levels (m/s2). The first is max_accel. The
+        # button only changes this limit, smoothly (max_jerk); top speed, braking and every safety
+        # check are unchanged, and each level is capped at stability_margin x the wheelie limit at the
+        # rover's current pitch (flat 7.7 m/s2 -> the 2.0 level; 33 deg climb 1.9 -> back to 1.0).
+        accel_levels: [1.0, 1.5, 2.0]
+        accel_level_names: [NORMAL, HIGH, MAX]
+        stability_margin: 0.5      # fraction of the wheelie limit a level may use
+        com_height: 0.33           # m  } rover_stability.py (URDF): centre of mass height and distance
+        com_ahead_of_rear_contact: 0.31  # m } ahead of the rearmost loaded wheel -> wheelie limit
+        wheelie_spin_factor: 0.835 # wheel spin-up share (7.7 m/s2 flat instead of the rigid 9.2)
         max_decel: 2.0             # m/s2 braking: 3.0 m/s -> 0 in ~1.5 s / ~2.6 m; nose-over is
                                    #      only above 13 m/s2 (front wheel 0.52 m ahead of the COM)
         max_jerk: 3.0              # m/s3 speeding up: the acceleration builds up over ~0.3 s, never a step

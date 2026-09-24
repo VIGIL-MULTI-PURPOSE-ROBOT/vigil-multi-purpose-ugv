@@ -38,7 +38,7 @@ from launch_ros.actions import Node
 
 PKG = 'vigil_sar'
 PARTITION = 'vigil_sar'
-NODE_SCRIPTS = ('terrain_mapper.py', 'cliff_navigator.py', 'ugv_dashboard.py', 'drive.py',
+NODE_SCRIPTS = ('terrain_mapper.py', 'cliff_navigator.py', 'ugv_dashboard.py', 'drive.py', 'obstacle_tracker.py',
                 'thermal_human_detector.py', 'human_tracker.py', 'sar_manager.py', 'build_sar_world.py')
 
 
@@ -187,6 +187,9 @@ def setup(context):
     w['collision_detector'] = str(eng.get('collision_detector', w.get('collision_detector', 'default')))
     w['physics_solver'] = str(eng.get('solver', w.get('physics_solver', 'default')))
     w['ground_friction'] = eng.get('ground_friction', w.get('ground_friction', 1.0))
+    if lc('sim_speed'):
+        # simulation (execution) speed only: Gazebo's target real-time factor
+        w['simulation_speed'] = float(lc('sim_speed').lower().rstrip('x'))
     if lc('fast') == 'true':
         # The 300 m world with 1 ms physics, 20 walking people and five cameras runs at a few
         # percent of real time on this class of laptop. fast:=true drops the walking people and the
@@ -243,6 +246,12 @@ def setup(context):
                                    f"{rep.get('thermal_plugins', '?')} thermal plugins "
                                    f"({rep.get('ambient_plugins_dropped', 0)} ambient-temperature ones dropped)"))
         ph = rep.get('physics', {})
+        actions.append(LogInfo(msg=f"[vigil_sar] simulation speed target {ph.get('real_time_factor', 1.0):g}x real time "
+                                   f"(execution speed only: 1 ms step, gravity, masses, friction, torques unchanged; "
+                                   f"the dashboard shows the measured factor). {len(rep.get('human_collision_boxes', []))} "
+                                   f"people have primitive collision bodies (people controller {rep.get('people_controller')}: "
+                                   f"{'force-driven rigid bodies' if rep.get('people_controller') == 2 else 'kinematic'}), "
+                                   f"collide bitmasks {rep.get('collide_bitmasks')}; obstacle labels {rep.get('obstacle_labels', {})}"))
         actions.append(LogInfo(msg=f"[vigil_sar] physics: gravity {ph.get('gravity')} m/s2, "
                                    f"{ph.get('step', 0) * 1000:.0f} ms step, "
                                    f"{ph.get('collision_detector')} collision detector, {ph.get('solver')} solver"))
@@ -446,6 +455,8 @@ def generate_launch_description():
         DeclareLaunchArgument('gpu', default_value='', description='auto (NVIDIA if present) | nvidia | intel; empty = profile/auto'),
         DeclareLaunchArgument('gui_config', default_value='',
                               description="empty = the light config/gui.config | default = Gazebo's own | <file>"),
+        DeclareLaunchArgument('sim_speed', default_value='',
+                              description='target real-time factor, e.g. 1, 2, 4 (empty = world.simulation_speed)'),
         DeclareLaunchArgument('fast', default_value='false',
                               description='no walking people, 1080p display camera: a faster run (physics unchanged)'),
         DeclareLaunchArgument('cleanup', default_value='true',

@@ -17,6 +17,9 @@ Every verdict comes from what the physics engine reports, never from the dashboa
   --phase scenario (scenario_worlds.py world + sim.launch.py + navigation.launch.py)
       flat_road / moderate_slope / steep_hill / obstacle / cliff_front: reach B, top speed, acceleration,
       front-wheel contact, tilt, no standing stops, clearance speed profile, never in the pit / the wall
+      human_block: the test drives INTO a standing person - the contact must stop the rover (no pass-through)
+      human_standing / human_crossing: the navigator must keep its distance from a standing / walking
+      person (their true pose from a gz OdometryPublisher on the person) and reach B
   --phase mission  (military_world, full sar_mission.launch.py)
       TEST 7 SAR at A   TEST 5 reach B   TEST 8 SAR while driving   TEST 9 SAR near B
       TEST 6 no overshoot   TEST 10 SAR after B   TEST 11 SAR again after STOP
@@ -27,6 +30,7 @@ Run through test_motion.sh, which starts and stops the simulation around each ph
 import argparse
 import json
 import math
+import subprocess
 import sys
 import time
 
@@ -136,6 +140,7 @@ class Probe(Node):
         self.create_subscription(String, '/sar/state', lambda m: self._json(m, 'sar'), 10)
         self.create_subscription(String, '/drive/status', lambda m: self._json(m, 'drive'), 10)
         self.create_subscription(String, '/sar/humans', self.on_humans, 10)
+        self.people = {}               # name -> (x, y) true pose (scenario people)
         self.cmd = self.create_publisher(Twist, '/cmd_vel', 10) if own_cmd_vel else None
         self.goal = self.create_publisher(PoseStamped, '/navigation/goal', 10)
         self.sar_cmd = self.create_publisher(String, '/sar/command', 10)
@@ -149,6 +154,10 @@ class Probe(Node):
 
     def on_imu(self, m):
         self.imu_z = float(m.linear_acceleration.z)
+
+    def watch_person(self, name, topic):
+        self.create_subscription(Odometry, topic, lambda m, n=name: self.people.__setitem__(
+            n, (m.pose.pose.position.x, m.pose.pose.position.y, m.pose.pose.position.z)), qos_profile_sensor_data)
 
     def on_contact(self, wheel, m):
         self.contact_msgs += 1
@@ -486,6 +495,78 @@ def _profile(nav, c):
     return vs[-1]
 
 
+def footprint_gap(p, px, py, radius):
+    """Distance (m) from the rover's 1.53 x 1.12 m body rectangle (true pose) to a person's body circle;
+    negative = they overlap."""
+    _, x, y, yaw, _ = p.gt
+    c, s = math.cos(yaw), math.sin(yaw)
+    dx, dy = px - x, py - y
+    u, w = c * dx + s * dy - 0.02, -s * dx + c * dy
+    ex, ey = abs(u) - 1.53 / 2, abs(w) - 1.12 / 2
+    inside = ex < 0 and ey < 0
+    d = max(ex, ey) if inside else math.hypot(max(ex, 0.0), max(ey, 0.0))
+    return d - radius
+
+
+def start_people_bridge(sc):
+    """Bridge the scenario people's gz odometry (not in bridge.yaml) for the duration of the test."""
+    args = [f"{q['odometry']}@nav_msgs/msg/Odometry[gz.msgs.Odometry" for q in sc.get('people', [])]
+    if not args:
+        return None
+    try:
+        return subprocess.Popen(['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', *args,
+                                 '--ros-args', '-p', 'use_sim_time:=true'],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except OSError:
+        return None
+
+
+def person_positions(p, sc):
+    out = []
+    for q in sc.get('people', []):
+        pos = p.people.get(q['name'])
+        if pos is None and q['kind'] == 'static':
+            pos = (q['at'][0], q['at'][1], 0.0)
+        if pos is not None:
+            out.append((q['name'], pos, q['radius']))
+    return out
+
+
+def phase_push(p, rep, sc):
+    """human_block: drive straight at a standing person (0.8 m/s commanded the whole time). With real
+    collision geometry the rover stops at the contact; it must never overlap the person's body."""
+    name = sc['name']
+    if not p.wait_for('/sim/ground_truth', lambda: p.gt is not None, wall=300):
+        rep.add(f'{name}: ground truth', False, 'no /sim/ground_truth')
+        return
+    p.spin_sim(3.0)
+    q = sc['people'][0]
+    min_gap, speeds, start = [math.inf], [], (p.gt[1], p.gt[2])
+    moved = [0.0]
+
+    def watch():
+        for _, pos, r in person_positions(p, sc):
+            min_gap[0] = min(min_gap[0], footprint_gap(p, pos[0], pos[1], r))
+            moved[0] = max(moved[0], math.hypot(pos[0] - q['at'][0], pos[1] - q['at'][1]))
+        speeds.append((p.gt[0], p.gt[4]))
+        return False
+    p.spin_sim(float(sc['max_time']), cmd=(0.8, 0.0), until=watch, wall_limit=float(sc['max_time']) * 40 + 120)
+    p.spin_sim(1.0, cmd=(0.0, 0.0))
+    t_end = speeds[-1][0] if speeds else 0.0
+    tail = [v for t, v in speeds if t_end - t <= 4.0]
+    v_tail = sum(tail) / max(1, len(tail))
+    travelled = math.hypot(p.gt[1] - start[0], p.gt[2] - start[1])
+    reach = math.hypot(q['at'][0] - start[0], q['at'][1] - start[1])
+    rep.add(f'{name}: stopped by the person', v_tail < 0.15,
+            f'mean speed over the last 4 s {v_tail:.2f} m/s while 0.8 m/s was still commanded; travelled '
+            f'{travelled:.2f} m towards a person {reach:.1f} m ahead')
+    rep.add(f'{name}: never passes through', min_gap[0] > -0.08,
+            f'closest rover-body-to-person-body distance {min_gap[0]:+.2f} m (negative = overlap; contact '
+            f'solver penetration is a few cm)')
+    rep.add(f'{name}: person is a real obstacle', moved[0] < 0.1,
+            f'the standing person moved {moved[0]:.2f} m (static casualty: must not be pushed away)')
+
+
 def phase_scenario(p, rep, sc, nav_cfg):
     name = sc['name']
     print(f"  scenario {name}: {sc['desc']}", flush=True)
@@ -503,6 +584,7 @@ def phase_scenario(p, rep, sc, nav_cfg):
     still = [0.0, 0.0, None]                          # current, worst, state during the worst
     yaw_prev = [p.gt[3], p.gt[0]]
     reached = [None, None]
+    person_gap = [math.inf, None]
     near_obstacle = [math.inf]
     in_pit = [False]
     p.send_goal(*goal)
@@ -528,6 +610,10 @@ def phase_scenario(p, rep, sc, nav_cfg):
             e = sp - _profile(nav_cfg, float(c))
             if e > excess[0]:
                 excess[:] = [e, (round(float(c), 2), round(sp, 2))]
+        for pname, pos, r in person_positions(p, sc):
+            g = footprint_gap(p, pos[0], pos[1], r)
+            if g < person_gap[0]:
+                person_gap[:] = [g, pname]
         if 'obstacle_box' in sc:
             near_obstacle[0] = min(near_obstacle[0], _box_distance(x, y, sc['obstacle_box']))
         if 'pit_box' in sc and _box_distance(x, y, sc['pit_box']) == 0.0:
@@ -560,6 +646,18 @@ def phase_scenario(p, rep, sc, nav_cfg):
     if 'obstacle_box' in sc:
         rep.add(f'{name}: steered round the wall', near_obstacle[0] >= 0.56,
                 f'robot centre came within {near_obstacle[0]:.2f} m of the wall (half width 0.56 m)')
+    if sc.get('people'):
+        want = float(sc['expect'].get('min_gap', 0.3))
+        seen = any(q['name'] in p.people or q['kind'] == 'static' for q in sc['people'])
+        rep.add(f'{name}: never touched the person', seen and person_gap[0] > 0.02,
+                (f'closest rover body to {person_gap[1]}: {person_gap[0]:.2f} m' if seen else
+                 'no person pose received (odometry bridge)'))
+        rep.add(f'{name}: kept a safe distance', seen and person_gap[0] >= want,
+                f'closest {person_gap[0]:.2f} m, want >= {want:.1f} m (human safety distance 2.0 m in the planner)')
+        if p.nav.get('collision'):
+            rep.add(f'{name}: dynamic-obstacle layer active', True,
+                    f"collision status at the end: {p.nav.get('collision_status')}, tracker "
+                    f"{p.nav['collision'].get('tracker')}")
     if 'pit_box' in sc:
         zmin = sc['expect'].get('min_z', -math.inf)
         rep.add(f'{name}: never fell / entered the pit', not in_pit[0] and mon.min_z >= zmin,
@@ -576,13 +674,18 @@ def main():
     ap.add_argument('--humans', type=float, default=0.0, help='sim minutes of SAR to wait for H1 (0 = skip)')
     a, _ = ap.parse_known_args()
     rclpy.init()
-    p = Probe(own_cmd_vel=a.phase == 'motion')
+    sc = json.load(open(a.meta))[a.scenario] if a.phase == 'scenario' else {}
+    p = Probe(own_cmd_vel=a.phase == 'motion' or sc.get('drive') == 'probe')
     rep = Report()
+    bridge = start_people_bridge(sc) if sc else None
+    for q in sc.get('people', []):
+        p.watch_person(q['name'], q['odometry'])
     try:
         if a.phase == 'motion':
             phase_motion(p, rep)
+        elif a.phase == 'scenario' and sc.get('drive') == 'probe':
+            phase_push(p, rep, sc)
         elif a.phase == 'scenario':
-            sc = json.load(open(a.meta))[a.scenario]
             nav_cfg = {}
             try:
                 import yaml
@@ -594,6 +697,8 @@ def main():
             phase_mission(p, rep, tuple(a.goal), a.humans)
     except KeyboardInterrupt:
         pass
+    if bridge is not None:
+        bridge.terminate()
     ok = rep.summary()
     p.destroy_node()
     if rclpy.ok():

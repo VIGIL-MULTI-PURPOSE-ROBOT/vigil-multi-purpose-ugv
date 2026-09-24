@@ -26,11 +26,16 @@ import math
 import os
 import sys
 
-import rclpy
-from rclpy.node import Node
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import JointState
-from std_msgs.msg import Float64MultiArray, String
+try:
+    import rclpy
+    from rclpy.node import Node
+    from geometry_msgs.msg import Twist
+    from nav_msgs.msg import Odometry
+    from sensor_msgs.msg import JointState
+    from std_msgs.msg import Float64MultiArray, String
+except ImportError:            # DriveLaw alone (offline tests without ROS 2)
+    rclpy = None
+    Node = object
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from ros_common import nested_section, node_time  # noqa: E402
@@ -67,6 +72,55 @@ class DriveLaw:
         self.skid = float(d.get('skid_factor', 0.65))
         self.v = self.a = self.w = 0.0
         self.wheels = [0.0] * 8
+        # ACCELERATION + (dashboard): a few speeding-up limits, the first = max_accel (validated).
+        # Only the acceleration limit changes: max_linear, braking, jerk and the wheel cap stay, and
+        # the jerk limit makes a level change itself smooth (the acceleration never steps).
+        self.base_acc = self.acc
+        levels = d.get('accel_levels') or [self.acc]
+        self.levels = [float(v) for v in levels]
+        if abs(self.levels[0] - self.acc) > 1e-9:
+            self.levels = [self.acc] + [v for v in self.levels if v > self.acc]
+        names = list(d.get('accel_level_names') or [])
+        self.level_names = [names[k] if k < len(names) else f'{v:g} m/s2' for k, v in enumerate(self.levels)]
+        self.level = 0
+        # never above stability_margin x the wheelie limit at the current pitch (rover_stability.py
+        # model: flat 7.7 m/s2, 33 deg climb 1.9 m/s2), and never below the validated max_accel
+        self.stab_margin = float(d.get('stability_margin', 0.5))
+        self.com_h = float(d.get('com_height', 0.33))
+        self.com_back = float(d.get('com_ahead_of_rear_contact', 0.31))
+        self.spin_factor = float(d.get('wheelie_spin_factor', 0.835))
+        self.pitch = 0.0
+        self.acc_cap = math.inf
+
+    # ------------------------------------------------------------ acceleration levels
+    @property
+    def level_name(self):
+        return self.level_names[self.level]
+
+    def wheelie_limit(self, pitch):
+        """Front-lift acceleration (m/s2) on a climb of `pitch` rad (nose up > 0)."""
+        g = 9.81
+        up = max(0.0, pitch)
+        return max(0.0, g * (self.com_back * math.cos(up) - self.com_h * math.sin(up)) / self.com_h * self.spin_factor)
+
+    def _apply_level(self):
+        want = self.levels[self.level]
+        self.acc_cap = max(self.base_acc, self.stab_margin * self.wheelie_limit(self.pitch))
+        self.acc = min(want, self.acc_cap)
+
+    def set_level(self, k):
+        self.level = max(0, min(len(self.levels) - 1, int(k)))
+        self._apply_level()
+
+    def step_level(self, d=1):
+        self.set_level(self.level + d)
+
+    def reset_level(self):
+        self.set_level(0)
+
+    def set_pitch(self, pitch):
+        self.pitch = float(pitch)
+        self._apply_level()
 
     def clamp_cmd(self, v, w):
         return max(-self.max_v, min(self.max_v, v)), max(-self.max_w, min(self.max_w, w))
@@ -111,6 +165,10 @@ class Drive(Node):
         self.pub_status = self.create_publisher(String, 'drive/status', 10)
         self.create_subscription(Twist, 'cmd_vel', self.command, 10)
         self.create_subscription(JointState, 'joint_states', self.on_joints, 10)
+        # ACCELERATION + button (dashboard): UP | DOWN | NORMAL | <level index>
+        self.create_subscription(String, 'drive/accel_command', self.on_accel, 10)
+        # pitch -> the level is capped below the wheelie limit on climbs
+        self.create_subscription(Odometry, 'sim/ground_truth', self.on_odom, 10)
         self.create_timer(TICK, self.tick)
         self.create_timer(0.2, self.report)
         self.get_logger().info(
@@ -124,6 +182,27 @@ class Drive(Node):
             self.target = list(self.law.clamp_cmd(msg.linear.x, msg.angular.z))
             self.last = node_time(self)
             self.n_cmd += 1
+
+    def on_accel(self, msg):
+        c = msg.data.strip().upper()
+        before = self.law.level_name
+        if c in ('UP', '+', 'ACCEL+'):
+            self.law.step_level(+1)
+        elif c in ('DOWN', '-'):
+            self.law.step_level(-1)
+        elif c in ('NORMAL', 'RESET', '0'):
+            self.law.reset_level()
+        elif c.isdigit():
+            self.law.set_level(int(c))
+        self.get_logger().info(f'acceleration {before} -> {self.law.level_name}: speeding-up limit '
+                               f'{self.law.levels[self.law.level]:.2f} m/s2 (now {self.law.acc:.2f}, stability cap '
+                               f'{self.law.acc_cap:.2f}); top speed {self.law.max_v:.2f} m/s unchanged')
+
+    def on_odom(self, msg):
+        q = msg.pose.pose.orientation
+        # nose-up pitch of the body (x axis) = -asin(R[2,0])
+        r20 = 2.0 * (q.x * q.z - q.w * q.y)
+        self.law.set_pitch(-math.asin(max(-1.0, min(1.0, r20))))
 
     def on_joints(self, msg):
         self.n_js += 1
@@ -148,7 +227,11 @@ class Drive(Node):
         now = node_time(self)
         d = dict(mode='velocity', cmd_v=round(self.target[0], 3), cmd_w=round(self.target[1], 3),
                  ramped_v=round(self.current[0], 3), ramped_w=round(self.current[1], 3),
-                 accel=round(self.law.a, 3), max_accel=self.law.acc, max_decel=self.law.dec, max_jerk=self.law.jerk,
+                 accel=round(self.law.a, 3), max_accel=round(self.law.acc, 3), max_decel=self.law.dec,
+                 max_jerk=self.law.jerk, accel_level=self.law.level, accel_level_name=self.law.level_name,
+                 accel_levels=self.law.levels, accel_level_names=self.law.level_names,
+                 accel_request=self.law.levels[self.law.level], accel_stability_cap=round(self.law.acc_cap, 2),
+                 pitch_deg=round(math.degrees(self.law.pitch), 1),
                  cmd_fresh=now - self.last < COMMAND_TIMEOUT,
                  cmd_age=round(now - self.last, 2) if self.last > 0 else None,
                  cmd_msgs=self.n_cmd, joint_state_msgs=self.n_js, max_linear=self.max_v, max_angular=self.max_w,

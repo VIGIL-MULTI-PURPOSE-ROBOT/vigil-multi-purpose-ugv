@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- vigil_sar: collision proxies for the parts of the rover body that had NO collision.
+     The CAD body mesh (meshes/cad_body.stl, base_link frame) spans x -0.83..0.46, y -0.35..0.52,
+     z -0.30..0.47, but base_link only had the 1.07 x 0.50 x 0.35 m chassis box (x -0.61..0.46,
+     y +-0.25, z -0.30..0.05): the rear body, the sides beyond +-0.25 m, the rear tower and mast were
+     visual only, so a person or a pole could stand inside them. These boxes cover them. Collision
+     only: no mass, no inertia change, all at least 0.39 m above the ground on flat ground (the chassis
+     box stays the lowest body part), and the rover's own links never collide with each other (self_collide off). -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="body_collision_proxies">
+    <!-- main hull, full body width (x -0.61..0.46, y +-0.35, z -0.20..0.11) -->
+    <collision name="hull_collision"><origin xyz="-0.075 0 -0.045"/><geometry><box size="1.07 0.70 0.31"/></geometry></collision>
+    <!-- rear body behind the chassis box (x -0.83..-0.61, y +-0.35, z -0.15..0.11; the mesh starts at
+         -0.15 there, which keeps 6 cm of ground clearance at the foot of a 33 deg climb) -->
+    <collision name="rear_body_collision"><origin xyz="-0.72 0 -0.02"/><geometry><box size="0.22 0.70 0.26"/></geometry></collision>
+    <!-- rear tower (x -0.83..-0.47, y +-0.35, z 0.11..0.30) -->
+    <collision name="rear_tower_collision"><origin xyz="-0.65 0 0.205"/><geometry><box size="0.36 0.70 0.19"/></geometry></collision>
+    <!-- sensor mast up to the LiDAR (x -0.77..-0.56, z 0.30..0.47) -->
+    <collision name="mast_collision"><origin xyz="-0.665 0 0.385"/><geometry><box size="0.21 0.08 0.17"/></geometry></collision>
+    <!-- side bracket at y +0.50..0.52 (x -0.58..-0.56, z -0.02..0.03) -->
+    <collision name="bracket_collision"><origin xyz="-0.57 0.43 0.005"/><geometry><box size="0.04 0.18 0.05"/></geometry></collision>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,4 @@
+# Moved: all agriculture settings (field, row mission, obstacle avoidance, soil moisture and the
+# crop / weed / human perception) are now in ONE file: config/agriculture.yaml
+# This file is kept only so older command lines that point at it still start (with defaults).
+{}

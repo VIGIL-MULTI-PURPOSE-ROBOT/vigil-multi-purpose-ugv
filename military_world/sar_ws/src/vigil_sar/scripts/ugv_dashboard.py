@@ -15,6 +15,10 @@ HTTP server, OpenCV JPEG/PNG encoding, one HTML page). Open http://localhost:808
   POST /goal       {"x":..,"y":..}          -> /navigation/goal   (SET GOAL B)
   POST /nav        {"cmd":"START"|"PAUSE"}  -> /navigation/command
   POST /sar        {"cmd":"START"|"STOP"}   -> /sar/command       (SAR switch)
+  POST /accel      {"cmd":"UP"|"DOWN"|"NORMAL"} -> /drive/accel_command (ACCELERATION + button)
+  POST /simspeed   {"rtf": 1|2|4}           -> gz /world/<world>/set_physics (target real-time factor)
+State also carries: dynamic obstacles (/perception/obstacles), COLLISION STATUS (navigator), the
+acceleration level (/drive/status) and the simulation speed (target and MEASURED real-time factor).
 """
 import json
 import math
@@ -39,6 +43,7 @@ from std_msgs.msg import String  # noqa: E402
 
 from terrain_core import CLASS_BGR, CLASS_NAMES, Params  # noqa: E402
 from ros_common import nested_params, image_to_numpy, odom_to_pose, grid_to_numpy, path_from_msg  # noqa: E402
+from sim_speed import RtfMeter, set_simulation_speed  # noqa: E402
 
 LUT = np.zeros((256, 3), np.uint8)
 for _k, _v in CLASS_BGR.items():
@@ -125,6 +130,19 @@ class Dashboard(Node):
         self.create_subscription(String, '/sar/humans', self.on_humans, 10)
         self.create_subscription(String, '/sar/events', self.on_event, 50)
         self.create_subscription(Odometry, '/sim/ground_truth', self.on_odom, s)
+        self.obstacles = {}
+        self.drive = {}
+        self.create_subscription(String, '/perception/obstacles', lambda m: self._set('obstacles', json.loads(m.data)), 10)
+        self.create_subscription(String, '/drive/status', lambda m: self._set('drive', json.loads(m.data)), 10)
+        self.accel_pub = self.create_publisher(String, '/drive/accel_command', 10)
+        # simulation speed: target (world.simulation_speed, or what the operator picked) + measured
+        w = cfg['world']
+        self.world_name = str(w.get('world_name', 'military_world'))
+        self.physics_step = float(w.get('physics_step', 0.001))
+        self.sim_target = float(w.get('simulation_speed', 1.0))
+        self.sim_options = [1.0, 2.0, 4.0]
+        self.sim_msg = ''
+        self.rtf_meter = RtfMeter(window=6.0)
         self.goal_pub = self.create_publisher(PoseStamped, '/navigation/goal', 10)
         self.nav_cmd_pub = self.create_publisher(String, '/navigation/command', 10)
         self.sar_cmd_pub = self.create_publisher(String, '/sar/command', 10)
@@ -223,19 +241,30 @@ class Dashboard(Node):
                 self.map_png, self.map_meta = buf.tobytes(), meta
 
     def real_time_factor(self):
-        """sim seconds per wall second, over the last few seconds. military_world with 1 ms
-        physics, 20 walking people and five cameras runs far below real time; everything on the
-        dashboard then happens at that fraction of the speed, so it is worth showing."""
+        """MEASURED sim seconds per wall second over the last few seconds (the target is only what
+        Gazebo tries; if the computer cannot keep up it runs slower, and this shows the truth)."""
         sim, wall = self.get_clock().now().nanoseconds * 1e-9, time.time()
-        if self.rtf_mark is None or sim < self.rtf_mark[0]:
-            self.rtf_mark = (sim, wall)
-            return None
-        d_sim, d_wall = sim - self.rtf_mark[0], wall - self.rtf_mark[1]
-        if d_wall < 3.0:
-            return self.rtf
-        self.rtf = round(d_sim / d_wall, 3) if d_wall > 0 else None
-        self.rtf_mark = (sim, wall)
+        if self.rtf_meter.samples and sim < self.rtf_meter.samples[-1][1]:
+            self.rtf_meter = RtfMeter(window=self.rtf_meter.window)      # world reset
+        self.rtf_meter.add(wall, sim)
+        r = self.rtf_meter.rtf()
+        self.rtf = None if r is None else round(r, 3)
         return self.rtf
+
+    def set_sim_speed(self, rtf):
+        """Operator picked 1x / 2x / 4x: ask Gazebo (in a thread - the service can take a second)."""
+        self.sim_msg = f'requesting {rtf:g}x ...'
+
+        def run():
+            ok, out = set_simulation_speed(self.world_name, rtf, self.physics_step)
+            with self.lock:
+                if ok:
+                    self.sim_target = rtf
+                    self.sim_msg = f'target set to {rtf:g}x'
+                else:
+                    self.sim_msg = f'could not set {rtf:g}x: {out[:120]}'
+            self._add_event(None, f'SIMULATION SPEED -> {rtf:g}x ({"ok" if ok else "FAILED"})', 'operator')
+        threading.Thread(target=run, daemon=True).start()
 
     def on_odom(self, m):
         pose = odom_to_pose(m)
@@ -256,7 +285,21 @@ class Dashboard(Node):
             tasks = sar.pop('tasks', [])
             cfg = self.cfg
             rtf = self.real_time_factor()
-            d = dict(rtf=rtf, nav=nav, terrain=ter, cliff=dict(self.cliff), map=self.map_meta, frame=self.frame_id,
+            obst = dict(self.obstacles)
+            drv = dict(self.drive)
+            coll = nav.get('collision') or {}
+            sim_speed = dict(target=self.sim_target, measured=rtf, options=self.sim_options, message=self.sim_msg,
+                             achieved=None if rtf is None else round(rtf / max(self.sim_target, 1e-6) * 100.0, 0))
+            dyn = dict(status=nav.get('collision_status', 'NO TRACKER DATA'), collision=coll,
+                       tracks=(obst.get('tracks') or [])[:12], n=obst.get('n', 0), dynamic=obst.get('dynamic', 0),
+                       counts=obst.get('counts', {}), segmentation=obst.get('segmentation'),
+                       processing_ms=obst.get('processing_ms'), params=obst.get('params', {}))
+            accel = dict(level=drv.get('accel_level', 0), name=drv.get('accel_level_name', 'NORMAL'),
+                         request=drv.get('accel_request'), active=drv.get('max_accel'),
+                         cap=drv.get('accel_stability_cap'), levels=drv.get('accel_levels'),
+                         names=drv.get('accel_level_names'), accel=drv.get('accel'), max_linear=drv.get('max_linear'))
+            d = dict(rtf=rtf, sim_speed=sim_speed, dynamic=dyn, accel=accel,
+                     nav=nav, terrain=ter, cliff=dict(self.cliff), map=self.map_meta, frame=self.frame_id,
                      thermal_frame=self.thermal_id,
                      path=None if self.path is None else np.round(self.path[::3], 2).tolist(),
                      previous_path=None if self.prev_path is None else np.round(self.prev_path[::3], 2).tolist(),
@@ -380,6 +423,17 @@ class Dashboard(Node):
                         cmd = str(g.get('cmd', '')).upper()
                         node.nav_cmd_pub.publish(String(data=cmd))
                         node._add_event(None, f'NAVIGATION {cmd}', 'operator')
+                    elif self.path.startswith('/accel'):
+                        cmd = str(g.get('cmd', 'UP')).upper()
+                        if cmd not in ('UP', 'DOWN', 'NORMAL'):
+                            raise ValueError(cmd)
+                        node.accel_pub.publish(String(data=cmd))
+                        node._add_event(None, f'ACCELERATION {cmd}', 'operator')
+                    elif self.path.startswith('/simspeed'):
+                        rtf = float(g.get('rtf', 1.0))
+                        if not 0.1 <= rtf <= 8.0:
+                            raise ValueError(rtf)
+                        node.set_sim_speed(rtf)
                     elif self.path.startswith('/sar'):
                         cmd = str(g.get('cmd', '')).upper()
                         node.sar_cmd_pub.publish(String(data=cmd))

@@ -48,19 +48,39 @@ def setup(context):
     if stage>=8:
         actions.append(IncludeLaunchDescription(PythonLaunchDescriptionSource(str(p/'launch/navigation.launch.py'))))
         actions.append(node('agri_ugv','environment.py',parameters=[{'use_sim_time':True,'lighting_enabled':stage>=10}]))
+    dashboard=LaunchConfiguration('dashboard').perform(context)=='true'
+    vision_cfg=str(p/'config/agriculture.yaml')   # one config: field, mission, obstacles, moisture, perception
     if stage>=9:
         if LaunchConfiguration('row_mission').perform(context)=='true':
-            actions.append(node('agri_ugv','crop_row_driver.py',parameters=[{'use_sim_time':True,'row_count':int(LaunchConfiguration('row_count').perform(context))}]))
+            # dashboard:=true only re-routes the driver's unchanged output through the START/STOP
+            # gate (row_start_gate.py republishes it on cmd_vel_nav while RUNNING).
+            gate_remap=[('cmd_vel_nav','crop_row/cmd_vel_request')] if dashboard else []
+            actions.append(node('agri_ugv','crop_row_driver.py',parameters=[{'use_sim_time':True,'row_count':int(LaunchConfiguration('row_count').perform(context)),'config':vision_cfg}],remappings=gate_remap))
+            # LiDAR + depth obstacle tracker feeding the mission's avoidance
+            actions.append(node('agri_ugv','agri_obstacles.py',parameters=[{'use_sim_time':True,'config':vision_cfg}]))
+            # autonomy supervisor around the row mission (state, decisions, recovery, metrics); autonomy:=false = off
+            if LaunchConfiguration('autonomy').perform(context)=='true':
+                actions.append(node('agri_ugv','agri_supervisor.py',parameters=[{'use_sim_time':True,'config':vision_cfg}]))
+            if dashboard:
+                actions.append(node('agri_ugv','row_start_gate.py',parameters=[{'use_sim_time':True,'autostart':LaunchConfiguration('autostart').perform(context)=='true'}]))
         else:
             actions.append(node('agri_ugv','exploration.py',parameters=[{'use_sim_time':True,'autostart':LaunchConfiguration('explore').perform(context)=='true','visit_b':True}]))
     if stage>=10:
         actions.append(node('agri_ugv','lighting.py',parameters=[{'use_sim_time':True}]))
     if stage>=11:
         actions.append(node('agri_ugv','suspension.py',parameters=[{'use_sim_time':True}]))
+    if LaunchConfiguration('moisture').perform(context)=='true':
+        # simulated soil-moisture probe + live moisture map of the crop field
+        actions.append(node('agri_ugv','agri_moisture_sensor.py',parameters=[{'use_sim_time':True,'config':vision_cfg}]))
+        actions.append(node('agri_ugv','agri_moisture_map.py',parameters=[{'use_sim_time':True,'config':vision_cfg}]))
+    if dashboard:
+        # observe-only: camera + pose in, detections / overlay / web page out
+        actions.append(node('agri_ugv','agri_vision.py',parameters=[{'use_sim_time':True,'config':vision_cfg}]))
+        actions.append(node('agri_ugv','agri_dashboard.py',parameters=[{'use_sim_time':True,'config':vision_cfg,'row_count':int(LaunchConfiguration('row_count').perform(context))}]))
     if stage>=6:
         guard=node('agri_ugv','resource_guard.py')
         actions.extend([RegisterEventHandler(OnProcessExit(target_action=guard,on_exit=[EmitEvent(event=Shutdown(reason='Simulation resource guard exited'))])),guard])
     return actions
 
 def generate_launch_description():
-    return LaunchDescription([DeclareLaunchArgument('stage',default_value='12'),DeclareLaunchArgument('headless',default_value='false'),DeclareLaunchArgument('rviz',default_value='true'),DeclareLaunchArgument('explore',default_value='true'),DeclareLaunchArgument('row_mission',default_value='true'),DeclareLaunchArgument('row_count',default_value='23'),OpaqueFunction(function=setup)])
+    return LaunchDescription([DeclareLaunchArgument('stage',default_value='12'),DeclareLaunchArgument('headless',default_value='false'),DeclareLaunchArgument('rviz',default_value='true'),DeclareLaunchArgument('explore',default_value='true'),DeclareLaunchArgument('row_mission',default_value='true'),DeclareLaunchArgument('row_count',default_value='0',description='0 = all crop rows of the field (from the world / config/agriculture.yaml); N = only N rows'),DeclareLaunchArgument('moisture',default_value='true',description='simulated soil-moisture sensor + moisture map'),DeclareLaunchArgument('dashboard',default_value='true',description='perception + web dashboard (http://localhost:8080) + START/STOP gate; false = previous launch exactly'),DeclareLaunchArgument('autonomy',default_value='true',description='agri_supervisor.py: autonomy supervisor (state, decisions, stuck recovery, metrics)'),DeclareLaunchArgument('autostart',default_value='false',description='with dashboard:=true, start the row mission without pressing START ROBOT'),OpaqueFunction(function=setup)])

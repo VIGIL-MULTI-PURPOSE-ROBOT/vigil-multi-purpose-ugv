@@ -13,6 +13,12 @@ gone. What vigil_sar adds is only what the SAR layer and the dashboard need, mar
         same callback, so the first command leaves within one planning pass
   [SAR] GOAL_REACHED sends an explicit zero command every tick
   [SAR] costmap rebuilds are throttled to navigation.map_update_period (the map is 170 m wide)
+  [DYN] /perception/obstacles (obstacle_tracker.py): people, vehicles and moving obstacles are stamped
+        into the planner's class grid with their safety distance and, when moving, along their
+        predicted path (obstacle_core.DynamicAvoidance). Collision prediction on the planned path ->
+        COLLISION RISK / AVOIDING / CLEAR in /navigation/status, a replan, and a smooth speed cap
+        (yield to a crossing person, slow near people). Cliffs are never overwritten. The navigator's
+        own driving, planning and escalation are unchanged.
 
 Subscribes: /vision/terrain_classes, /vision/slope, /vision/roughness, /sim/ground_truth,
             /navigation/goal and /goal_pose (geometry_msgs/PoseStamped, e.g. RViz 2D goal)
@@ -34,8 +40,9 @@ from geometry_msgs.msg import Twist, PoseStamped  # noqa: E402
 from nav_msgs.msg import Odometry, OccupancyGrid, Path  # noqa: E402
 from std_msgs.msg import String, Float64  # noqa: E402
 
-from terrain_core import Params  # noqa: E402
+from terrain_core import Params, OBSTACLE, CLIFF  # noqa: E402
 from planner_core import NavigatorCore, wrap  # noqa: E402
+from obstacle_core import ObstacleParams, DynamicAvoidance, tracks_from_msg  # noqa: E402
 from ros_common import nested_params, odom_to_pose, grid_to_numpy, path_msg  # noqa: E402
 
 
@@ -78,6 +85,16 @@ class CliffNavigator(Node):
         self.create_subscription(Float64, '/navigation/speed_limit',
                                  lambda m: setattr(self, 'speed_limit', float(m.data)), 10)
         self.create_subscription(String, '/navigation/command', self.on_command, 10)
+        # [DYN] dynamic obstacles
+        self.op = ObstacleParams.from_dict(cfg.get('obstacles', {}))
+        self.dyn = DynamicAvoidance(self.op, self.tp, nav_cfg, OBSTACLE, keep_classes=(CLIFF,))
+        self.base_cls = None                  # last terrain class grid (before the overlay)
+        self.obst_msg, self.obst_t = None, -1e9
+        self.obst_dirty = False
+        self.had_overlay = False
+        self.last_stamp = -1e9
+        if self.op.enabled:
+            self.create_subscription(String, '/perception/obstacles', self.on_obstacles, 10)
         self.last_logged = None                                # [SAR] state changes go to the log
         # 20 Hz (vigil_rough_terrain: 10 Hz): half the reaction time, for a quicker turn-in
         self.create_timer(float(nav_cfg.get('tick_period', 0.05)), self.tick)
@@ -95,8 +112,34 @@ class CliffNavigator(Node):
 
     def _build(self, m):
         cls = grid_to_numpy(m)
+        self.base_cls = np.where(cls < 0, 0, cls).astype(np.uint8)
+        self._rebuild()
+
+    def _rebuild(self):
+        """[DYN] terrain classes (+ tracked obstacles) -> planner costmap."""
+        cls = self.base_cls
+        if cls is None:
+            return
         ok = lambda a: a if a is not None and a.shape == cls.shape else None  # noqa: E731
-        self.nav.update_map(np.where(cls < 0, 0, cls).astype(np.uint8), ok(self.slope), ok(self.rough))
+        if self.op.enabled and self.pose is not None and self._obstacles_fresh() and self.dyn.active():
+            cls = self.dyn.overlay(cls, self.pose, self.nav.goal)
+            self.had_overlay = True
+        else:
+            self.dyn.cells = 0
+            self.had_overlay = False
+        self.nav.update_map(cls, ok(self.slope), ok(self.rough))
+
+    def on_obstacles(self, m):                                  # [DYN]
+        try:
+            self.obst_msg = json.loads(m.data)
+        except ValueError:
+            return
+        self.obst_t = self.now()
+        self.dyn.set_tracks(tracks_from_msg(self.obst_msg, self.obst_t))
+        self.obst_dirty = True
+
+    def _obstacles_fresh(self):
+        return self.now() - self.obst_t < max(1.0, 2.0 * self.op.track_timeout)
 
     def on_odom(self, m):
         self.pose = odom_to_pose(m)
@@ -148,6 +191,16 @@ class CliffNavigator(Node):
             self.last_build = t
             m, self.pending_map = self.pending_map, None
             self._build(m)
+            self.last_stamp = t
+        elif self.op.enabled and self.base_cls is not None and t - self.last_stamp >= self.op.stamp_period:
+            # [DYN] obstacles moved: re-stamp them (or clear the old stamps) without waiting for terrain
+            fresh = self._obstacles_fresh()
+            if (self.obst_dirty and fresh and self.dyn.active()) or (self.had_overlay and not (fresh and self.dyn.active())):
+                self.last_stamp = t
+                self.obst_dirty = False
+                if fresh and self.obst_msg is not None:
+                    self.dyn.set_tracks(tracks_from_msg(self.obst_msg, t))
+                self._rebuild()
         if self.hold is not None:
             v, w = self.hold_tick()
         elif not self.started:
@@ -159,6 +212,13 @@ class CliffNavigator(Node):
                 v = self.speed_limit
             if self.nav.state in self.nav.TERMINAL:
                 v, w = 0.0, 0.0
+            elif self.op.enabled and self._obstacles_fresh():
+                v, w = self.dyn.apply(t, self.pose, self.nav, v, w, self.speed)   # [DYN] only lowers v
+        if self.op.enabled and (not self.started or self.hold is not None or not self._obstacles_fresh()):
+            # not driving (or no tracker): still report what is around, without a path
+            if self._obstacles_fresh():
+                self.dyn.risk = dict(status='CLEAR')
+                self.dyn.status = 'CLEAR'
         tw = Twist()
         tw.linear.x, tw.angular.z = float(v), float(w)
         self.cmd.publish(tw)
@@ -167,6 +227,12 @@ class CliffNavigator(Node):
                   speed=round(self.speed, 3), tilt=round(self.pose.tilt_deg, 1))
         st['started'] = self.started                            # [SAR] dashboard fields
         st['speed_limit'] = self.speed_limit
+        if self.op.enabled:                                     # [DYN] collision status
+            st['collision'] = self.dyn.report(self.pose)
+            st['collision']['tracker'] = 'OK' if self._obstacles_fresh() else 'NO DATA'
+            st['collision_status'] = st['collision']['status'] if self._obstacles_fresh() else 'NO TRACKER DATA'
+            if self.dyn.reason and st.get('state') not in ('GOAL_REACHED',):
+                st['obstacle_reason'] = self.dyn.reason
         if not self.started and self.hold is None:
             st['state'] = 'READY - SET GOAL B' if self.start_on_goal else 'READY - PRESS START'
             st['reason'] = f'set goal B on the map (current B = {self.nav.goal[0]:.1f}, {self.nav.goal[1]:.1f})'

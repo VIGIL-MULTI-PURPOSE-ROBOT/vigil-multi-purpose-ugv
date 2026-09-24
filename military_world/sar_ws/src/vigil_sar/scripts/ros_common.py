@@ -10,7 +10,8 @@ import numpy as np
 
 SECTIONS = ('robot', 'camera', 'terrain', 'navigation', 'dashboard',
             # vigil_sar additions
-            'rgb_camera', 'thermal_camera', 'human_detection', 'human_thermal', 'sar', 'world', 'spawn')
+            'rgb_camera', 'thermal_camera', 'human_detection', 'human_thermal', 'sar', 'world', 'spawn',
+            'obstacles')
 
 
 def node_time(node):

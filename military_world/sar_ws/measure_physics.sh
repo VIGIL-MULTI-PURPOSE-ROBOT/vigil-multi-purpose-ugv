@@ -4,6 +4,12 @@
 # variants of the SAR world, starts each without GUI and without sensors, and reads Gazebo's
 # real-time factor.            cd ~/Documents/military_world/sar_ws && bash measure_physics.sh   (~8 min)
 # Result: diagnosis/measure_physics.log (send it back). Nothing in the project is changed.
+#
+# Simulation speed: every variant is built with the configured target (world.simulation_speed, 4x by
+# default), so each line shows how fast that variant CAN run: 400 % = the 4x target is reached,
+# 150 % = this computer manages 1.5x. The last line runs the current world WITH all sensors, which is
+# what a real mission gets. Only execution speed is measured: step, gravity, masses, friction unchanged
+# (F_step_2ms is listed for information only - the rover's physics was validated at 1 ms).
 set -u
 cd "$(dirname "$0")" || exit 1
 set +u; source /opt/ros/jazzy/setup.bash; source install/local_setup.bash; set -u
@@ -26,9 +32,13 @@ cfg0['world'].update(physics_step=eng['max_step_size'], gravity=eng['gravity'], 
 mw = find_military_world(cfg0['world'].get('military_world_dir', ''))
 def build(name, **over):
     c = copy.deepcopy(cfg0); c['world'].update(over); b.build(c, mw, out / f'{name}.sdf'); return out / f'{name}.sdf'
-build('A_current')
+rep = build('A_current')
+print('target real-time factor', cfg0['world'].get('simulation_speed', 1.0))
 build('B_people_frozen', moving_people=False)
 build('F_step_2ms', physics_step=0.002)
+build('G_kinematic_people', people_controller=1)   # cost of the force-driven (contact) people
+build('H_bullet_detector', collision_detector='bullet')
+build('I_target_1x', simulation_speed=1.0)
 # C: every non-ground model keeps its look but loses its collision shapes
 # D: only the ground (terrain tiles, roads, apron, bridge) - all other models removed
 for name, keep_models in (('C_no_object_collisions', True), ('D_ground_only', False)):
@@ -58,14 +68,21 @@ print('variants written to', out)
 PY
 stop_all() { bash stop_sar.sh >/dev/null 2>&1; sleep 3; }
 rtf() { timeout 90 gz topic -e -t /stats -n 40 2>/dev/null | awk '/real_time_factor/ {s+=$2; n++} END {if (n) printf "%5.1f %%", 100*s/n; else print "no data"}'; }
-for f in "$V"/A_current.sdf "$V"/B_people_frozen.sdf "$V"/C_no_object_collisions.sdf "$V"/D_ground_only.sdf \
-         "$V"/E_flat_plane_ground.sdf "$V"/F_step_2ms.sdf; do
+run() {   # $1 world file, $2 label, $3 sensors true/false
+  local f="$1" label="$2" sens="$3"
   stop_all
   ( ros2 launch vigil_sar sim.launch.py gui:=false profile:=none cleanup:=true world_file:="$f" \
-      rgbd:=false lidar:=false segmentation:=false hd_camera:=false thermal:=false ) > "$OUT/measure_launch.log" 2>&1 &
+      rgbd:=$sens lidar:=false segmentation:=$sens hd_camera:=$sens thermal:=$sens ) > "$OUT/measure_launch.log" 2>&1 &
   for i in $(seq 240); do grep -q "wheel_controller.*activate successful" "$OUT/measure_launch.log" 2>/dev/null && break; sleep 1; done
   sleep 15
-  say "$(printf '%-34s %s' "$(basename "$f" .sdf)" "$(rtf)")"
+  say "$(printf '%-40s %s' "$label" "$(rtf)")"
+}
+say "(real-time factor achieved; the target is in the generated world, 400 % = 4x)"
+for f in "$V"/A_current.sdf "$V"/B_people_frozen.sdf "$V"/G_kinematic_people.sdf "$V"/H_bullet_detector.sdf \
+         "$V"/C_no_object_collisions.sdf "$V"/D_ground_only.sdf "$V"/E_flat_plane_ground.sdf "$V"/F_step_2ms.sdf \
+         "$V"/I_target_1x.sdf; do
+  run "$f" "$(basename "$f" .sdf)" false
 done
+run "$V/A_current.sdf" "A_current WITH all sensors (a mission)" true
 stop_all
 say "=== done: $LOG"

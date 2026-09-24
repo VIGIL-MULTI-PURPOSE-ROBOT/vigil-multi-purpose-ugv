@@ -122,6 +122,144 @@ def pose_of(node):
     return (values + [0.0] * 6)[:6]
 
 
+# Segmentation label per obstacle category (world.label_obstacles). Ground keeps label 1 (the cliff
+# void test in terrain_core only asks "label 0 or not", so extra labels change nothing there).
+# obstacle_core.py reads the same numbers from config obstacles.labels.
+OBSTACLE_LABELS = dict(HUMAN=10, VEHICLE=20, BUILDING=30, ROCK=40, DEBRIS=50, VEGETATION=60, OBJECT=70)
+
+
+def obstacle_category(model, sem=None):
+    """HUMAN / VEHICLE / BUILDING / ROCK / DEBRIS / VEGETATION / OBJECT, or None for the ground.
+    Many export models carry no semantic tag (SAR_Building_URB_*, SAR_Batch_ROCK_*, SAR_Vehicle_*),
+    so the model name decides when the tag does not."""
+    sem = semantic(model)[0] if sem is None else sem
+    obj = (sem.get('sar_object') or '').upper()
+    cls = (sem.get('semantic_class') or '').upper()
+    name = (model.get('name') or '').upper()
+    if obj in GROUND_OBJECTS or cls in GROUND_CLASSES or name.startswith(('SAR_TERRAIN', 'SAR_ROAD', 'SAR_STREET',
+                                                                          'SAR_TRACK')):
+        return None
+    if obj == 'HUMAN' or cls == 'HUMAN' or 'PERSON' in name:
+        return 'HUMAN'
+    if cls == 'VEHICLE' or 'VEHICLE' in name:
+        return 'VEHICLE'
+    if cls == 'ROCK' or 'ROCK' in name:
+        return 'ROCK'
+    if cls == 'RUBBLE' or any(k in name for k in ('RUBBLE', 'DEBRIS', 'PANEL', 'PIPE')):
+        return 'DEBRIS'
+    if cls in ('VEGETATION', 'TREE') or any(k in name for k in ('VEG', 'TREE', 'BUSH', '_LOG')):
+        return 'VEGETATION'
+    if cls in ('WALL', 'BUILDING', 'STRUCTURE') or ('SAR_BUILDING' in name and 'FURNITURE' not in name):
+        return 'BUILDING'
+    if 'WATER' in name or cls == 'WATER':
+        return None
+    return 'OBJECT'
+
+
+def _rpy(r, p, y):
+    import math
+    cr, sr, cp, sp, cy, sy = math.cos(r), math.sin(r), math.cos(p), math.sin(p), math.cos(y), math.sin(y)
+    return [[cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr],
+            [sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr],
+            [-sp, cp * sr, cp * cr]]
+
+
+def single_box_collision(link, name='body_box'):
+    """Replace every box collision of a link by ONE box: the axis-aligned (link frame) bounding box of
+    all their rotated corners. A person's 7 body-part boxes become one 0.5 x 0.4 x 1.7 m box; the rover
+    still stops against the whole person, the physics tests 1 shape instead of 7."""
+    cols = [c for c in link.findall('collision') if c.find('geometry/box/size') is not None]
+    if not cols:
+        return None
+    lo, hi = [1e9] * 3, [-1e9] * 3
+    for c in cols:
+        sx, sy, sz = [float(v) for v in c.findtext('geometry/box/size').split()]
+        px, py, pz, r, p_, y = pose_of(c)
+        R = _rpy(r, p_, y)
+        for dx in (-sx / 2, sx / 2):
+            for dy in (-sy / 2, sy / 2):
+                for dz in (-sz / 2, sz / 2):
+                    q = [(px, py, pz)[k] + R[k][0] * dx + R[k][1] * dy + R[k][2] * dz for k in range(3)]
+                    lo = [min(a, b) for a, b in zip(lo, q)]
+                    hi = [max(a, b) for a, b in zip(hi, q)]
+    surface = cols[0].find('surface')
+    index = list(link).index(cols[0])
+    for c in cols:
+        link.remove(c)
+    new = ET.Element('collision', name=name)
+    ET.SubElement(new, 'pose').text = ' '.join(f'{(a + b) / 2:.4f}' for a, b in zip(lo, hi)) + ' 0 0 0'
+    ET.SubElement(ET.SubElement(ET.SubElement(new, 'geometry'), 'box'), 'size').text = \
+        ' '.join(f'{b - a:.4f}' for a, b in zip(lo, hi))
+    if surface is not None:
+        new.append(copy.deepcopy(surface))
+    link.insert(index, new)
+    return [b - a for a, b in zip(lo, hi)], len(cols)
+
+
+def _part_of_collision(link, col):
+    """Body part of an exported collision box: c00..c06 pair with visuals v00..v06 (same index)."""
+    name = col.get('name') or ''
+    vis = link.find(f"visual[@name='v{name[1:]}']") if name.startswith('c') else None
+    return part_of(vis) if vis is not None else 'Torso'
+
+
+def primitive_collisions(link):
+    """Replace a person's 7 exported body-part BOXES by primitives that follow the body:
+         head          -> sphere
+         torso, hips   -> upright cylinder (the trunk)
+         legs, arms    -> cylinder along the limb
+    Each primitive keeps its box's pose (position AND the limb's roll / pitch), so the collision body
+    stands, lies or leans exactly like the visual person, and it is part of the person's own link:
+    it moves with the person whatever moves it. Radii cover the box cross-section (conservative:
+    the rover is kept off the whole limb). Returns [(part, shape, dims)]."""
+    out = []
+    for col in list(link.findall('collision')):
+        size = col.find('geometry/box/size')
+        if size is None:
+            continue
+        sx, sy, sz = [float(v) for v in size.text.split()]
+        part = _part_of_collision(link, col)
+        geom = col.find('geometry')
+        for child in list(geom):
+            geom.remove(child)
+        if part == 'Head':
+            r = 0.5 * max(sx, sy, sz)
+            ET.SubElement(ET.SubElement(geom, 'sphere'), 'radius').text = f'{r:.4f}'
+            out.append((part, 'sphere', [round(r, 3)]))
+        else:
+            r = 0.5 * max(sx, sy)
+            cyl = ET.SubElement(geom, 'cylinder')
+            ET.SubElement(cyl, 'radius').text = f'{r:.4f}'
+            ET.SubElement(cyl, 'length').text = f'{sz:.4f}'
+            out.append((part, 'cylinder', [round(r, 3), round(sz, 3)]))
+        col.set('name', f"{col.get('name')}_{part.lower()}")
+    return out
+
+
+def scale_walker_speed(model, scale, max_speed):
+    """Walkers (controller 1) follow their timed waypoints exactly, so their speed is the authored one
+    (0.3 - 1.85 m/s in the export: realistic walking). world.human_speed_scale multiplies it (by
+    compressing the waypoint times) and world.human_max_speed caps every leg. Returns the new top speed."""
+    import math
+    plug = model.find("plugin[@name='sar::WaypointSystem']")
+    if plug is None:
+        return None
+    wps = plug.findall('waypoint')
+    keys = [(float(w.findtext('time')), [float(v) for v in w.findtext('pose').split()]) for w in wps]
+    new_t, top, t_acc = [0.0], 0.0, 0.0
+    for (t0, a), (t1, b) in zip(keys, keys[1:]):
+        dist = math.hypot(b[0] - a[0], b[1] - a[1])
+        dt = (t1 - t0) / max(1e-6, scale)
+        if max_speed and dist / max(dt, 1e-6) > max_speed:
+            dt = dist / max_speed
+        t_acc += dt
+        new_t.append(t_acc)
+        top = max(top, dist / max(dt, 1e-6))
+    for w, t in zip(wps, new_t):
+        w.find('time').text = f'{t:.6f}'
+    return top
+
+
 def fix_hull_collisions(world, cfg, report):
     """Replace bounding-box collisions that are wrong with the model's own mesh.
 
@@ -231,6 +369,22 @@ def build(cfg, mw, out_path=None):
         load_sar_physics(mw).configure_world(root, ctrl)
         report['movers'] = len(movers)
         report['people_controller'] = ctrl
+        if ctrl == 2:
+            # contact-aware people (military_world sar::WaypointSystem controller 2): dynamic bodies
+            # under gravity, walked by a FORCE towards their route and kept upright by a balance torque.
+            # They are real rigid bodies: the rover cannot overlap them, and a person blocked by the
+            # rover stops (its route clock stops) instead of being teleported through it. Their
+            # walking speed is set here (sar_physics uses 1.8 / 2.2 m/s, a jog): world.human_contact_speed.
+            v = float(w.get('human_contact_speed', 1.3))
+            vmax_c = float(w.get('human_max_speed', 0.0) or 0.0)
+            if vmax_c > 0:
+                v = min(v, vmax_c)
+            for m in movers:
+                plug = m.find("plugin[@name='sar::WaypointSystem']")
+                node = plug.find('cruise_speed')
+                if node is not None and plug.findtext('carried') != 'true':
+                    node.text = f'{v:g}'
+            report['contact_walk_speed'] = v
     else:
         for m in movers:
             for plug in m.findall("plugin[@name='sar::WaypointSystem']"):
@@ -243,6 +397,12 @@ def build(cfg, mw, out_path=None):
     # 3. physics step + thermal background
     phys = world.find('physics')
     phys.find('max_step_size').text = str(float(w.get('physics_step', 0.001)))
+    # simulation speed = Gazebo's target real-time factor. Only HOW FAST the simulation executes: the
+    # step, gravity, masses, friction and torques are unchanged, so every motion is physically the same.
+    rtf = phys.find('real_time_factor')
+    if rtf is None:
+        rtf = ET.SubElement(phys, 'real_time_factor')
+    rtf.text = f"{max(0.1, float(w.get('simulation_speed', 1.0))):g}"
     # gravity pinned to Earth's (physics.engine.gravity, 9.81 m/s2) instead of trusting the export
     g_node = world.find('gravity')
     if g_node is None:
@@ -265,6 +425,10 @@ def build(cfg, mw, out_path=None):
     # so the engine used to depend on world.moving_people. collision_detector "default" (the
     # vigil_rough_terrain setting) removes the block in every run; a detector name pins that one.
     contact_people = bool(w.get('moving_people', True)) and int(w.get('people_controller', 1)) == 2
+    # the rover's physics was validated with world.collision_detector; contact people use the SAME
+    # detector unless world.people_contact_detector is "sar_physics" (its bullet / PGS choice)
+    if contact_people and str(w.get('people_contact_detector', 'world')).strip().lower() == 'world':
+        contact_people = False
     detector = str(w.get('collision_detector', 'default')).strip().lower()
     solver_type = str(w.get('physics_solver', 'default')).strip().lower()
     if not contact_people:
@@ -292,6 +456,7 @@ def build(cfg, mw, out_path=None):
                 node.text = solver_type
     dart = phys.find('dart')
     report['physics'] = dict(step=float(w.get('physics_step', 0.001)), gravity=g_node.text,
+                             real_time_factor=float(rtf.text),
                              collision_detector=((dart.findtext('collision_detector') or 'default')
                                                  if dart is not None else 'default (DART, as vigil_rough_terrain)'),
                              solver=((dart.findtext('solver/solver_type') or 'default')
@@ -381,6 +546,60 @@ def build(cfg, mw, out_path=None):
             world.append(m)
             report['building_humans'].append(dict(h, temps=sorted(set(round(t, 2) for t in visual_temps(m)))))
 
+    # 10. obstacle geometry, labels and walking speed (dynamic-obstacle avoidance)
+    #   a) world.human_collision "primitives": EVERY person (walking, standing, lying, trapped, inside a
+    #      building) gets a collision body made of primitives that follow the body parts - sphere head,
+    #      cylinder trunk, cylinder legs and arms - in the person's own link, so it moves with the person.
+    #      ("box" = one box round the whole body, "parts" = the export's 7 boxes.)
+    #   b) world.label_obstacles: a segmentation label per category (HUMAN 10, VEHICLE 20, BUILDING 30,
+    #      ROCK 40, DEBRIS 50, VEGETATION 60, OBJECT 70) on every obstacle model inside the zone, so
+    #      obstacle_tracker.py knows WHAT the depth camera sees (a person gets a wider berth than a crate).
+    #   c) world.human_speed_scale / human_max_speed: walking speed stays the authored, realistic one
+    #      unless configured otherwise; it never follows the simulation speed (that is Gazebo's RTF).
+    report['human_collision_boxes'] = []
+    report['obstacle_labels'] = {}
+    zone10 = [w.get(k) for k in ('zone_x_min', 'zone_x_max', 'zone_y_min', 'zone_y_max')]
+    lab_margin = float(w.get('collision_zone_margin', 5.0))
+    scale = float(w.get('human_speed_scale', 1.0))
+    vmax = float(w.get('human_max_speed', 0.0) or 0.0)
+    report['walker_speed'] = dict(scale=scale, max_speed=vmax, top_speeds={})
+    for model in world.findall('model'):
+        sem = semantic(model)[0]
+        cat = obstacle_category(model, sem)
+        walking = model.find("plugin[@name='sar::WaypointSystem']") is not None
+        if cat == 'HUMAN':
+            mode = str(w.get('human_collision', 'primitives')).strip().lower()
+            if not walking and 'static_human_collision' in w:
+                mode = str(w['static_human_collision']).strip().lower()
+            for link in model.findall('link'):
+                if mode == 'primitives':
+                    parts = primitive_collisions(link)
+                    if parts:
+                        report['human_collision_boxes'].append(dict(model=model.get('name'), walking=walking,
+                                                                    shapes=parts))
+                elif mode == 'box':
+                    res = single_box_collision(link)
+                    if res:
+                        report['human_collision_boxes'].append(dict(model=model.get('name'), walking=walking,
+                                                                    shapes=[('body', 'box', [round(v, 3) for v in res[0]])]))
+        if model.find("plugin[@name='sar::WaypointSystem']") is not None and (scale != 1.0 or vmax > 0.0):
+            top = scale_walker_speed(model, scale, vmax)
+            if top is not None:
+                report['walker_speed']['top_speeds'][model.get('name')] = round(top, 2)
+        if cat and w.get('label_obstacles', True):
+            x, y = pose_of(model)[:2]
+            inside = None in zone10 or (zone10[0] - lab_margin <= x <= zone10[1] + lab_margin and
+                                        zone10[2] - lab_margin <= y <= zone10[3] + lab_margin)
+            # batch models (one model, many rocks) sit at the origin with world-placed shapes
+            if not inside and x == 0.0 and y == 0.0:
+                inside = True
+            if inside and model.find(f"plugin[@name='{LABEL_NAME}']") is None:
+                lab = ET.Element('plugin', filename=LABEL_FILE, name=LABEL_NAME)
+                ET.SubElement(lab, 'label').text = str(OBSTACLE_LABELS[cat])
+                pose = model.find('pose')
+                model.insert(list(model).index(pose) + 1 if pose is not None else 0, lab)
+                report['obstacle_labels'][cat] = report['obstacle_labels'].get(cat, 0) + 1
+
     # 6. every visual whose <temperature> IS the ambient temperature carries a per-visual Thermal
     #    system for nothing: Gazebo renders a visual without one at exactly that ambient temperature
     #    (the atmosphere gradient varies it by <1 K, far below the 296.5 K human band). The export
@@ -428,6 +647,41 @@ def build(cfg, mw, out_path=None):
                     report['static_props'] += 1
     report['people_ignore_ground'] = 0
     kinematic = bool(w.get('moving_people', True)) and int(w.get('people_controller', 1)) == 1
+    contact_walkers = bool(w.get('moving_people', True)) and int(w.get('people_controller', 1)) == 2
+    report['collide_bitmasks'] = None
+
+    def set_mask(col, mask):
+        surf = col.find('surface')
+        if surf is None:
+            surf = ET.SubElement(col, 'surface')
+        cont = surf.find('contact')
+        if cont is None:
+            cont = ET.SubElement(surf, 'contact')
+        node = cont.find('collide_bitmask')
+        if node is None:
+            node = ET.SubElement(cont, 'collide_bitmask')
+        node.text = mask
+    if contact_walkers:
+        # Contact collision groups (a pair collides when their masks share a bit):
+        #   ground 0x01 | static world 0x02 | walking people 0x05 | the rover 0xffff (default, untouched)
+        #   people x ground  : 0x05 & 0x01 -> YES  (they stand and walk on the terrain)
+        #   people x rover   : 0x05 & 0xffff -> YES (real contact: the rover can never overlap a person)
+        #   people x people  : 0x05 & 0x05 -> YES
+        #   people x static world : 0x05 & 0x02 -> no (authored routes pass door frames / props, as before)
+        #   rover x everything: YES
+        for model in world.findall('model'):
+            sem = semantic(model)[0]
+            if (sem.get('semantic_class') or '').upper() in GROUND_CLASSES or sem.get('sar_object') in GROUND_OBJECTS:
+                mask = '0x01'
+            elif model.find("plugin[@name='sar::WaypointSystem']") is not None:
+                mask = '0x05'
+            elif w.get('walkers_hit_only_rover', True):
+                mask = '0x02'
+            else:
+                continue
+            for col in model.iter('collision'):
+                set_mask(col, mask)
+        report['collide_bitmasks'] = dict(ground='0x01', static_world='0x02', walkers='0x05', rover='0xffff')
     if w.get('people_ignore_ground', True) and kinematic:
         def set_mask(col, mask):
             surf = col.find('surface')
@@ -449,7 +703,12 @@ def build(cfg, mw, out_path=None):
                 for col in model.iter('collision'):
                     set_mask(col, '0x02')            # walker: bit 2 -> no ground contact
                 report['people_ignore_ground'] += 1
-        # everything else (rover, props, buildings) keeps the default 0xffff and hits both
+            elif w.get('walkers_hit_only_rover', True):
+                for col in model.iter('collision'):
+                    set_mask(col, '0x01')            # static world: bit 1 -> no walker contact tests
+        # the rover keeps the default 0xffff and hits the ground, the static world AND the walkers.
+        # A walker (0x02) is tested only against the rover: kinematic people walk their authored
+        # routes (through a door frame now and then) without thousands of pointless wall contacts.
 
     # 9. collision shapes the rover can never touch (measured 2026-09-24, diagnosis/measure_physics.log:
     #    current 6.5 % real time, people frozen 17 %, object collisions removed 51 %, ground only 100 %).
@@ -486,6 +745,10 @@ def build(cfg, mw, out_path=None):
         if (sem.get('semantic_class') or '').upper() in GROUND_CLASSES or sem.get('sar_object') in GROUND_OBJECTS:
             continue                                   # the ground always collides
         walker = model.find("plugin[@name='sar::WaypointSystem']") is not None
+        if obstacle_category(model, sem) == 'HUMAN' and w.get('humans_always_collide', True) \
+                and not (walker and drop_walkers):
+            report['collisions_removed']['kept'] += sum(1 for _ in model.iter('collision'))
+            continue                                   # every person keeps its (single) box, everywhere
         mp = pose_of(model)
         for link in model.iter('link'):
             lp = pose_of(link) if link.find('pose') is not None else [0.0] * 6
@@ -545,6 +808,11 @@ def main():
           f"{cr.get('too_high', 0)} out of the rover's reach, {cr.get('walkers', 0)} of walkers")
     print(f"  segmentation-labelled ground models: {rep['labelled']}, walking people: {rep['movers']} "
           f"({len(rep.get('frozen_outside_zone', []))} outside the operational zone stand still)")
+    hb = rep.get('human_collision_boxes', [])
+    print(f"  simulation speed target {rep['physics']['real_time_factor']:g}x real time; people with primitive "
+          f"collision bodies: {len(hb)} ({sum(1 for h in hb if h.get('walking'))} walking, controller "
+          f"{rep.get('people_controller', '-')}, {rep.get('contact_walk_speed', '-')} m/s); collide bitmasks "
+          f"{rep.get('collide_bitmasks')}; obstacle labels {rep.get('obstacle_labels', {})}")
     print(f"  physics: {rep['physics']['step'] * 1000:.0f} ms step, {rep['physics']['collision_detector']} "
           f"collision detector, {rep['physics']['solver']} solver, gravity {rep['physics']['gravity']}")
     gfr = rep['ground_friction']

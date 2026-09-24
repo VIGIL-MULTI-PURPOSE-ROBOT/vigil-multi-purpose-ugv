@@ -43,7 +43,22 @@
       collision_zone_only: true    # objects outside the zone (+ margin) keep only their visuals
       collision_zone_margin: 5.0   # m
       collision_max_bottom: 1.3    # m above the model base: higher shapes (canopies, roofs) are dropped
-      walker_collisions: false     # kinematic walkers already pass through walls and the rover
+      # --- Obstacle geometry (dynamic-obstacle avoidance) ---
+      human_collision: primitives  # EVERY person: sphere head, cylinder trunk / legs / arms placed on the
+                                   # body parts (moves with the person) | box = one box | parts = export boxes
+      humans_always_collide: true  # people keep their box everywhere (never pruned by the zone rules)
+      walker_collisions: true      # walking people collide with the rover (was false: it drove through them)
+      walkers_hit_only_rover: true # people collide with the rover, the ground and each other, not with every
+                                   # wall / prop their authored route passes (collide bitmasks)
+      label_obstacles: true        # segmentation label per category inside the zone (obstacles.labels)
+      human_speed_scale: 1.0       # x the authored walking speeds (0.3 - 1.85 m/s: realistic). Walking
+                                   # speed NEVER follows the simulation speed; that is Gazebo's RTF.
+      human_max_speed: 2.0         # m/s cap on any walking leg (0 = no cap)
+      # --- Simulation speed (execution speed only: masses, gravity, friction, torques, sizes and the
+      # 1 ms step are untouched). Gazebo runs the physics up to this many times real time; if the
+      # computer cannot keep up it runs as fast as it can, and the dashboard shows the MEASURED factor.
+      # 1x / 2x / 4x can also be switched live on the dashboard (gz set_physics service).
+      simulation_speed: 4.0
       # Gazebo GUI: follow the rover (gz CameraTracking) so a 1.5 m rover is visible in a 300 m world
       lidar: false                 # no SAR node uses the lidar; its 360 deg scans of the whole world cost
                                    # render time every 0.2 s (lidar:=true on the command line turns it on)
@@ -57,7 +72,14 @@
       label_ground: true                        # segmentation label 1 on terrain/roads (cliff void test)
       add_building_humans: true                 # extra casualties inside URB_001/002/004
       moving_people: true                       # keep sar::WaypointSystem walkers
-      people_controller: 1                      # 1 kinematic (cheap, default) | 2 contact-aware (sar_physics.py)
+      # 2 = contact-aware people (default): real rigid bodies under gravity, walked by a force and kept
+      #     upright by a balance torque (military_world sar::WaypointSystem). The rover cannot overlap
+      #     them; a person blocked by the rover waits. 1 = kinematic: the pose is SET every step, so a
+      #     person walks through the rover (the overlap seen on 2026-09-24) - kept only as an option.
+      people_controller: 2
+      human_contact_speed: 1.3                  # m/s walking speed of contact people (sar_physics: 1.8-2.2)
+      people_contact_detector: world            # world = the rover-validated collision_detector below |
+                                                # sar_physics = bullet / PGS for everything
       # A visual whose exported <temperature> IS the ambient temperature renders identically with or
       # without its Thermal plugin, so the generated world drops those ~390 plugins: much less work
       # for the Gazebo GUI (it loads every visual plugin as a system) and no warning flood - that
@@ -211,6 +233,8 @@
       pixel_stride: 2
       # --- performance keys (new; a 170 m map is 2.9 M cells) ---
       analysis_window: 12.0        # m half-size re-classified around the camera each frame
+      tracked_labels_excluded: [10]  # segmentation labels left to obstacle_tracker.py while it runs (10 =
+                                   # people): no trail of stale obstacle cells behind a walking person
       grid_publish_rate: 2.0       # Hz (sim time) for the four OccupancyGrids. 2 Hz = the navigator's map
                                    # is at most 0.5 s (1.5 m at 3 m/s) old: with 1 Hz a cliff seen at the
                                    # 6 m cliff_detection_distance left too little room to brake from 3 m/s.
@@ -306,7 +330,33 @@
       max_lateral_accel: 3.0       # m/s2 in turns (grip 8.3, roll-over ~13): at 3 m/s -> 1.0 rad/s
       lookahead_time: 0.8          # s: lookahead grows to 2.4 m at 3 m/s (1.3 m minimum)
       brake_plan_decel: 1.5        # m/s2 used to plan the stop at B (drive max_decel 2.0: 25 % margin)
+      human_slow_distance: 4.0     # m beyond the human safety distance where slowing for a person starts
+      human_slow_speed: 1.0        # m/s at the human safety distance (people beside the path, humans first)
                                    # -> braking for B starts ~3 m out from 3 m/s
+
+    # ------------------------------------------------------------ dynamic obstacles (obstacle_tracker.py)
+    # Depth + segmentation + pose -> tracked obstacles with class, position, velocity and direction;
+    # the navigator predicts them collision_prediction_time ahead, plans round the predicted motion
+    # and slows / yields smoothly. Distances are from the obstacle's EDGE. A cliff stays a hard limit.
+    obstacles:
+      enabled: true
+      dynamic_obstacle_distance: 1.5   # m kept from any MOVING obstacle
+      human_safety_distance: 2.0       # m kept from a person, moving or not (humans first)
+      vehicle_safety_distance: 1.5     # m kept from a vehicle
+      static_obstacle_distance: 0.3    # m kept from other static objects the overlay handles
+      collision_prediction_time: 4.0   # s of predicted motion (obstacles and the rover's own path)
+      robot_footprint_margin: 0.15     # m added around the 1.53 x 1.12 m footprint in the overlay
+      tracking_range: 14.0             # m (depth camera range 15 m)
+      rate: 10.0                       # Hz processing (simulation time; the depth camera is 10 Hz)
+      sync_tolerance: 0.06             # s: depth and segmentation frames must share a stamp to this
+      dynamic_speed: 0.30              # m/s filtered speed -> DYNAMIC (hysteresis down to static_speed)
+      static_speed: 0.15
+      max_obstacle_speed: 4.0          # m/s clamp
+      confirm_frames: 3                # frames before a track is used
+      track_timeout: 1.5               # s a track is kept (and predicted) after it was last seen
+      yield_timeout: 6.0               # s yielding to one moving obstacle before planning round where it is
+      stamp_period: 0.3                # s between planner overlays
+      pixel_stride: 2
 
     # ------------------------------------------------------------ search and rescue
     sar:

@@ -12,6 +12,12 @@ the rock-terrain project (`vigil_rough_terrain_ws`). That workspace was only rea
 > and its speed-up is not yet measured. The long urban SAR run in Gazebo is not finished yet.
 > See [Simulation speed](#simulation-speed).
 >
+> **25 Sep 2026: dynamic obstacles.** Added: collision boxes on walking people, obstacle tracking and
+> prediction, collision status, the ACCELERATION + button and a 4× simulation-speed target (see
+> [Dynamic obstacles](#dynamic-obstacles-collisions-acceleration-and-simulation-speed)). All of it is
+> tested offline (36 tests, closed loop with the real navigator). It has **not run in Gazebo yet**,
+> and the 4× target has not been measured on a real PC.
+>
 > Paths such as `~/Documents/military_world` below are the author's. In a clone of the
 > repository, use `<repo>/military_world` instead.
 On top of that stack it adds:
@@ -36,7 +42,7 @@ military_world/                      (your world, unchanged)
         ├── launch/ sim | navigation | sar | dashboard | sar_mission (all-in-one)
         ├── scripts/  nodes + cores (below)
         ├── dashboard/index.html
-        └── test/test_sar_offline.py
+        └── test/test_sar_offline.py  test/test_dynamic_obstacles.py
 ```
 
 ## Mission
@@ -50,6 +56,78 @@ military_world/                      (your world, unchanged)
 7. Every building within 25 m gets building views. For each face the robot stops in front of the wall, turns the thermal camera to face it, slows down and sweeps ±25°.
 8. When a warm candidate appears, the robot turns to it to confirm it (humans come first). After 4 consecutive frames the event `HUMAN Hn DETECTED` fires. A marker appears on the map and an entry in the human list, and neither is ever duplicated.
 9. After all points, building views and a final scan, the mission reports `SAR COMPLETE` with the number of humans found and 10/10 search points. The robot then holds its position.
+
+Throughout, people, vehicles and moving obstacles are tracked. The rover keeps its distance from them, predicts their motion and plans round it. See the next section.
+
+## Dynamic obstacles, collisions, acceleration and simulation speed
+
+**Collision geometry.** People are physical bodies, not visuals only. The robot's collision covers its whole body.
+
+**Why the walker overlapped the rover (the screenshot of 24 Sep):**
+- People used controller 1, which is kinematic: `sar::WaypointSystem` **set the person's pose every physics step**.
+- A pose that is set is not simulated. The person was placed on its route even when the rover stood there, and the contact solver could only shove the rover afterwards.
+- On top of that, the rover's collision was a 1.07 × 0.50 m chassis box. The rear body, the sides beyond ±0.25 m, the rear tower and the mast were visual only: 8 % of the CAD body.
+
+| what | now (`build_sar_world.py` step 10, `urdf/collision_proxies.xacro`) |
+|---|---|
+| every person (37: walking, standing, lying, trapped, inside buildings) | a **primitive collision body** in the person's own link, so it moves with the person:<br>• sphere head<br>• cylinder trunk and hips<br>• cylinder legs and arms<br>Each primitive sits on the exported body-part pose (a leaning leg stays leaning), with radii covering the part (`world.human_collision: primitives`) |
+| walking people | **`people_controller: 2`** (military_world's contact-aware controller):<br>• dynamic rigid bodies under gravity<br>• walked by a **force** and kept upright by a balance torque<br>• no pose is ever set<br>A person blocked by the rover stops and waits. The rover can never overlap them. Walking speed is `human_contact_speed: 1.3` m/s. |
+| contact groups (collide bitmask; a pair collides when the masks share a bit) | ground 0x01, static world 0x02, walking people 0x05, rover 0xffff (untouched):<br>• person × rover, person × ground and person × person: **yes**<br>• person × wall or prop: no (their authored routes pass door frames, as before) |
+| robot | chassis box plus **hull (full 0.70 m width), rear body, rear tower, mast, LiDAR, thermal mast and camera** (collision only, no mass change, ≥ 0.39 m above flat ground), 8 wheel cylinders, rocker beams. It now covers **100 %** of the CAD body (was 91.6 %). |
+| physics engine | unchanged: DART with the rover-validated ode detector (`people_contact_detector: world`) |
+| buildings, walls, vehicles, rocks, debris | the export's boxes and cylinders; everything the rover can reach keeps its collision (test-checked) |
+| segmentation labels | HUMAN 10, VEHICLE 20, BUILDING 30, ROCK 40, DEBRIS 50, VEGETATION 60, OBJECT 70 in the zone |
+
+**Gazebo proof** (real contact physics, judged on the true poses): `bash test_motion.sh --scenario human_block --scenario human_standing --scenario human_crossing`
+
+- `human_block`: the test itself drives the rover **into** a standing person at 0.8 m/s, with no navigator. The contact must stop it, with no overlap beyond a few cm of solver penetration.
+- `human_standing`, `human_crossing`: the navigator must never touch the standing or walking person, must keep its distance, and must reach B.
+
+**Dynamic obstacles** (`scripts/obstacle_core.py`, node `obstacle_tracker.py`, section `obstacles:`):
+
+1. **Detection.** Depth + segmentation + pose (existing sensors). The depth frame is paired with the segmentation frame of the same stamp and the pose at that stamp, so it stays correct at any simulation speed. The points are clustered per class.
+2. **Tracking.** Each track has a position, velocity, speed and direction over the frames (alpha-beta filter). It is DYNAMIC above 0.3 m/s. Walls, rocks, debris and vegetation never get a velocity. Output: `/perception/obstacles`.
+3. **Prediction and planning.** `cliff_navigator` stamps people, vehicles and anything moving into the planner's map, with the class safety distance plus `robot_footprint_margin`. Moving ones are swept along the path predicted over `collision_prediction_time`. The unchanged planner then inflates this by the rover's half-width, replans, and slows down smoothly through its clearance speed profile. The rover's own planned motion is checked against the predicted obstacles, which gives **COLLISION RISK**, a replan, and a smooth yield (never a turn, never faster).
+4. **Humans first.** People get the largest distance (2.0 m). The rover slows within 4 m of a person even beside the path, and yields to a person crossing.
+5. **No stop-forever.** After `yield_timeout` (6 s) the rover plans round where the obstacle *is*; the navigator's escalation (wide replan, climb, recovery) does the rest.
+6. **Cliffs** are never relabelled by the overlay; they stay hard constraints.
+7. **Narrow paths.** Static walls and objects are not stamped again (the terrain map has them), so every gap the 1.12 m footprint fits through stays open. A 1.7 m gap is tested.
+8. While the tracker runs, `terrain_mapper` leaves people's pixels to it (`terrain.tracked_labels_excluded: [10]`), so a walking person leaves no trail of stale obstacle cells.
+
+| parameter (`obstacles:`) | default |
+|---|---|
+| `dynamic_obstacle_distance` | 1.5 m |
+| `human_safety_distance` | 2.0 m |
+| `vehicle_safety_distance` | 1.5 m |
+| `static_obstacle_distance` | 0.3 m |
+| `collision_prediction_time` | 4.0 s |
+| `robot_footprint_margin` | 0.15 m |
+
+**Dashboard additions:**
+
+- **COLLISION** pill: `CLEAR` / `COLLISION RISK` / `AVOIDING`.
+- **DYNAMIC OBSTACLES** panel: count, class, distance, direction, speed, and status (STATIC / MOVING / APPROACHING / TOO CLOSE).
+- **Map:** tracked obstacles with their safety ring, velocity arrow and predicted path.
+- **ACCELERATION +** (and −): the speeding-up limit steps NORMAL 1.0 → HIGH 1.5 → MAX 2.0 m/s² (`physics.drive.accel_levels`).
+  - It works through `drive.py`'s jerk-limited DriveLaw, so the change is smooth.
+  - Top speed (3.0 m/s), braking and every safety check are unchanged. There is no force and no teleport.
+  - Each level is capped at 50 % of the wheelie limit at the current pitch: 7.7 m/s² on flat ground, 1.9 m/s² on a 33° climb.
+- **SIM SPEED:** 1× / 2× / 4× buttons (`gz set_physics`), with the target and the **measured** real-time factor.
+
+**Simulation speed:** `world.simulation_speed: 4.0` writes `<real_time_factor>4</real_time_factor>`
+into the generated world. `sim_speed:=1|2|4` on the launch line or the dashboard buttons change it.
+
+- **Execution speed only:** the 1 ms step, gravity, masses, friction, torques and sizes are unchanged.
+- Every node runs on simulation time, so sensors, navigation and the drive stay in step.
+- If the PC cannot keep up, Gazebo runs as fast as it can, and the dashboard shows the real factor.
+- Before the collision pruning, the full world ran at **6.5 %** of real time. Whether 4× is reachable depends on the PC: run `bash measure_physics.sh`, whose last line is a real mission with all sensors, and report the number. The 1 ms step is not raised to 2 ms, because the rover's suspension was validated at 1 ms.
+
+**Check in Gazebo:** while a mission runs, `ros2 run vigil_sar dynamic_check.py` prints and saves (`diagnosis/dynamic_check.json`):
+- the closest approach to people and vehicles, against the safety distances
+- time spent CLEAR / COLLISION RISK / AVOIDING
+- navigator states (a stop-forever would show up here)
+- acceleration levels used
+- the measured simulation speed
 
 ## Build
 
@@ -113,6 +191,10 @@ ros2 launch vigil_sar sar_mission.launch.py       # restart; leftover vigil_sar 
 ```bash
 cd ~/Documents/military_world/sar_ws/src/vigil_sar
 python3 test/test_sar_offline.py                  # ~8 min (includes a full simulated SAR mission)
+python3 test/test_dynamic_obstacles.py            # ~20 s: collision geometry, tracker, prediction, 14 closed-loop
+                                                  # scenarios (people standing / crossing / head-on, vehicle, building,
+                                                  # narrow gap, cliff, hill, several obstacles, B stop, blocked gap),
+                                                  # acceleration levels, simulation speed
 ```
 
 ## Topics
@@ -129,6 +211,9 @@ python3 test/test_sar_offline.py                  # ~8 min (includes a full simu
 | `/sar/state`, `/sar/search_points`, `/sar/command` | String | sar_manager ↔ dashboard |
 | `/navigation/goal`, `/navigation/path`, `/navigation/previous_path`, `/navigation/status`, `/cmd_vel` | | cliff_navigator (unchanged topics) |
 | `/navigation/hold`, `/navigation/speed_limit`, `/navigation/command` | Float64 / Float64 / String | NEW: scan heading, SAR speed cap, START |
+| `/perception/obstacles` | String JSON | NEW: obstacle_tracker → cliff_navigator, terrain_mapper, dashboard (tracks: class, x, y, vx, vy, speed, direction, distance, dynamic) |
+| `/navigation/status` → `collision`, `collision_status` | (fields) | NEW: CLEAR / COLLISION RISK / AVOIDING, time to collision, speed cap |
+| `/drive/accel_command`, `/drive/status` | String / String JSON | NEW: ACCELERATION + (UP / DOWN / NORMAL) → drive.py; level, active limit, stability cap |
 
 ## What was changed and why
 
@@ -374,7 +459,7 @@ boxes) and the walkers' collisions every millisecond.
 | `world.collision_zone_only` | `true` | drop object collisions outside the operational zone |
 | `world.collision_zone_margin` | `5.0` | ... plus this margin (m) |
 | `world.collision_max_bottom` | `1.3` | drop collisions whose bottom is higher than this (m): the rover cannot touch them |
-| `world.walker_collisions` | `false` | walking people keep moving and stay warm for the thermal camera, but have no collision |
+| `world.walker_collisions` | `true` (was `false`) | walking people collide with the rover (primitive body, force-driven contact controller; see [Dynamic obstacles](#dynamic-obstacles-collisions-acceleration-and-simulation-speed)) |
 
 The launch prints the result, e.g. `collision shapes: 955 kept; removed 1953 outside the zone, 81 out
 of the rover's reach, 106 of walkers`. Visuals, thermal and depth images and the rover's physics
@@ -393,7 +478,13 @@ ros2 launch vigil_sar sar_mission.launch.py segmentation:=false
 - **First real launch reached sensor creation on 2026-09-23** and exposed the gz-sensors thermal-noise segfault, now fixed (see the crash section). The rest was developed in a cloud container without ROS or Gazebo. Everything was tested offline instead: detection on ray-cast thermal images, the full SAR mission, the world builder, xacro processing and the ported cores. The first real launch should be checked for:
   - `/thermal/image_raw` arriving as `mono16` (`ros2 topic echo /thermal/image_raw --field encoding`)
   - human pixels near 30500 (305 K)
-- **Real-time factor.** The full world runs below real time; see [Simulation speed](#simulation-speed).
+- **Real-time factor.** The full world runs below real time; see [Simulation speed](#simulation-speed). The 4× target is what Gazebo *tries*; the dashboard shows what the PC achieves.
+- **Dynamic obstacles are not yet checked in Gazebo.** They are tested offline, including rendered depth and segmentation images and closed-loop runs. The first Gazebo run should confirm three things:
+  - the segmentation labels arrive (`/perception/obstacles` → `"segmentation": true`)
+  - walkers are tracked as HUMAN with a velocity
+  - `dynamic_check.py` reports no person closer than the safety distance
+- **People do not avoid the rover.** They follow their route. With the contact controller, a person who walks into a stopped rover is stopped by the contact (and pushes with at most 600 N). The rover gives way first, because it plans round every person.
+- **The contact people cost more physics time** than kinematic ones: 16 bodies under gravity on the terrain. `measure_physics.sh` shows the effect. `people_controller: 1` brings back the old kinematic walkers, but with them the rover and people can overlap again.
 - **Pose source.** Pose comes from `/sim/ground_truth`, exactly as in vigil_rough_terrain; there is no SLAM.
 - **Building footprints** come from `sar_metadata.json`. That is mission-planning information, not ground truth: the casualty ground truth is never used at runtime.
 - **Walls block thermal.** Casualties inside buildings are found through doors and openings (LWIR does not see through walls). Humans placed deep inside, out of line of sight, are not detected. That is physically correct.

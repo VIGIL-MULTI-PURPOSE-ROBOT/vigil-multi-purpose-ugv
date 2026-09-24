@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(agri_ugv)
 find_package(ament_cmake REQUIRED)
-install(DIRECTORY launch config worlds models behavior_trees DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch config worlds models behavior_trees dashboard DESTINATION share/${PROJECT_NAME})
 file(GLOB runtime_scripts CONFIGURE_DEPENDS scripts/*.py)
 install(PROGRAMS ${runtime_scripts} DESTINATION lib/${PROJECT_NAME})
 ament_package()

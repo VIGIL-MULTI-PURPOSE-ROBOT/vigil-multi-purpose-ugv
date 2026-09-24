@@ -528,8 +528,12 @@ class WorldBuilderTests(unittest.TestCase):
                         self.assertIn(os.path.basename(uri),
                                       [os.path.basename(u.text) for v in g.iter('visual') for u in v.iter('uri')])
             else:
-                self.assertEqual([os.path.basename(u.text) for u in m.iter('uri')],
-                                 [os.path.basename(u.text) for u in g.iter('uri')])
+                # collision meshes are the exported ones (step 9 may prune shapes the rover cannot
+                # reach - outside the zone or too high - but never adds or swaps one)
+                exp_cols = [os.path.basename(u.text) for c in m.iter('collision') for u in c.iter('uri')]
+                for c in g.iter('collision'):
+                    for u in c.iter('uri'):
+                        self.assertIn(os.path.basename(u.text), exp_cols, m.get('name'))
         added = [n for n in gm if n.startswith('SAR_BuildingPerson_')]
         self.assertEqual(len(added), 4)
         self.assertEqual(gen.find('physics').findtext('max_step_size'), str(float(CFG['world']['physics_step'])))
@@ -852,10 +856,17 @@ class RobotModelTests(unittest.TestCase):
         ours = (PKG / 'urdf/agri_ugv.urdf.xacro').read_text()
         ours = ours.replace('velocity="$(arg wheel_max_rad_s)"', 'velocity="15"')
         ours = ours.replace('effort="$(arg wheel_effort)"', 'effort="400"')
+        # vigil_sar collision proxies (collision only, no mass): undo them for the comparison
+        ours = ours.replace('\n  <xacro:include filename="$(find vigil_sar)/urdf/collision_proxies.xacro"/>', '')
+        ours = '\n'.join(l for l in ours.splitlines() if 'body_collision_proxies' not in l)
+        ours = ours.replace('<xacro:cad_visual part="lidar" material="rubber"/>\n    <collision name="lidar_collision">'
+                            '<origin xyz="-0.013 0 -0.012"/><geometry><cylinder radius="0.05" length="0.056"/>'
+                            '</geometry></collision></link>', '<xacro:cad_visual part="lidar" material="rubber"/></link>')
         strip = lambda t: [l for l in t.splitlines() if l.strip() and 'thermal' not in l and 'wheel_max_rad_s' not in l
                            and 'wheel_effort' not in l
                            and not l.strip().startswith(('<!--', '*', 'only read', 'urdf/', '15 rad/s', 'needs.',
-                                                         'physics.drive.wheel_torque_limit'))]
+                                                         'physics.drive.wheel_torque_limit',
+                                                         'collision proxies', 'rear body, full body width'))]
         self.assertEqual(strip(rough)[1:], strip(ours)[1:])
         cad = (ROUGH / 'urdf/cad_geometry.xacro').read_text().replace('vigil_rough_terrain', 'vigil_sar')
         self.assertEqual(cad, (PKG / 'urdf/cad_geometry.xacro').read_text())

@@ -7,17 +7,19 @@ install(PROGRAMS
   scripts/drive.py scripts/terrain_mapper.py scripts/cliff_navigator.py scripts/ugv_dashboard.py
   scripts/thermal_human_detector.py scripts/human_tracker.py scripts/sar_manager.py scripts/build_sar_world.py
   scripts/find_crash.py scripts/motion_test.py scripts/rover_stability.py scripts/scenario_worlds.py
-  scripts/scale_check.py
+  scripts/scale_check.py scripts/obstacle_tracker.py scripts/dynamic_check.py
   DESTINATION lib/${PROJECT_NAME})
 # shared Python modules imported by the nodes
 install(FILES
   scripts/terrain_core.py scripts/planner_core.py scripts/vision_overlay.py scripts/ros_common.py
   scripts/terrain_window.py scripts/thermal_core.py scripts/sar_core.py scripts/sar_paths.py
+  scripts/obstacle_core.py scripts/sim_speed.py
   DESTINATION lib/${PROJECT_NAME})
 if(BUILD_TESTING)
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
   enable_testing()
   add_test(NAME sar_offline COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sar_offline.py)
+  add_test(NAME sar_dynamic_obstacles COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dynamic_obstacles.py)
   set_tests_properties(sar_offline PROPERTIES TIMEOUT 900)
 endif()
 ament_package()

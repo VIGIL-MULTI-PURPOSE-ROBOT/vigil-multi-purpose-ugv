@@ -13,7 +13,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
     font: 13px/1.35 "Inter", "Segoe UI", system-ui, sans-serif; }
-  header { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: #080a0d; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: #080a0d; }
   header h1 { font-size: 15px; letter-spacing: .12em; margin: 0; font-weight: 800; white-space: nowrap; }
   header h1 span { color: var(--accent); }
   .pill { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: .05em; border: 1px solid currentColor; white-space: nowrap; }
@@ -22,7 +22,7 @@
   .dot.on { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
   /* The SAR switch is ALWAYS live: it is never greyed out, whatever the navigator is doing. */
   #sarSwitch { font: 800 15px/1 system-ui; letter-spacing: .08em; padding: 9px 20px; border-radius: 8px; cursor: pointer;
-    border: 2px solid var(--human); background: #2a1219; color: #fff; min-width: 170px; }
+    border: 2px solid var(--human); background: #2a1219; color: #fff; min-width: 150px; white-space: nowrap; }
   #sarSwitch:hover { background: #3a0f18; box-shadow: 0 0 12px rgba(255,51,85,.45); }
   #sarSwitch.active { border-color: #fff; background: #b3122f; color: #fff; box-shadow: 0 0 14px rgba(255,51,85,.6); }
   #sarSwitch.pending { opacity: .75; }
@@ -33,7 +33,7 @@
     border: 2px solid var(--safe); background: #10281a; color: var(--safe); }
   #startBtn.running { border-color: var(--muted); color: var(--muted); background: #20262e; }
   main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); grid-template-rows: minmax(0, 1.25fr) minmax(0, 0.9fr) auto;
-    gap: 10px; padding: 10px; height: calc(100% - 52px); }
+    gap: 10px; padding: 10px; height: calc(100% - var(--hdr, 52px)); }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative; }
   .panel h2 { margin: 0; padding: 7px 12px; font-size: 11px; letter-spacing: .14em; color: var(--muted); border-bottom: 1px solid var(--line);
     display: flex; align-items: center; gap: 8px; font-weight: 700; }
@@ -56,7 +56,19 @@
   .kv span { font: 600 15px/1.3 "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
   .big { font: 800 20px/1.1 system-ui, sans-serif; letter-spacing: .04em; padding: 10px 12px; }
   .reason { padding: 0 12px 8px; color: var(--muted); min-height: 28px; font-size: 12px; }
-  .bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1.15fr 1.5fr; gap: 10px; min-height: 0; max-height: 270px; }
+  #accelBtn { font: 800 12px system-ui; letter-spacing: .05em; padding: 7px 10px; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--accent); background: #0f2330; color: var(--accent); white-space: nowrap; }
+  #accelBtn.high { border-color: var(--uneven); color: var(--uneven); background: #2b2410; }
+  #accelDown { padding: 7px 8px; font-weight: 800; border-radius: 8px; }
+  .simspeed { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .simspeed button { padding: 3px 7px; font-weight: 800; }
+  .simspeed b { font: 700 12px ui-monospace, monospace; color: var(--text); }
+  #obsTable { width: 100%; border-collapse: collapse; font: 12px ui-monospace, monospace; }
+  #obsTable td, #obsTable th { padding: 3px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  #obsTable th { color: var(--muted); font: 600 10px system-ui; letter-spacing: .08em; }
+  #obsTable tr.dyn td { color: var(--uneven); }
+  #obsTable tr.hum td:first-child { color: var(--human); font-weight: 700; }
+  .bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 0.85fr 0.95fr 1.55fr 0.95fr 0.85fr 1.15fr; gap: 10px; min-height: 0; max-height: 270px; }
   .scroll { overflow-y: auto; flex: 1; min-height: 0; }
   #events, #humanList { list-style: none; margin: 0; padding: 4px 0; }
   #events li { padding: 3px 10px; border-left: 3px solid transparent; display: grid; grid-template-columns: 62px 1fr; gap: 6px; font-size: 12px; }
@@ -82,6 +94,7 @@
   @media (max-width: 1100px) {
     main { grid-template-columns: 1fr; height: auto; grid-template-rows: none; }
     .bottom { grid-template-columns: 1fr; max-height: none; }
+    header { flex-wrap: wrap; }
     .imgwrap, #mapwrap { height: 340px; flex: none; }
   }
 </style>
@@ -95,6 +108,12 @@
   <button id="startBtn" title="Start the A -> B mission">START A→B</button>
   <span id="sarLive">● SAR ACTIVE</span>
   <button id="sarSwitch" title="Start search and rescue - available at any time">🔍 START SAR</button>
+  <div id="collPill" class="pill" style="color:var(--muted)" title="collision prediction on the planned path">COLLISION ---</div>
+  <button id="accelDown" title="acceleration back one level">−</button>
+  <button id="accelBtn" title="ACCELERATION +: raise the speeding-up limit one level (smooth, never above top speed, capped on climbs)">ACCELERATION + · NORMAL</button>
+  <div class="simspeed" title="simulation (execution) speed: target real-time factor / measured">SIM SPEED
+    <button data-rtf="1">1×</button><button data-rtf="2">2×</button><button data-rtf="4">4×</button>
+    <b id="simSpeed">-</b></div>
   <div class="conn"><span id="rtf" title="simulation speed: sim seconds per real second"></span><div id="dot" class="dot"></div><span id="conn">connecting</span></div>
 </header>
 <div id="toast"></div>
@@ -149,6 +168,13 @@
       </div>
     </section>
     <section class="panel">
+      <h2>DYNAMIC OBSTACLES · COLLISION STATUS</h2>
+      <div class="big" id="collState" style="font-size:17px;padding-bottom:4px">---</div>
+      <div class="reason" id="collReason" style="min-height:0"></div>
+      <div class="reason" id="obsInfo" style="min-height:0;color:var(--text)"></div>
+      <div class="scroll"><table id="obsTable"><thead><tr><th>CLASS</th><th>DIST</th><th>DIR</th><th>SPEED</th><th>STATUS</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section class="panel">
       <h2>ROBOT</h2>
       <div class="kv">
         <div><b>X</b><span id="rx">-</span></div>
@@ -157,6 +183,8 @@
         <div><b>SPEED</b><span id="sp">-</span></div>
         <div><b>ROLL / PITCH</b><span id="rp">-</span></div>
         <div><b>GOAL B</b><span id="gxy" style="font-size:13px">-</span></div>
+        <div><b>ACCEL LIMIT</b><span id="acc">-</span></div>
+        <div><b>SIM SPEED</b><span id="simS" style="font-size:13px">-</span></div>
       </div>
     </section>
     <section class="panel">
@@ -181,6 +209,8 @@ const SAR_COLORS = { 'SAR OFF': 'var(--muted)', 'SAR READY': 'var(--uneven)', 'S
   'CONFIRMING HUMAN': 'var(--warn)', 'HUMAN DETECTED': 'var(--human)', 'FINAL SCAN': '#ff8fa3', 'SAR COMPLETE': 'var(--safe)' };
 const TERR_COLORS = { 'SAFE': 'var(--safe)', 'UNEVEN': 'var(--uneven)', 'POSSIBLE DROP': 'var(--warn)', 'STEEP': '#aa6e3c',
   'OBSTACLE': '#dd44dd', 'CLIMBABLE': '#aa96ff', 'HIGH CLIFF': 'var(--danger)', 'UNKNOWN': 'var(--muted)' };
+const COLL_COLORS = { 'CLEAR': 'var(--safe)', 'COLLISION RISK': 'var(--danger)', 'AVOIDING': 'var(--uneven)', 'NO TRACKER DATA': 'var(--muted)' };
+const OBJ_COLORS = { HUMAN: '#ff3355', VEHICLE: '#5aa9ff', BUILDING: '#8fa0b3', ROCK: '#aa6e3c', DEBRIS: '#c08a50', VEGETATION: '#3cc850', OBJECT: '#dd44dd', UNKNOWN: '#cccccc' };
 const $ = id => document.getElementById(id);
 const fmt = (v, d = 2, u = '') => (v === undefined || v === null || Number.isNaN(v)) ? '-' : Number(v).toFixed(d) + u;
 const hms = s => { s = Math.max(0, Math.floor(s || 0)); return [s / 3600, (s % 3600) / 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
@@ -210,6 +240,7 @@ async function poll() {
 }
 setInterval(poll, 250);
 
+new ResizeObserver(() => document.documentElement.style.setProperty('--hdr', (document.querySelector('header').offsetHeight) + 'px')).observe(document.querySelector('header'));
 function pill(el, text, color) { el.textContent = text; el.style.color = color; }
 let toastT = null;
 let sarPending = null;      // SAR click awaiting the server's confirmation
@@ -268,13 +299,41 @@ function update() {
   // robot / nav / terrain
   if (r) {
     $('rx').textContent = fmt(r.x); $('ry').textContent = fmt(r.y); $('rh').textContent = fmt(r.heading, 0, '°');
-    $('rtf').textContent = (S.rtf == null) ? '' : ('sim ' + (S.rtf * 100).toFixed(0) + '% of real time  ·  ');
+    $('rtf').textContent = '';
     $('sp').textContent = fmt(r.speed, 2, ' m/s'); $('rp').textContent = fmt(r.roll, 0) + '° / ' + fmt(r.pitch, 0) + '°';
   }
   if (S.goal) $('gxy').textContent = `${fmt(S.goal[0], 1)}, ${fmt(S.goal[1], 1)}`;
   $('gd').textContent = fmt(S.dist_to_b ?? n.dist_to_goal ?? n.distance_to_goal, 2, ' m'); $('pl').textContent = fmt(n.path_length, 1, ' m');
   $('replans').textContent = (n.hazard_replans ?? '-') + ' / ' + (n.replans ?? '-');
   $('navState').textContent = st; $('navState').style.color = STATE_COLORS[st] || 'var(--text)';
+  // dynamic obstacles / collision status
+  const dy = S.dynamic || {}, co = dy.collision || {}, cs = dy.status || 'NO TRACKER DATA';
+  pill($('collPill'), cs, COLL_COLORS[cs] || 'var(--text)');
+  $('collState').textContent = cs; $('collState').style.color = COLL_COLORS[cs] || 'var(--text)';
+  const rk = co.risk || {};
+  $('collReason').textContent = cs === 'COLLISION RISK' && rk.cls ? `${rk.cls} predicted on the path in ${fmt(rk.ttc, 1, ' s')} - replanning / slowing` :
+    (co.reason || (cs === 'AVOIDING' ? 'path bent round a person / vehicle / moving obstacle' : cs === 'CLEAR' ? 'no conflict within the prediction time' : 'obstacle_tracker not publishing'));
+  const cnt = dy.counts || {};
+  $('obsInfo').textContent = `${dy.n || 0} tracked · ${dy.dynamic || 0} moving` + (Object.keys(cnt).length ? ' · ' + Object.entries(cnt).map(([k, v]) => `${v} ${k.toLowerCase()}`).join(', ') : '');
+  $('obsTable').tBodies[0].innerHTML = (dy.tracks || []).slice(0, 8).map(o => `<tr class="${o.dynamic ? 'dyn' : ''} ${o.cls === 'HUMAN' ? 'hum' : ''}">
+    <td>${o.cls}</td><td>${fmt(o.distance, 1, ' m')}</td><td title="${fmt(o.bearing_deg, 0, '°')}">${o.direction}</td>
+    <td>${o.dynamic ? fmt(o.speed, 1, ' m/s') : '-'}</td>
+    <td>${o.dynamic ? (o.closing_speed > 0.2 ? 'APPROACHING' : 'MOVING') : 'STATIC'}${o.distance < o.safety ? ' · TOO CLOSE' : ''}</td></tr>`).join('') ||
+    '<tr><td colspan="5" style="color:var(--muted)">no obstacles tracked</td></tr>';
+  // acceleration level
+  const ac = S.accel || {};
+  const hi = (ac.level || 0) > 0;
+  $('accelBtn').textContent = `ACCELERATION + · ${ac.name || 'NORMAL'}` + (ac.active != null ? ` ${fmt(ac.active, 1)} m/s²` : '');
+  $('accelBtn').classList.toggle('high', hi);
+  $('acc').textContent = ac.active != null ? `${fmt(ac.active, 1)} m/s²` : '-';
+  $('acc').title = ac.cap != null ? `requested ${ac.request} m/s², stability cap ${ac.cap} m/s² at this pitch` : '';
+  // simulation speed: target and measured
+  const ss = S.sim_speed || {};
+  const meas = ss.measured == null ? '…' : ss.measured.toFixed(2) + '×';
+  $('simSpeed').textContent = `${fmt(ss.target, 0)}× target · ${meas} measured`;
+  $('simS').textContent = `${fmt(ss.target, 0)}× / ${meas}`;
+  $('simS').style.color = (ss.measured != null && ss.target && ss.measured < 0.9 * ss.target) ? 'var(--uneven)' : 'var(--text)';
+  document.querySelectorAll('.simspeed button').forEach(b => b.classList.toggle('on', Number(b.dataset.rtf) === ss.target));
   $('navReason').textContent = n.reason || '';
   $('terr').textContent = tc; $('terr').style.color = TERR_COLORS[tc] || 'var(--text)';
   $('drop').textContent = fmt(t.drop, 2, ' m'); $('drop').style.color = (t.drop > S.params.max_safe_drop) ? 'var(--danger)' : 'var(--text)';
@@ -300,6 +359,7 @@ function update() {
   if (!$('legend').childElementCount && S.class_names) {
     S.class_names.forEach((nm, k) => { if (k === 0) return; $('legend').insertAdjacentHTML('beforeend', `<span><i style="background:${S.class_colors[k]}"></i>${nm}</span>`); });
     $('legend').insertAdjacentHTML('beforeend', '<span><i style="background:#35d0ff"></i>path</span><span><i style="background:#9aa3ad"></i>previous path</span>' +
+      '<span><i style="border:1px dashed #ff3355;border-radius:50%"></i>tracked obstacle + safety distance</span>' +
       '<span><i style="background:#ff3355;border-radius:50%"></i>human</span><span><i style="background:#ffc800"></i>search point</span><span><i style="border:1px solid #8fa0b3"></i>building</span>');
   }
 }
@@ -317,6 +377,9 @@ $('sarSwitch').onclick = () => {
   if (S) update();
 };
 $('fullBtn').onclick = () => window.open('/camera4k.jpg?t=' + Date.now(), '_blank');
+$('accelBtn').onclick = () => { post('/accel', { cmd: 'UP' }); toast('ACCELERATION +', true); };
+$('accelDown').onclick = () => { post('/accel', { cmd: 'DOWN' }); toast('ACCELERATION −', true); };
+document.querySelectorAll('.simspeed button').forEach(b => b.onclick = () => { post('/simspeed', { rtf: Number(b.dataset.rtf) }); toast(`SIMULATION SPEED ${b.dataset.rtf}×`, true); });
 
 // ------------------------------------------------------------------- map
 const cv = $('map'), ctx = cv.getContext('2d'), DPR = () => devicePixelRatio;
@@ -409,6 +472,22 @@ function draw() {
     const tip = W2C(r.x + c * (hl + 2.0), r.y + s * (hl + 2.0));
     ctx.strokeStyle = '#ffc800'; ctx.lineWidth = 3 * DPR(); ctx.beginPath(); ctx.moveTo(ca, cb); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
     if (view.w > 60) disc([r.x, r.y], '#ffffff', '', 5);
+  }
+  // tracked obstacles: safety ring, velocity arrow, predicted path
+  const px2 = cv.width / view.w;
+  for (const o of ((S.dynamic || {}).tracks || [])) {
+    const col = OBJ_COLORS[o.cls] || '#ccc', [a, b] = W2C(o.x, o.y);
+    if (o.dynamic || o.cls === 'HUMAN' || o.cls === 'VEHICLE') {
+      ctx.strokeStyle = col; ctx.globalAlpha = 0.45; ctx.lineWidth = 1 * DPR(); ctx.setLineDash([4 * DPR(), 4 * DPR()]);
+      ctx.beginPath(); ctx.arc(a, b, (o.radius + o.safety) * px2, 0, 7); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = col; ctx.globalAlpha = 0.8; ctx.beginPath(); ctx.arc(a, b, Math.max(3 * DPR(), o.radius * px2), 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+    if (o.dynamic) {
+      const T = ((S.dynamic || {}).params || {}).collision_prediction_time || 4;
+      line([[o.x, o.y], [o.x + o.vx * T, o.y + o.vy * T]], col, 2, [2, 4]);
+      const [ea, eb] = W2C(o.x + o.vx, o.y + o.vy);
+      ctx.strokeStyle = col; ctx.lineWidth = 3 * DPR(); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(ea, eb); ctx.stroke();
+    }
   }
   // tentative candidates, then confirmed humans (always on top, never removed)
   for (const t of (S.tentative || [])) { const [a, b] = W2C(t.x, t.y); ctx.strokeStyle = '#ff8fa3'; ctx.lineWidth = 2 * DPR(); ctx.setLineDash([3 * DPR(), 3 * DPR()]);

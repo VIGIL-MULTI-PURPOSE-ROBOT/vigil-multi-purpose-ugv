@@ -81,6 +81,14 @@ class TerrainMapperNode(Node):
         self.create_subscription(Path, '/navigation/previous_path',
                                  lambda m: setattr(self, 'prev_path', path_from_msg(m)), 10)
         self.create_subscription(String, '/navigation/status', self.on_status, 10)
+        # [DYN] pixels of tracked classes (people) are left to obstacle_tracker.py while it runs: a
+        # walking person then leaves no trail of stale OBSTACLE cells in the height map, and the
+        # navigator plans round the person's tracked position + safety distance + predicted motion.
+        # Without tracker data (node off, stale) every pixel is mapped exactly as before.
+        self.tracked_labels = [int(v) for v in (cfg['terrain'].get('tracked_labels_excluded') or [])]
+        self.tracker_t = -1e9
+        self.create_subscription(String, '/perception/obstacles',
+                                 lambda m: setattr(self, 'tracker_t', node_time(self)), 10)
         self.pub_cls = self.create_publisher(OccupancyGrid, '/vision/terrain_classes', 2)
         self.pub_cost = self.create_publisher(OccupancyGrid, '/vision/traversability', 2)
         self.pub_slope = self.create_publisher(OccupancyGrid, '/vision/slope', 2)
@@ -138,6 +146,9 @@ class TerrainMapperNode(Node):
             self.cam = CameraModel(self.p, K=self.K, width=self.depth.shape[1], height=self.depth.shape[0])
         t0 = self.get_clock().now()
         depth, pose = self.depth, self.pose
+        if (self.tracked_labels and self.seg is not None and self.seg.shape == depth.shape
+                and node_time(self) - self.tracker_t < 1.0):
+            depth = np.where(np.isin(self.seg, self.tracked_labels), np.nan, depth).astype(np.float32)
         frame = self.mapper.process(depth, pose, self.cam, seg=self.seg)
         stamp = self.get_clock().now().to_msg()
         now = node_time(self)          # simulation time: grid_publish_rate is a sim-time rate

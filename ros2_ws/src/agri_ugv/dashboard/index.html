@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIGIL Agriculture</title>
+<style>
+  :root {
+    --bg: #0d1014; --panel: #151a20; --panel2: #1b2129; --line: #27303a;
+    --text: #d9e1ea; --muted: #7d8a99; --accent: #35d0ff;
+    --crop: #3cc850; --weed: #ff3b3b; --human: #ff3cff; --unknown: #ffc800; --other: #28aaff; --warn: #ff7800;
+    --dry: #8c510a; --wet: #08458f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text);
+    font: 13px/1.35 "Inter", "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line); background: #0a0d10; }
+  header h1 { font-size: 15px; letter-spacing: .12em; margin: 0; font-weight: 700; }
+  header h1 span { color: var(--crop); }
+  .pill { padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: .06em;
+    border: 1px solid currentColor; }
+  .pill.alert { background: var(--human); color: #fff !important; border-color: var(--human); animation: blink 1s infinite; }
+  .pill.weedalert { background: var(--weed); color: #fff !important; border-color: var(--weed); }
+  .pill.obalert { background: var(--warn); color: #111 !important; border-color: var(--warn); animation: blink 1s infinite; }
+  .pill.done { background: var(--accent); color: #0d1014 !important; border-color: var(--accent); }
+  .pill.hide { display: none; }
+  @keyframes blink { 50% { opacity: .45; } }
+  .conn { margin-left: auto; color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--weed); }
+  .dot.on { background: var(--crop); box-shadow: 0 0 8px var(--crop); }
+  main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr); gap: 12px; padding: 12px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    display: flex; flex-direction: column; min-height: 0; }
+  .panel h2 { margin: 0; padding: 8px 12px; font-size: 11px; letter-spacing: .14em; color: var(--muted);
+    border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; font-weight: 700; flex-wrap: wrap; }
+  .panel h2 .right { margin-left: auto; font-weight: 500; letter-spacing: 0; }
+  #camwrap { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; min-height: 300px; }
+  #cam { width: 100%; height: 100%; object-fit: contain; max-height: 520px; }
+  .mapwrap { flex: 1; position: relative; min-height: 300px; }
+  .mapwrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+  .kv div { background: var(--panel); padding: 7px 10px; min-width: 0; }
+  .kv b { display: block; font-size: 10px; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .kv span { font: 600 16px/1.3 "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .big { font: 800 20px/1.15 system-ui, sans-serif; letter-spacing: .04em; padding: 10px 12px 4px; }
+  .reason { padding: 0 12px 8px; color: var(--muted); min-height: 18px; font-size: 12px; }
+  .counters { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--line); }
+  .counters div { background: var(--panel); padding: 8px 6px; text-align: center; }
+  .counters b { display: block; font-size: 10px; letter-spacing: .08em; font-weight: 700; }
+  .counters span { font: 800 22px/1.2 "JetBrains Mono", ui-monospace, monospace; }
+  .latest { padding: 6px 12px; color: var(--muted); font-size: 12px; }
+  .latest b { color: var(--text); }
+  .bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; }
+  .controls { grid-column: 1 / -1; display: flex; gap: 14px; align-items: center; padding: 12px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .btn { font: 800 18px/1 system-ui, sans-serif; letter-spacing: .08em; padding: 16px 34px; border-radius: 10px;
+    border: 2px solid currentColor; background: transparent; cursor: pointer; }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  #startBtn { color: var(--crop); } #startBtn:not(:disabled):hover { background: rgba(60,200,80,.15); }
+  #stopBtn { color: var(--weed); } #stopBtn:not(:disabled):hover { background: rgba(255,59,59,.15); }
+  .controls .note { color: var(--muted); flex: 1; min-width: 240px; }
+  .log { grid-column: 1 / -1; }
+  #events { list-style: none; margin: 0; padding: 4px 0; overflow-y: auto; max-height: 240px; }
+  #events li { padding: 4px 12px; border-left: 3px solid transparent; display: grid;
+    grid-template-columns: 70px 90px 260px 1fr; gap: 8px; font-size: 12px; }
+  #events li .t { color: var(--muted); font-family: ui-monospace, monospace; }
+  button.small { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+    padding: 3px 9px; font-size: 11px; cursor: pointer; }
+  button.small.on { border-color: var(--accent); color: var(--accent); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; padding: 6px 12px; border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--muted); align-items: center; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .scale { flex: 1; min-width: 160px; height: 10px; border-radius: 3px;
+    background: linear-gradient(90deg, #8c510a, #d8b365, #f5f5dc, #5ab4ac, #01665e, #08458f); }
+  .progress { height: 8px; background: var(--panel2); border-radius: 4px; overflow: hidden; margin: 2px 12px 8px; }
+  .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .5s; }
+  .progress.m i { background: linear-gradient(90deg, #8c510a, #5ab4ac, #08458f); }
+  .obbox { padding: 6px 12px 8px; }
+  .auto { grid-column: 1 / -1; }
+  .auto .kv { grid-template-columns: repeat(6, 1fr); }
+  .auto .kv span { font-size: 14px; }
+  .auto .metrics { grid-template-columns: repeat(8, 1fr); }
+  .auto .metrics span { font-size: 13px; }
+  .lvl-FULL { color: var(--crop); } .lvl-DEGRADED { color: var(--unknown); } .lvl-LIMITED { color: var(--warn); }
+  .lvl-SAFETY { color: var(--weed); }
+  .obbox.idle { color: var(--muted); }
+  @media (max-width: 1000px) {
+    main, .bottom { grid-template-columns: 1fr; }
+    .auto .kv, .auto .metrics { grid-template-columns: repeat(2, 1fr); }
+    .counters { grid-template-columns: repeat(3, 1fr); }
+    #events li { grid-template-columns: 64px 1fr; }
+    #events li .t + .t { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>VIGIL <span>AGRICULTURE</span></h1>
+  <div id="statePill" class="pill">---</div>
+  <div id="rowPill" class="pill">ROW -</div>
+  <div id="humanPill" class="pill alert hide">HUMAN DETECTED</div>
+  <div id="weedPill" class="pill weedalert hide">WEED DETECTED</div>
+  <div id="obPill" class="pill obalert hide">DYNAMIC OBSTACLE DETECTED</div>
+  <div id="donePill" class="pill done hide">MISSION COMPLETE</div>
+  <div class="conn"><div id="dot" class="dot"></div><span id="conn">connecting</span></div>
+</header>
+<main>
+  <!-- row 1: camera | field map -->
+  <section class="panel">
+    <h2>RGB CAMERA · CROP / WEED / HUMAN DETECTION <span class="right" id="fps"></span></h2>
+    <div id="camwrap"><img id="cam" alt="camera"></div>
+    <div class="legend">
+      <span><i style="background:var(--crop)"></i>CROP (on the row line)</span>
+      <span><i style="background:var(--weed)"></i>WEED (confirmed)</span>
+      <span><i style="background:var(--human)"></i>HUMAN</span>
+      <span><i style="background:var(--unknown)"></i>UNKNOWN (never weed)</span>
+      <span><i style="background:var(--other)"></i>OTHER OBJECT</span>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>FIELD / ROW MAP <span class="right"><button class="small on" id="fitBtn">Whole field</button>
+      <button class="small" id="followBtn">Follow robot</button></span></h2>
+    <div class="mapwrap"><canvas id="map"></canvas></div>
+    <div class="legend">
+      <span><i style="background:#2f6b36"></i>crop rows</span><span><i style="background:#35d0ff"></i>current row</span>
+      <span><i style="background:#9fe870"></i>completed</span><span><i style="background:var(--warn)"></i>obstacle</span>
+      <span><i style="background:var(--human)"></i>human</span><span><i style="background:var(--weed)"></i>weed</span>
+      <span><i style="background:#ff7800"></i>interrupted row</span><span><i style="border:1px dashed #ff3b3b"></i>uncovered (revisit)</span>
+    </div>
+  </section>
+
+  <!-- row 2: moisture map | robot status -->
+  <section class="panel">
+    <h2>LIVE MOISTURE MAP <span class="right" id="mInfo"></span></h2>
+    <div class="mapwrap"><canvas id="mmap"></canvas></div>
+    <div class="legend">
+      <b style="color:var(--dry)">DRY</b><span id="mLo">low</span><div class="scale"></div><span id="mHi">high</span><b style="color:#5aa9ff">WET</b>
+      <span>· faded = interpolated · grey = not surveyed · dots = samples</span>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>ROBOT STATUS</h2>
+    <div class="big" id="robotState">---</div>
+    <div class="reason" id="robotReason"></div>
+    <div class="kv">
+      <div><b>ROW</b><span id="rowNum">-</span></div>
+      <div><b>SPEED</b><span id="sp">-</span></div>
+      <div><b>DIRECTION</b><span id="rowDir" style="font-size:13px">-</span></div>
+      <div><b>SOIL MOISTURE</b><span id="moist">-</span></div>
+      <div><b>X</b><span id="rx">-</span></div>
+      <div><b>Y</b><span id="ry">-</span></div>
+    </div>
+    <div class="big" id="rowState" style="font-size:16px">---</div>
+    <div class="reason" id="rowReason"></div>
+    <div class="latest"><b>CROP COVERAGE</b> <span id="covTxt">-</span></div>
+    <div class="progress"><i id="covBar"></i></div>
+    <div class="latest"><b>MOISTURE MAPPING</b> <span id="mapTxt">-</span></div>
+    <div class="progress m"><i id="mapBar"></i></div>
+    <h2 style="border-top:1px solid var(--line)">OBSTACLE AVOIDANCE <span class="right" id="obCount"></span></h2>
+    <div class="obbox idle" id="obBox">No obstacle in the robot's way.</div>
+  </section>
+
+  <div class="bottom">
+    <section class="panel">
+      <h2>DETECTIONS <span class="right" style="font-size:11px">de-duplicated in the world</span></h2>
+      <div class="counters">
+        <div><b style="color:var(--crop)">CROP</b><span id="cCrop">0</span></div>
+        <div><b style="color:var(--weed)">WEEDS</b><span id="cWeed">0</span></div>
+        <div><b style="color:var(--human)">HUMANS</b><span id="cHuman">0</span></div>
+        <div><b style="color:var(--unknown)">UNKNOWN</b><span id="cUnk">0</span></div>
+        <div><b style="color:var(--other)">OTHER</b><span id="cOther">0</span></div>
+        <div><b style="color:var(--warn)">OBSTACLES</b><span id="cOb">0</span></div>
+      </div>
+      <div class="latest" id="latestHuman">No human detected.</div>
+      <div class="latest" id="latestWeed">No weed detected.</div>
+    </section>
+    <section class="panel">
+      <h2>MISSION SUMMARY</h2>
+      <div class="kv">
+        <div><b>CROP COVERAGE</b><span id="sCov">-</span></div>
+        <div><b>MOISTURE MAP</b><span id="sMap">-</span></div>
+        <div><b>ROWS</b><span id="sRows">-</span></div>
+        <div><b>HUMANS</b><span id="sHum">-</span></div>
+        <div><b>WEEDS</b><span id="sWeed">-</span></div>
+        <div><b>OBSTACLES</b><span id="sOb">-</span></div>
+        <div><b>DETOURS</b><span id="sDet">-</span></div>
+        <div><b>REVERSE TURNS</b><span id="sRev">-</span></div>
+        <div><b>MOISTURE RANGE</b><span id="sMr" style="font-size:13px">-</span></div>
+      </div>
+      <div class="reason" id="sNote" style="padding-top:8px"></div>
+    </section>
+  </div>
+
+  <section class="panel auto">
+    <h2>AGRICULTURE AUTONOMY <span class="right" id="auInfo">supervisor: agri_supervisor.py</span></h2>
+    <div class="kv">
+      <div><b>MISSION</b><span id="auMission">FIELD COVERAGE</span></div>
+      <div><b>AUTONOMY STATE</b><span id="auState">-</span></div>
+      <div><b>DECISION</b><span id="auDecision">-</span></div>
+      <div><b>CURRENT ROW</b><span id="auRow">-</span></div>
+      <div><b>COVERAGE</b><span id="auCov">-</span></div>
+      <div><b>MOISTURE MAPPING</b><span id="auMoist">-</span></div>
+      <div><b>CURRENT MOISTURE</b><span id="auMoistNow">-</span></div>
+      <div><b>NAVIGATION</b><span id="auNav">-</span></div>
+      <div><b>OBSTACLE</b><span id="auOb">-</span></div>
+      <div><b>LOCALIZATION CONFIDENCE</b><span id="auLoc">-</span></div>
+      <div><b>PERCEPTION CONFIDENCE</b><span id="auPerc">-</span></div>
+      <div><b>ROBOT PROGRESS</b><span id="auProg">-</span></div>
+      <div><b>AUTONOMY LEVEL</b><span id="auLevel">-</span></div>
+      <div><b>RECOVERY</b><span id="auRec">-</span></div>
+      <div><b>MANUAL INTERVENTION</b><span id="auMan">-</span></div>
+      <div><b>ROWS DONE / LEFT</b><span id="auRows">-</span></div>
+      <div><b>INTERRUPTED ROWS</b><span id="auInt">-</span></div>
+      <div><b>UNCOVERED</b><span id="auGaps">-</span></div>
+    </div>
+    <div class="reason" id="auSensors" style="padding-top:6px"></div>
+    <h2 style="border-top:1px solid var(--line)">AUTONOMY METRICS</h2>
+    <div class="kv metrics">
+      <div><b>MISSION SUCCESS</b><span id="mSucc">-</span></div>
+      <div><b>COLLISIONS</b><span id="mCol">-</span></div>
+      <div><b>NEAR MISSES</b><span id="mNear">-</span></div>
+      <div><b>REPLANS</b><span id="mRep">-</span></div>
+      <div><b>RECOVERIES</b><span id="mRec">-</span></div>
+      <div><b>NO-PROGRESS</b><span id="mNop">-</span></div>
+      <div><b>MIN CLEARANCE</b><span id="mClr">-</span></div>
+      <div><b>DISTANCE</b><span id="mDist">-</span></div>
+      <div><b>MISSION TIME</b><span id="mTime">-</span></div>
+      <div><b>FIELD COVERAGE</b><span id="mCov">-</span></div>
+      <div><b>ROWS COMPLETED</b><span id="mRows">-</span></div>
+      <div><b>ROWS REVISITED</b><span id="mRev">-</span></div>
+      <div><b>MOISTURE MAP</b><span id="mMap">-</span></div>
+      <div><b>UNMAPPED AREA</b><span id="mUnm">-</span></div>
+      <div><b>LOCALIZATION</b><span id="mLoc">-</span></div>
+      <div><b>MANUAL</b><span id="mMan">-</span></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button class="btn" id="startBtn">▶ START ROBOT</button>
+    <button class="btn" id="stopBtn">■ STOP ROBOT</button>
+    <span class="note" id="ctlNote">START runs the row-by-row mission over the whole field; STOP holds it at zero speed through the existing controller, START continues where it stopped.</span>
+  </div>
+  <section class="panel log">
+    <h2>EVENT LOG</h2>
+    <ul id="events"></ul>
+  </section>
+</main>
+<script>
+const COL = { CROP: '#3cc850', WEED: '#ff3b3b', HUMAN: '#ff3cff', UNKNOWN: '#ffc800', OTHER_OBJECT: '#28aaff',
+  ROBOT: '#35d0ff', ROW: '#9fe870', AUTONOMY: '#b58cff', SAFETY: '#ff7800', DONE: '#35d0ff', OBSTACLE: '#ff7800', MOISTURE: '#5ab4ac' };
+const STATE_COL = { READY: '#ffc800', RUNNING: '#3cc850', STOPPED: '#ff3b3b', COMPLETE: '#35d0ff', HALTED: '#ff7800',
+  'NO START GATE': '#7d8a99', CONNECTING: '#7d8a99' };
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 2, u = '') => (v === undefined || v === null || Number.isNaN(v)) ? '-' : Number(v).toFixed(d) + u;
+let S = null, lastFrame = 0, lastFrameT = performance.now(), fps = 0, mode = 'fit';
+let mImg = null, mVer = -1;
+
+let camBusy = false, camFrame = -1;
+function pollCam() {
+  if (camBusy || (S && S.frame === camFrame)) return;
+  camBusy = true; const i = new Image(), f = S ? S.frame : 0;
+  i.onload = () => { $('cam').src = i.src; camFrame = f; camBusy = false; };
+  i.onerror = () => { camBusy = false; };
+  i.src = '/camera.jpg?f=' + f + '&t=' + Date.now();
+}
+setInterval(pollCam, 80);
+
+async function poll() {
+  try {
+    const r = await fetch('/state.json', { cache: 'no-store' });
+    S = await r.json(); $('dot').classList.add('on'); $('conn').textContent = 'live'; update();
+    const mm = S.moisture_map || {};
+    if (mm.version !== mVer && mm.meta) {
+      const i = new Image(); const v = mm.version;
+      i.onload = () => { mImg = i; mVer = v; }; i.src = '/moisture.png?v=' + v;
+    }
+  } catch (e) { $('dot').classList.remove('on'); $('conn').textContent = 'disconnected'; }
+}
+setInterval(poll, 250);
+
+function update() {
+  const rs = S.robot_state || {}, row = S.row || {}, r = S.robot, c = S.counts || {}, m = S.mission || {};
+  const mo = S.moisture || {}, ms = mo.status || {}, lat = mo.latest;
+  const st = rs.state || '---';
+  $('statePill').textContent = st; $('statePill').style.color = STATE_COL[st] || 'var(--text)';
+  $('robotState').textContent = st; $('robotState').style.color = STATE_COL[st] || 'var(--text)';
+  $('robotReason').textContent = rs.reason || '';
+  $('rowPill').textContent = 'ROW ' + (row.current ?? '-') + ' / ' + (row.total ?? '-');
+  $('rowPill').style.color = row.mode === 'headland' ? 'var(--warn)' : 'var(--crop)';
+  $('rowNum').textContent = (row.current ?? '-') + ' / ' + (row.total ?? '-');
+  $('rowState').textContent = row.state || '---';
+  const warnStates = ['TURNING TO NEXT ROW', 'REVERSE U-TURN TO NEXT ROW', 'AVOIDING OBSTACLE', 'PASSING OBSTACLE', 'RETURNING TO ROW', 'YIELDING TO MOVING OBSTACLE', 'HEADLAND BLOCKED', 'ROW END BLOCKED'];
+  $('rowState').style.color = warnStates.includes(row.state) ? 'var(--warn)' : (row.state === 'SAFETY HOLD' || row.state === 'WAITING FOR A CLEAR WAY') ? 'var(--weed)' : 'var(--crop)';
+  $('rowReason').textContent = (row.hold || '') + (m.direction ? ` row ${m.row} ${m.direction}: x ${fmt(m.row_start_x, 1)} → ${fmt(m.row_end_x, 1)} m` : '');
+  $('rowDir').textContent = (row.direction || '-') + (row.heading ? ' · ' + row.heading : '');
+  if (r) { $('sp').textContent = fmt(r.speed, 2, ' m/s'); $('rx').textContent = fmt(r.x); $('ry').textContent = fmt(r.y); }
+  $('moist').textContent = lat ? fmt(lat.moisture, 1, ' %') : '-';
+  $('moist').style.color = !lat ? 'var(--text)' : lat.category === 'DRY' ? '#d8b365' : lat.category === 'WET' ? '#5aa9ff' : 'var(--text)';
+  const cov = m.coverage_pct ?? 0, mc = ms.coverage_pct ?? 0;
+  $('covTxt').textContent = fmt(cov, 1, ' %') + (m.rows_completed !== undefined ? ` · ${m.rows_completed} / ${m.total_rows} rows` : '');
+  $('covBar').style.width = Math.min(100, cov) + '%';
+  $('mapTxt').textContent = ms.complete ? 'COMPLETE · ' + fmt(mc, 1, ' %') : fmt(mc, 1, ' %') + (ms.samples ? ` · ${ms.samples} samples` : '');
+  $('mapBar').style.width = Math.min(100, mc) + '%';
+  // obstacle panel
+  const av = m.avoidance, on = S.obstacle_now, dyn = (S.obstacles || []).filter(o => o.dynamic && o.distance !== undefined && o.distance < 8);
+  $('obPill').classList.toggle('hide', !(dyn.length || (av && av.dynamic)));
+  $('obCount').textContent = (S.obstacles || []).length + ' tracked';
+  if (av) {
+    $('obBox').className = 'obbox';
+    $('obBox').innerHTML = `<b style="color:var(--warn)">${av.dynamic ? 'DYNAMIC OBSTACLE' : 'OBSTACLE'} ${av.id || ''}</b> · ${av.cls || ''} · ` +
+      `${fmt(av.distance, 1, ' m')} ${av.side || ''}<br><b>STATE:</b> ${av.state} · current row ${m.row}`;
+  } else if (on) {
+    $('obBox').className = 'obbox';
+    $('obBox').innerHTML = `${on.dynamic ? 'Moving' : 'Static'} ${on.cls || 'obstacle'} ${on.id} at ${fmt(on.distance, 1, ' m')} ` +
+      `(${Math.abs(on.bearing) < 20 ? 'AHEAD' : on.bearing > 0 ? 'LEFT' : 'RIGHT'}) · not in the robot's way`;
+  } else { $('obBox').className = 'obbox idle'; $('obBox').textContent = 'No obstacle in the robot\'s way.'; }
+  // detections
+  $('cCrop').textContent = c.CROP ?? 0; $('cWeed').textContent = c.WEED ?? 0; $('cHuman').textContent = c.HUMAN ?? 0;
+  $('cUnk').textContent = c.UNKNOWN ?? 0; $('cOther').textContent = c.OTHER_OBJECT ?? 0;
+  const obSeen = (m.detours ?? 0) + (m.reverse_turns ?? 0);
+  $('cOb').textContent = (S.obstacles || []).length;
+  const humans = (S.items || []).filter(i => i.cls === 'HUMAN').sort((a, b) => b.last - a.last);
+  const weeds = (S.items || []).filter(i => i.cls === 'WEED').sort((a, b) => b.last - a.last);
+  $('humanPill').classList.toggle('hide', !(S.humans_active || []).length);
+  $('weedPill').classList.toggle('hide', !weeds.some(w => w.active));
+  $('latestHuman').innerHTML = humans.length ? `<b style="color:var(--human)">HUMAN ${humans[0].id}</b>${humans[0].active ? ' · IN VIEW' : ''} · world (${fmt(humans[0].x, 1)}, ${fmt(humans[0].y, 1)}) m · ${fmt(humans[0].dist, 1)} m from robot · confidence ${fmt(humans[0].conf, 2)}` : 'No human detected.';
+  $('latestWeed').innerHTML = weeds.length ? `<b style="color:var(--weed)">WEED ${weeds[0].id}</b> · world (${fmt(weeds[0].x, 2)}, ${fmt(weeds[0].y, 2)}) m · size ${fmt(weeds[0].size, 2)} m · confidence ${fmt(weeds[0].conf, 2)}` : 'No weed detected.';
+  // summary
+  $('sCov').textContent = fmt(cov, 1, ' %'); $('sMap').textContent = ms.complete ? 'COMPLETE' : fmt(mc, 1, ' %');
+  $('sMap').style.color = ms.complete ? 'var(--accent)' : 'var(--text)';
+  $('sRows').textContent = (m.rows_completed ?? '-') + ' / ' + (m.total_rows ?? row.total ?? '-');
+  $('sHum').textContent = c.HUMAN ?? 0; $('sWeed').textContent = c.WEED ?? 0;
+  $('sOb').textContent = (S.obstacles || []).length; $('sDet').textContent = m.detours ?? 0; $('sRev').textContent = m.reverse_turns ?? 0;
+  $('sMr').textContent = ms.min !== undefined ? `${fmt(ms.min, 0)}–${fmt(ms.max, 0)} % (dry ${fmt(ms.dry_pct, 0)} % · wet ${fmt(ms.wet_pct, 0)} %)` : '-';
+  $('sNote').textContent = S.mission_complete ? 'MISSION COMPLETE: every row driven and the moisture map of the field is complete.' :
+    (m.done ? 'Field rows complete' + (ms.complete ? '' : ' · moisture map below the completion threshold') : '') +
+    (m.field ? ` · ${m.field.rows} rows from the ${m.field.source} · spacing ${m.field.row_spacing} m` : '');
+  $('donePill').classList.toggle('hide', !S.mission_complete);
+  if (ms.range) { $('mLo').textContent = ms.range[0] + ' %'; $('mHi').textContent = ms.range[1] + ' %'; }
+  $('mInfo').textContent = lat ? `probe (${fmt(lat.x, 1)}, ${fmt(lat.y, 1)}) m · row ${lat.row} · ${lat.category}` : 'waiting for the moisture sensor';
+  // controls
+  $('startBtn').disabled = !(st === 'READY' || st === 'STOPPED');
+  $('stopBtn').disabled = st !== 'RUNNING';
+  if (st === 'NO START GATE') $('ctlNote').textContent = 'Start/stop gate not running (launched with dashboard:=false, autostart or row_mission:=false).';
+  updateAutonomy();
+  const ul = $('events'); ul.innerHTML = '';
+  for (const e of (S.events || [])) {
+    const li = document.createElement('li'), col = COL[e.kind] || 'var(--text)';
+    li.style.borderLeftColor = col;
+    li.innerHTML = `<span class="t">${e.clock}</span><span class="t">${e.t < 1e6 ? 'sim ' + fmt(e.t, 0) + 's' : ''}</span><b style="color:${col}">${e.title}</b><span>${e.detail || ''}</span>`;
+    ul.appendChild(li);
+  }
+  if (S.frame !== lastFrame) {
+    const now = performance.now(); fps = 0.8 * fps + 0.2 * (1000 * (S.frame - lastFrame) / Math.max(1, now - lastFrameT));
+    lastFrame = S.frame; lastFrameT = now; $('fps').textContent = fps.toFixed(1) + ' fps';
+  }
+}
+
+function updateAutonomy() {
+  const a = S.autonomy || {};
+  if (!a.state) { $('auInfo').textContent = 'supervisor not running (agri_supervisor.py)'; return; }
+  const f = a.field || {}, mo = a.moisture || {}, me = a.metrics || {}, ob = a.obstacle;
+  $('auInfo').textContent = `decision: ${a.decision}` + (a.hold ? ` · HOLD: ${a.hold}` : '') + (a.speed_cap ? ` · speed cap ${a.speed_cap} m/s` : '');
+  $('auState').textContent = a.state; $('auDecision').textContent = a.decision;
+  $('auRow').textContent = a.current_row ? `Row ${a.current_row} / ${a.total_rows}` : '-';
+  $('auCov').textContent = fmt(a.coverage_pct, 0, ' %');
+  $('auMoist').textContent = mo.complete ? 'COMPLETE' : fmt(mo.mapping_pct, 0, ' %');
+  $('auMoistNow').textContent = mo.current == null ? '-' : `${fmt(mo.current, 0, ' %')} ${mo.category || ''}`;
+  $('auNav').textContent = a.navigation || '-';
+  $('auOb').textContent = ob ? `${(ob.cls || 'obstacle').toUpperCase()} ${fmt(ob.distance, 1, ' m')}${ob.dynamic ? ' MOVING' : ''}` : 'NONE';
+  $('auLoc').textContent = fmt(a.localization_confidence, 0, ' %');
+  const lf = a.localization_factors || {};
+  $('auLoc').title = `pose fresh ${lf.fresh} · IMU agreement ${lf.imu} · wheels ${lf.wheels} (slip ${lf.wheel_slip}) · jumps ${lf.jumps}`;
+  $('auPerc').textContent = fmt(a.perception_confidence, 0, ' %');
+  $('auProg').textContent = a.robot_progress || '-';
+  $('auLevel').textContent = a.autonomy_level || '-'; $('auLevel').className = 'lvl-' + (a.autonomy_level || '').split(' ')[0];
+  $('auRec').textContent = a.recovery || '-';
+  $('auMan').textContent = a.manual_interventions ?? 0;
+  $('auRows').textContent = `${(f.completed_rows || []).length} / ${(f.remaining_rows || []).length}`;
+  $('auInt').textContent = (f.interrupted_rows || []).map(r => r.row).filter((v, i, x) => x.indexOf(v) === i).join(', ') || 'none';
+  $('auGaps').textContent = (f.uncovered || []).length ? `${f.uncovered.length} stretch(es)` : 'none';
+  $('auSensors').textContent = 'sensors: ' + Object.entries(a.sensors || {}).map(([k, v]) => `${k} ${v.state}${v.rate ? ' ' + v.rate + ' Hz' : ''}`).join(' · ') +
+    (f.boundary ? ` · field ${f.rows} rows, spacing ${fmt(f.row_spacing, 2)} m, ${f.row_direction}, x ${f.boundary[0]}..${f.boundary[1]} y ${f.boundary[2]}..${f.boundary[3]}` : '');
+  $('mSucc').textContent = me.mission_success ? 'YES' : (a.state === 'REVISIT_REQUIRED' ? 'PARTIAL' : '-');
+  $('mCol').textContent = me.collisions ?? '-'; $('mNear').textContent = me.near_collisions ?? '-';
+  $('mRep').textContent = me.replans ?? '-'; $('mRec').textContent = me.recoveries ?? '-'; $('mNop').textContent = me.no_progress_events ?? '-';
+  $('mClr').textContent = fmt(me.min_obstacle_clearance, 2, ' m'); $('mDist').textContent = fmt(me.distance_m, 0, ' m');
+  $('mTime').textContent = me.mission_time_s != null ? `${Math.floor(me.mission_time_s / 60)}:${String(Math.round(me.mission_time_s % 60)).padStart(2, '0')}` : '-';
+  $('mCov').textContent = fmt(me.field_coverage_pct, 1, ' %'); $('mRows').textContent = me.rows_completed ?? '-';
+  $('mRev').textContent = me.rows_revisited ?? 0; $('mMap').textContent = fmt(me.moisture_map_pct, 0, ' %');
+  $('mUnm').textContent = fmt(me.unmapped_area_pct, 0, ' %'); $('mLoc').textContent = fmt(me.localization_confidence, 0, ' %');
+  $('mMan').textContent = me.manual_interventions ?? 0;
+  const mt = $('mapTxt');
+  if (mo.label && mt && mo.complete) mt.textContent = mo.label;
+}
+
+async function send(cmd) { await fetch('/command', { method: 'POST', body: JSON.stringify({ cmd }) }); poll(); }
+$('startBtn').onclick = () => send('START');
+$('stopBtn').onclick = () => send('STOP');
+
+// ------------------------------------------------------------------- shared map helpers
+function mkView(cv) {
+  const o = { cv, ctx: cv.getContext('2d'), view: null };
+  new ResizeObserver(() => { const r = cv.getBoundingClientRect(); cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio; }).observe(cv);
+  o.W2C = (x, y) => { const s = cv.width / o.view.w; return [(x - o.view.x0) * s, cv.height - (y - o.view.y0) * s]; };
+  o.line = (pts, color, width, dash = []) => {
+    if (!pts || pts.length < 2) return; const c = o.ctx;
+    c.save(); c.strokeStyle = color; c.lineWidth = width * devicePixelRatio; c.setLineDash(dash.map(d => d * devicePixelRatio));
+    c.lineJoin = 'round'; c.lineCap = 'round'; c.beginPath();
+    pts.forEach((p, i) => { const [a, b] = o.W2C(p[0], p[1]); i ? c.lineTo(a, b) : c.moveTo(a, b); }); c.stroke(); c.restore();
+  };
+  o.label = (a, b, text, color) => {
+    const c = o.ctx; c.font = `700 ${11 * devicePixelRatio}px system-ui`; c.textAlign = 'left'; c.textBaseline = 'middle';
+    const tw = c.measureText(text).width, p = 3 * devicePixelRatio;
+    c.fillStyle = 'rgba(10,13,16,0.8)'; c.fillRect(a + 8 * devicePixelRatio, b - 8 * devicePixelRatio, tw + 2 * p, 16 * devicePixelRatio);
+    c.fillStyle = color; c.fillText(text, a + 8 * devicePixelRatio + p, b);
+  };
+  o.robot = () => {
+    if (!S.robot) return; const R = S.robot, c = o.ctx, co = Math.cos(R.yaw), s = Math.sin(R.yaw), hl = 0.85, hw = 0.55;
+    const corners = [[hl, hw], [hl, -hw], [-hl, -hw], [-hl, hw]].map(([u, v]) => [R.x + co * u - s * v, R.y + s * u + co * v]);
+    c.fillStyle = 'rgba(255,255,255,0.92)'; c.strokeStyle = '#0d1014'; c.lineWidth = 1.5 * devicePixelRatio; c.beginPath();
+    corners.forEach((p, i) => { const [a, b] = o.W2C(p[0], p[1]); i ? c.lineTo(a, b) : c.moveTo(a, b); }); c.closePath(); c.fill(); c.stroke();
+    const [ca, cb] = o.W2C(R.x, R.y), tip = o.W2C(R.x + co * (hl + 1.0), R.y + s * (hl + 1.0));
+    c.strokeStyle = '#ffc800'; c.lineWidth = 3 * devicePixelRatio; c.beginPath(); c.moveTo(ca, cb); c.lineTo(tip[0], tip[1]); c.stroke();
+    if (cv.width / o.view.w < 10 * devicePixelRatio) { c.fillStyle = '#fff'; c.beginPath(); c.arc(ca, cb, 5 * devicePixelRatio, 0, 7); c.fill(); }
+  };
+  o.fit = (margin, follow) => {
+    const f = S.field, aspect = cv.width / cv.height;
+    let tv;
+    if (follow && S.robot) { const w = 16; tv = { x0: S.robot.x - w / 2, y0: S.robot.y - w / aspect / 2, w }; }
+    else {
+      const x0 = f.x_min - margin, x1 = f.x_max + margin, y0 = f.rows[0] - 0.61 - margin, y1 = f.rows[f.rows.length - 1] + 0.61 + margin;
+      const w = Math.max(x1 - x0, (y1 - y0) * aspect);
+      tv = { x0: (x0 + x1) / 2 - w / 2, y0: (y0 + y1) / 2 - w / aspect / 2, w };
+    }
+    o.view = o.view ? { x0: o.view.x0 + (tv.x0 - o.view.x0) * 0.15, y0: o.view.y0 + (tv.y0 - o.view.y0) * 0.15, w: o.view.w + (tv.w - o.view.w) * 0.15 } : tv;
+  };
+  o.scalebar = () => {
+    const c = o.ctx, px = cv.width / o.view.w, len = o.view.w > 30 ? 10 : o.view.w > 12 ? 5 : 1;
+    c.strokeStyle = '#d9e1ea'; c.lineWidth = 2 * devicePixelRatio; c.beginPath();
+    c.moveTo(12 * devicePixelRatio, cv.height - 14 * devicePixelRatio); c.lineTo(12 * devicePixelRatio + len * px, cv.height - 14 * devicePixelRatio); c.stroke();
+    c.fillStyle = '#d9e1ea'; c.font = `${11 * devicePixelRatio}px system-ui`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.fillText(len + ' m', 12 * devicePixelRatio, cv.height - 20 * devicePixelRatio);
+  };
+  return o;
+}
+const FM = mkView($('map')), MM = mkView($('mmap'));
+
+function drawField() {
+  const o = FM, c = o.ctx, cv = o.cv;
+  if (!S || !S.field || !cv.width) return;
+  o.fit(4, mode === 'follow');
+  c.fillStyle = '#12161b'; c.fillRect(0, 0, cv.width, cv.height);
+  const f = S.field, row = S.row || {}, m = S.mission || {}, px = cv.width / o.view.w;
+  const [fa, fb] = o.W2C(f.x_min, f.rows[f.rows.length - 1] + 0.61), [fc, fd] = o.W2C(f.x_max, f.rows[0] - 0.61);
+  c.fillStyle = 'rgba(120,90,60,0.18)'; c.fillRect(fa, fb, fc - fa, fd - fb);
+  c.strokeStyle = 'rgba(200,200,200,0.35)'; c.lineWidth = 1; c.strokeRect(fa, fb, fc - fa, fd - fb);
+  const fr = m.row_fractions || [], ints = new Set(((m.interrupted_rows) || []).map(r => r.row));
+  f.rows.forEach((y, k) => {
+    const cur = row.current === k + 1, done = fr.length ? fr[k] >= 0.98 && !cur : (m.rows_completed ?? row.completed ?? 0) > k && !cur;
+    o.line([[f.x_min, y], [f.x_max, y]], cur ? '#35d0ff' : done ? '#9fe870' : '#2f6b36', cur ? 3 : Math.max(1.5, 0.35 * px / devicePixelRatio));
+    if (px > 6 * devicePixelRatio || k % 2 === 0 || cur) {
+      const [a, b] = o.W2C(f.x_min - 0.3, y);
+      c.fillStyle = cur ? '#35d0ff' : '#6d7d6f'; c.font = `${10 * devicePixelRatio}px system-ui`; c.textAlign = 'right'; c.textBaseline = 'middle';
+      c.fillText('ROW ' + (k + 1), a, b);
+    }
+  });
+  // autonomy: interrupted rows (orange tick) and uncovered stretches (red) to revisit
+  f.rows.forEach((y, k) => { if (ints.has(k + 1)) { const [a, b] = o.W2C(f.x_max + 0.4, y); c.fillStyle = '#ff7800'; c.fillRect(a, b - 3 * devicePixelRatio, 8 * devicePixelRatio, 6 * devicePixelRatio); } });
+  for (const g of (m.gaps || [])) o.line([[g[1], f.rows[g[0] - 1]], [g[2], f.rows[g[0] - 1]]], '#ff3b3b', 3, [4, 3]);
+  c.fillStyle = 'rgba(60,200,80,0.5)';
+  for (const p of (S.crops || [])) { const [a, b] = o.W2C(p[0], p[1]); c.fillRect(a - 1, b - 1, 2 * devicePixelRatio, 2 * devicePixelRatio); }
+  o.line(S.trail, 'rgba(255,255,255,0.55)', 1.5, [1, 4]);
+  // tracked obstacles (outline + motion arrow)
+  for (const ob of (S.obstacles || [])) {
+    const pts = ob.points && ob.points.length > 2 ? ob.points : null, col = ob.dynamic ? '#ff7800' : 'rgba(255,120,0,0.75)';
+    if (pts) { c.fillStyle = ob.dynamic ? 'rgba(255,120,0,0.45)' : 'rgba(255,120,0,0.25)'; c.strokeStyle = col; c.lineWidth = 1.5 * devicePixelRatio; c.beginPath();
+      pts.forEach((p, i) => { const [a, b] = o.W2C(p[0], p[1]); i ? c.lineTo(a, b) : c.moveTo(a, b); }); c.closePath(); c.fill(); c.stroke(); }
+    const [a, b] = o.W2C(ob.x, ob.y);
+    if (ob.dynamic) { const [a2, b2] = o.W2C(ob.x + ob.vx * 2, ob.y + ob.vy * 2); c.strokeStyle = '#ff7800'; c.lineWidth = 2.5 * devicePixelRatio; c.beginPath(); c.moveTo(a, b); c.lineTo(a2, b2); c.stroke(); }
+    if (px > 8 * devicePixelRatio || ob.dynamic) o.label(a, b, ob.id, col);
+  }
+  for (const it of (S.items || [])) {
+    const [a, b] = o.W2C(it.x, it.y), col = COL[it.cls] || '#fff', r = 5 * devicePixelRatio;
+    if (it.cls === 'HUMAN') {
+      c.fillStyle = col; c.beginPath(); c.arc(a, b, (it.active ? 8 : 6) * devicePixelRatio, 0, 7); c.fill();
+      if (it.active) { c.strokeStyle = col; c.lineWidth = 2 * devicePixelRatio; c.beginPath(); c.arc(a, b, (12 + 4 * Math.sin(performance.now() / 200)) * devicePixelRatio, 0, 7); c.stroke(); }
+      o.label(a, b, it.id, col);
+    } else if (it.cls === 'WEED') {
+      c.strokeStyle = col; c.lineWidth = 2.5 * devicePixelRatio; c.beginPath();
+      c.moveTo(a - r, b - r); c.lineTo(a + r, b + r); c.moveTo(a + r, b - r); c.lineTo(a - r, b + r); c.stroke();
+    } else if (it.cls === 'UNKNOWN') { c.fillStyle = col; c.beginPath(); c.arc(a, b, 2.5 * devicePixelRatio, 0, 7); c.fill(); }
+  }
+  o.robot(); o.scalebar();
+}
+
+function drawMoisture() {
+  const o = MM, c = o.ctx, cv = o.cv;
+  if (!S || !S.field || !cv.width) return;
+  o.fit(1.5, false);
+  c.fillStyle = '#12161b'; c.fillRect(0, 0, cv.width, cv.height);
+  const f = S.field, meta = (S.moisture_map || {}).meta, px = cv.width / o.view.w;
+  const [fa, fb] = o.W2C(f.x_min, f.rows[f.rows.length - 1] + 0.61), [fc, fd] = o.W2C(f.x_max, f.rows[0] - 0.61);
+  c.fillStyle = '#2a2f36'; c.fillRect(fa, fb, fc - fa, fd - fb);                       // not surveyed
+  if (mImg && meta) {
+    const [a, b] = o.W2C(meta.origin_x, meta.origin_y + meta.height * meta.resolution);
+    c.imageSmoothingEnabled = true; c.drawImage(mImg, a, b, meta.width * meta.resolution * px, meta.height * meta.resolution * px);
+  }
+  c.strokeStyle = '#d9e1ea'; c.lineWidth = 1.5 * devicePixelRatio; c.strokeRect(fa, fb, fc - fa, fd - fb);   // field boundary
+  f.rows.forEach(y => o.line([[f.x_min, y], [f.x_max, y]], 'rgba(20,40,20,0.35)', 1));
+  c.fillStyle = 'rgba(15,15,15,0.55)';
+  const pts = (S.moisture || {}).points || [];
+  const step = Math.max(1, Math.floor(pts.length / 2500));
+  for (let i = 0; i < pts.length; i += step) { const [a, b] = o.W2C(pts[i][0], pts[i][1]); c.fillRect(a - 0.75 * devicePixelRatio, b - 0.75 * devicePixelRatio, 1.5 * devicePixelRatio, 1.5 * devicePixelRatio); }
+  const lat = (S.moisture || {}).latest;
+  if (lat) { const [a, b] = o.W2C(lat.x, lat.y); c.strokeStyle = '#fff'; c.lineWidth = 2 * devicePixelRatio; c.beginPath(); c.arc(a, b, 6 * devicePixelRatio, 0, 7); c.stroke();
+    o.label(a, b, fmt(lat.moisture, 1, ' %'), '#fff'); }
+  o.robot(); o.scalebar();
+}
+function loop() { requestAnimationFrame(loop); drawField(); drawMoisture(); }
+requestAnimationFrame(loop);
+$('fitBtn').onclick = () => { mode = 'fit'; $('fitBtn').classList.add('on'); $('followBtn').classList.remove('on'); };
+$('followBtn').onclick = () => { mode = 'follow'; $('followBtn').classList.add('on'); $('fitBtn').classList.remove('on'); };
+</script>
+</body>
+</html>
