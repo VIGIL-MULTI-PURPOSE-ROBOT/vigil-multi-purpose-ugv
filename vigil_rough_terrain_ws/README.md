@@ -13,34 +13,6 @@ colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-arg
 source install/local_setup.bash
 export ROS_DOMAIN_ID=71
 ```
-
-## Run the automatic two-rover comparison
-
-```bash
-ros2 launch vigil_rough_terrain comparison.launch.py
-```
-
-Both models spawn and settle under gravity. The eight-wheel rover starts first;
-the rigid four-wheel comparator follows 18 simulation seconds later. Both use the
-same waypoints and 0.18 m/s commanded cruising speed. Starting positions are offset
-to avoid overlap: eight-wheel `(-5.4,-3.6,1.2)`, four-wheel `(-5.4,-4.536,1.2)`.
-The shared course goes through `(-4.896,-3.024)`, `(-4.32,-2.16)` to B `(-3.024,-2.16)` (scaled with the terrain;
-the measured results below were recorded on the earlier 25 × 25 m terrain);
-goal tolerance is 0.30 m. Start offsets mean this is a demonstration, not a
-controlled experiment over identical wheel tracks.
-
-Measured run: **eight-wheel reached B; four-wheel got stuck before B**. The
-four-wheel rover did **not** flip. Outcomes are measured, never forced. The
-comparator retains the original CAD body and front/rear ground-bearing wheel
-pairs, matching total mass and approximate clearance; removed assembly mass is
-added to its central payload. It is a local comparison model, not a named
-commercial rover. No suitable installed four-wheel model was found.
-
-Results are saved to `/tmp/vigil-comparison.json`; change this with
-`output:=/absolute/path/result.json`. The recorded development run is in
-`src/vigil_rough_terrain/docs/validation/comparison.json`. The eight-wheel rover drives clear to a parking point after reaching B, then
-both rovers stop when finished. Ctrl+C stops the launch. Use `gui:=false` for server-only operation.
-
 ## Run only the original eight-wheel rover
 
 ```bash
