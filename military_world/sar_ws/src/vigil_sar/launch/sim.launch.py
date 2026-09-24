@@ -208,7 +208,9 @@ def setup(context):
     prof_path = Path(prof_arg) if prof_arg not in ('auto', 'none') else mw / 'sar_ws/generated/render_profile.yaml'
     profile = load_profile(prof_path) if prof_arg != 'none' else {}
     psens = profile.get('sensors', {}) if isinstance(profile.get('sensors'), dict) else {}
-    defaults = {'rgbd': True, 'lidar': True, 'segmentation': True, 'hd_camera': True,
+    # lidar: no vigil_sar node uses /lidar/points, and every 5 Hz scan of the 300 m world stalls the
+    # physics while it renders -> off unless world.lidar is true (or lidar:=true on the command line)
+    defaults = {'rgbd': True, 'lidar': bool(w.get('lidar', False)), 'segmentation': True, 'hd_camera': True,
                 'thermal': bool(tc.get('enabled', True))}
     on, source = {}, {}
     for k in SENSOR_ARGS:
@@ -252,6 +254,9 @@ def setup(context):
             actions.append(LogInfo(msg=f"[vigil_sar] operational zone x [{z[0]:g}, {z[1]:g}] y [{z[2]:g}, {z[3]:g}] "
                                        f"({z[1] - z[0]:g} x {z[3] - z[2]:g} m) inside the 300 x 300 m world (1 unit = 1 m, "
                                        f"no rescaling); {len(rep.get('frozen_outside_zone', []))} walkers outside it stand still"))
+        actions.append(LogInfo(msg=f"[vigil_sar] simulation cost: {rep.get('static_props', 0)} props static, "
+                                   f"{rep.get('people_ignore_ground', 0)} walkers skip terrain contact "
+                                   f"(rover physics unchanged: 1 ms step, vigil_rough_terrain springs)"))
         for fix in rep.get('collision_fixes', []):
             actions.append(LogInfo(msg=f"[vigil_sar] collision fix: {fix['model']} -> {fix['action']} ({fix['reason']})"))
         if rep.get('start_blocked_by'):

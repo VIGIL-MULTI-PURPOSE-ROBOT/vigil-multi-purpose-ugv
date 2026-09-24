@@ -34,7 +34,19 @@
       zone_y_min: -35.0
       zone_y_max: 135.0
       freeze_people_outside_zone: true   # walkers outside the zone stand still (they cannot be reached)
+      # Simulation speed (the rover's physics is untouched: 1 ms step, vigil_rough_terrain springs):
+      static_props: true           # 77 barrels/cones/crates/pallets: static (same look, same collision,
+                                   # cannot be knocked over) instead of 77 bodies integrated 1000x/s
+      people_ignore_ground: true   # kinematic walkers skip person-vs-terrain-mesh contact tests
+      # Collision shapes nobody can touch (measured: 3,100 shapes -> 6.5 % real time, ground only 100 %).
+      # Looks, thermal and depth images are unchanged: cameras see visuals, not collision shapes.
+      collision_zone_only: true    # objects outside the zone (+ margin) keep only their visuals
+      collision_zone_margin: 5.0   # m
+      collision_max_bottom: 1.3    # m above the model base: higher shapes (canopies, roofs) are dropped
+      walker_collisions: false     # kinematic walkers already pass through walls and the rover
       # Gazebo GUI: follow the rover (gz CameraTracking) so a 1.5 m rover is visible in a 300 m world
+      lidar: false                 # no SAR node uses the lidar; its 360 deg scans of the whole world cost
+                                   # render time every 0.2 s (lidar:=true on the command line turns it on)
       gui_follow_rover: true
       gui_follow_offset: [-5.0, 0.0, 2.5]  # m, camera relative to the rover (behind and above)
       # The rover suspension was validated at 1 ms (vigil_rough_terrain README).
@@ -130,7 +142,8 @@
       camera_height: 0.72          # m above ground
       camera_pitch: 0.0            # rad, positive = down (0 looks straight into door openings)
       near: 0.2
-      far: 120.0
+      far: 40.0                    # m render distance (detection_range 30 m + margin); 120 m made the
+                                   # thermal camera draw most of the 300 m world 10 times a second
       detection_range: 30.0        # m; blobs estimated farther than this are ignored
       temperature_threshold: 296.5 # K; lower edge of the human band (covered casualties are 297.65 K)
       human_max_temperature: 311.0 # K; hotter = engine / generator / warm-case decoy, never human

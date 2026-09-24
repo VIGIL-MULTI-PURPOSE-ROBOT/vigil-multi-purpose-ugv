@@ -38,7 +38,7 @@ EXC_1=(--exclude=/build/ --exclude=/install/ --exclude=/log/ --exclude=/run/)
 EXC_2=(--exclude=/build/ --exclude='/Claude outputs/' --exclude='*.blend1' --exclude='*.log'
        --exclude=/sar_ws/build/ --exclude=/sar_ws/install/ --exclude=/sar_ws/log/
        --exclude=/sar_ws/generated/ --exclude=/sar_ws/diagnosis/ --exclude=/sar_ws/test_results/)
-EXC_3=(--exclude=/agriculture --exclude=/rock_terrain --exclude=/military_sar)   # the shortcut links
+EXC_3=(--exclude=/agriculture --exclude=/rock_terrain --exclude=/military_sar --exclude=/REPO_README.md)   # links; front page
 
 for s in "${SRC[@]}"; do [[ -d "$s" ]] || { echo "missing: $s"; exit 1; }; done
 
@@ -61,6 +61,8 @@ for i in 0 1 2 3; do
   rsync -a "${COMMON[@]}" "${!ex}" "${SRC[$i]}/" "$WORK/${DST[$i]}/"
   echo "   ${SRC[$i]}  ->  ${DST[$i]}/"
 done
+# the repository's front page: ~/Documents/vigil/REPO_README.md -> README.md
+[[ -f "$D/vigil/REPO_README.md" ]] && cp "$D/vigil/REPO_README.md" "$WORK/README.md" && echo "   vigil/REPO_README.md  ->  README.md"
 
 echo "== 3/5 checks"
 cd "$WORK"
@@ -83,15 +85,12 @@ echo "== 4/5 commit"
 read -r -p "Push these to $BRANCH of ${REPO_URL}? [y/N] " ok
 [[ "$ok" == y || "$ok" == Y ]] || { echo "Nothing pushed (the prepared clone is in $WORK)."; exit 0; }
 git commit -q -F - <<'MSG'
-Add Military SAR project and VIGIL master launcher; update agriculture and rock terrain
+Update VIGIL simulation projects
 
 - military_world/: military search-and-rescue world and the vigil_sar ROS 2 workspace (sar_ws)
 - vigil/: master launcher menu that starts ONE of the three independent projects
 - ros2_ws/ (agriculture) and vigil_rough_terrain_ws/ (rock terrain): current state
 Build output (build/, install/, log/, generated/) is not included.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01Pn5dBMscTgyfjmn8DK1F6v
 MSG
 
 echo "== 5/5 push"

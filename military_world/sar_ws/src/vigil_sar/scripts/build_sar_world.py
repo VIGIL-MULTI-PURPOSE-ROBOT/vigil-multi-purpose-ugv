@@ -407,6 +407,109 @@ def build(cfg, mw, out_path=None):
     report['thermal_plugins'] = sum(1 for v in world.iter('visual')
                                     if v.find(f"plugin[@name='{THERMAL}']") is not None)
 
+    # 8. simulation cost. The rover's own physics stays exactly vigil_rough_terrain's (1 ms step,
+    #    same springs, same friction); what made military_world run at ~6 % of real time is the
+    #    WORLD: every physics step (1000 / s) DART also integrated 77 loose props sitting on the
+    #    terrain and tested the 7 body boxes of every walking person against the 36 terrain meshes.
+    #    a) world.static_props: barrels / cones / crates / pallets become static - they look and
+    #       collide exactly the same (the rover still hits them), they just cannot be knocked over.
+    #    b) world.people_ignore_ground: kinematic walkers (controller 1 sets their pose every step,
+    #       they never rest on the ground) skip the pointless person-vs-terrain contact tests via
+    #       collide_bitmask. People still collide with the rover, props and buildings.
+    report['static_props'] = 0
+    if w.get('static_props', True):
+        for model in world.findall('model'):
+            if (semantic(model)[0].get('sar_object') or '') == 'DYNAMIC_PROP':
+                st = model.find('static')
+                if st is None:
+                    st = ET.SubElement(model, 'static')
+                if st.text != 'true':
+                    st.text = 'true'
+                    report['static_props'] += 1
+    report['people_ignore_ground'] = 0
+    kinematic = bool(w.get('moving_people', True)) and int(w.get('people_controller', 1)) == 1
+    if w.get('people_ignore_ground', True) and kinematic:
+        def set_mask(col, mask):
+            surf = col.find('surface')
+            if surf is None:
+                surf = ET.SubElement(col, 'surface')
+            cont = surf.find('contact')
+            if cont is None:
+                cont = ET.SubElement(surf, 'contact')
+            node = cont.find('collide_bitmask')
+            if node is None:
+                node = ET.SubElement(cont, 'collide_bitmask')
+            node.text = mask
+        for model in world.findall('model'):
+            sem = semantic(model)[0]
+            if (sem.get('semantic_class') or '').upper() in GROUND_CLASSES or sem.get('sar_object') in GROUND_OBJECTS:
+                for col in model.iter('collision'):
+                    set_mask(col, '0x01')            # ground: bit 1
+            elif model.find("plugin[@name='sar::WaypointSystem']") is not None:
+                for col in model.iter('collision'):
+                    set_mask(col, '0x02')            # walker: bit 2 -> no ground contact
+                report['people_ignore_ground'] += 1
+        # everything else (rover, props, buildings) keeps the default 0xffff and hits both
+
+    # 9. collision shapes the rover can never touch (measured 2026-09-24, diagnosis/measure_physics.log:
+    #    current 6.5 % real time, people frozen 17 %, object collisions removed 51 %, ground only 100 %).
+    #    The world has ~3,100 collision shapes (every tree, bush, rock and rubble piece is made of
+    #    boxes) and DART tests them against each other and the moving bodies every 1 ms step. Cameras
+    #    and the thermal camera see VISUALS, not collision shapes, so nothing changes for perception:
+    #    a) world.collision_zone_only: objects outside the operational zone (+ margin) keep their
+    #       looks but lose their collision shapes - the rover never drives there.
+    #    b) world.collision_max_bottom: shapes that start higher than this above the model's base
+    #       (tree canopies, upper floors, roof parts) cannot touch a 1.14 m rover.
+    #    c) world.walker_collisions false: the kinematic walkers are placed on their route every step
+    #       and already walk through walls and the rover (military_world README); their collision
+    #       boxes only cost time. They stay visible and warm; the depth camera still sees them.
+    zone = [w.get(k) for k in ('zone_x_min', 'zone_x_max', 'zone_y_min', 'zone_y_max')]
+    margin = float(w.get('collision_zone_margin', 5.0))
+    max_bottom = w.get('collision_max_bottom', None)
+    drop_walkers = not w.get('walker_collisions', True) and kinematic
+    report['collisions_removed'] = dict(outside_zone=0, too_high=0, walkers=0, kept=0)
+
+    def shape_height(col):
+        g = col.find('geometry')
+        g = g[0] if g is not None and len(g) else None
+        if g is None:
+            return None
+        if g.tag == 'box':
+            return float(g.findtext('size').split()[2])
+        if g.tag == 'cylinder':
+            return float(g.findtext('length'))
+        if g.tag == 'sphere':
+            return 2.0 * float(g.findtext('radius'))
+        return None                                    # meshes / planes: keep
+    for model in world.findall('model'):
+        sem = semantic(model)[0]
+        if (sem.get('semantic_class') or '').upper() in GROUND_CLASSES or sem.get('sar_object') in GROUND_OBJECTS:
+            continue                                   # the ground always collides
+        walker = model.find("plugin[@name='sar::WaypointSystem']") is not None
+        mp = pose_of(model)
+        for link in model.iter('link'):
+            lp = pose_of(link) if link.find('pose') is not None else [0.0] * 6
+            for col in list(link.findall('collision')):
+                why = None
+                if walker and drop_walkers:
+                    why = 'walkers'
+                elif w.get('collision_zone_only', True) and None not in zone:
+                    cp = pose_of(col)
+                    x, y = mp[0] + lp[0] + cp[0], mp[1] + lp[1] + cp[1]
+                    if not (zone[0] - margin <= x <= zone[1] + margin and zone[2] - margin <= y <= zone[3] + margin):
+                        why = 'outside_zone'
+                if why is None and max_bottom is not None and not walker:
+                    h = shape_height(col)
+                    if h is not None:
+                        bottom = lp[2] + pose_of(col)[2] - h / 2.0
+                        if bottom > float(max_bottom):
+                            why = 'too_high'
+                if why:
+                    link.remove(col)
+                    report['collisions_removed'][why] += 1
+                else:
+                    report['collisions_removed']['kept'] += 1
+
     # 7. collisions that trap the rover (see fix_hull_collisions)
     fix_hull_collisions(world, cfg, report)
 
@@ -435,6 +538,11 @@ def main():
     rep = build(cfg, mw, a.out or None)
     print(f"[build_sar_world] {rep['output']}")
     print(f"  humans with heat signature: {rep['n_humans']} ({len(rep['building_humans'])} added inside buildings)")
+    print(f"  simulation cost: {rep.get('static_props', 0)} props made static, {rep.get('people_ignore_ground', 0)} "
+          f"walkers skip terrain contact")
+    cr = rep.get('collisions_removed', {})
+    print(f"  collision shapes: {cr.get('kept', 0)} kept; removed {cr.get('outside_zone', 0)} outside the zone, "
+          f"{cr.get('too_high', 0)} out of the rover's reach, {cr.get('walkers', 0)} of walkers")
     print(f"  segmentation-labelled ground models: {rep['labelled']}, walking people: {rep['movers']} "
           f"({len(rep.get('frozen_outside_zone', []))} outside the operational zone stand still)")
     print(f"  physics: {rep['physics']['step'] * 1000:.0f} ms step, {rep['physics']['collision_detector']} "
