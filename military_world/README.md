@@ -67,16 +67,6 @@ is measured in simulation seconds, so use the small demo to distinguish slow
 physics from a stopped controller. Software rendering helps some GPU setups,
 but cannot repair an incompatible EGL / graphics-driver installation.
 
-**Why the old export failed:** the launcher defaulted to frozen models.
-Parented body meshes also retained a world transform inside their GLB files,
-so Gazebo applied the person position twice. Meshes now export as detached
-objects at the origin, with placement and inherited scale supplied by SDF.
-Collision boxes are centered on each body part instead of the model origin.
-Its alternative used `<actor>` links without a supported animated skin, or
-an ordinary unrigged GLB as a skin. The replacement uses regular models
-with visible meshes and collision geometry, driven by `sar::WaypointSystem`.
-It uses Gazebo's [model pose command API](https://gazebosim.org/api/sim/8/classgz_1_1sim_1_1Model.html)
-to update physics and rendering together, without ROS or downloaded assets.
 
 ## Files
 
