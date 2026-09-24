@@ -3,7 +3,17 @@
 ROS 2 **Jazzy** + Gazebo **Harmonic** workspace inside `military_world/sar_ws`.
 
 It reuses the VIGIL eight-wheel rover and its full perception and navigation stack from
-`~/Documents/robot/vigil_rough_terrain_ws`. That workspace was only read, never written.
+the rock-terrain project (`vigil_rough_terrain_ws`). That workspace was only read, never written.
+
+> **Status (24 Sep 2026).** In Gazebo: driving at 3.0 m/s with smooth acceleration is verified
+> (motion tests 16/16, flat road / slope / steep hill / obstacle / cliff scenarios). The detection
+> and SAR mission logic pass offline tests, including a full simulated mission. **Open:** the full
+> world runs far below real time (measured 6.5 %). A collision-shape reduction was added on 24 Sep,
+> and its speed-up is not yet measured. The long urban SAR run in Gazebo is not finished yet.
+> See [Simulation speed](#simulation-speed).
+>
+> Paths such as `~/Documents/military_world` below are the author's. In a clone of the
+> repository, use `<repo>/military_world` instead.
 On top of that stack it adds:
 
 - a 4K RGB camera
@@ -52,8 +62,13 @@ export ROS_DOMAIN_ID=72          # different from vigil_rough_terrain (71) so th
 chmod +x src/vigil_sar/scripts/*.py src/vigil_sar/test/*.py stop_sar.sh
 ```
 
-The walking people need the `sar::WaypointSystem` plugin in `military_world/build/`, which is already
-built there. If it is ever missing, build it once with `cd ~/Documents/military_world && bash run_gazebo.sh --check`.
+The walking people need the `sar::WaypointSystem` plugin in `military_world/build/`. The plugin is not in
+the repository, so build it once (needs `cmake`, `g++` and gz-sim8; source `/opt/ros/jazzy/setup.bash` first):
+
+```bash
+cd ~/Documents/military_world
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --target sar-waypoint-system -j2
+```
 
 ## Run: everything in one command
 
@@ -129,7 +144,7 @@ python3 test/test_sar_offline.py                  # ~8 min (includes a full simu
 | `scripts/drive.py` | same wheel maths; watchdog and ramp moved to the node (simulation) clock | at ~5 % real time the wall-clock watchdog zeroed the wheels between commands and the rover never moved |
 | `scripts/ros_common.py` | `node_time()` | one clock for every freshness check |
 | `scripts/ugv_dashboard.py`, `dashboard/index.html` | simulation speed (`sim NN% of real time`) in the header | the number that explains why everything feels slow |
-| `launch/sim.launch.py` | `fast:=true` (4 ms step, no walkers) | a usable demo speed without editing the config |
+| `launch/sim.launch.py` | `fast:=true` (no walking people, 1080p display camera; physics unchanged) | a faster demo without editing the config |
 | `scripts/terrain_window.py` | NEW: runs the unchanged analysis only around the camera | 170 m map: full-map analysis took 1.1 s per frame; a test shows identical results |
 | `scripts/terrain_mapper.py` | windowed mapper, grid rate throttle, 4K decoded only when drawn, overlay width | real-time on the large map and with 4K |
 | `scripts/vision_overlay.py` | 16:9 crop and configurable output width | 4K is 16:9 while depth is 4:3 at the same horizontal FOV |
@@ -335,27 +350,50 @@ ground-plane estimate) and in `terrain_mapper.py` (4K frame age, grid publish ra
 
 ### Simulation speed
 
-The dashboard header now shows `sim NN% of real time`. At ~5 %, 93 m of driving is ~50 minutes of
-wall clock. To trade accuracy for speed:
+The dashboard header shows `sim NN% of real time`; Gazebo shows the same number as RTF (bottom
+right). All speeds (3.0 m/s, walking people) are in *simulation* time, so below 100 % everything
+looks slow on screen.
+
+**Measured on the author's PC** (`bash measure_physics.sh`, rover standing, no GUI):
+
+| world variant | real time |
+|---|---|
+| full world as exported | 6.5 % |
+| people frozen | 17 % |
+| no collisions on objects (terrain + rover only) | 51 % |
+| ground only | 100 % |
+
+Sensors (4K, thermal, segmentation) changed it by only a few percent (`measure_speed.sh`). The cost
+is the physics engine checking ~3,100 collision shapes (mostly small vegetation, rock and rubble
+boxes) and the walkers' collisions every millisecond.
+
+**Fix (24 Sep 2026, `build_sar_world.py` step 9, set in `config/sar_mission.yaml`):**
+
+| key | default | effect |
+|---|---|---|
+| `world.collision_zone_only` | `true` | drop object collisions outside the operational zone |
+| `world.collision_zone_margin` | `5.0` | ... plus this margin (m) |
+| `world.collision_max_bottom` | `1.3` | drop collisions whose bottom is higher than this (m): the rover cannot touch them |
+| `world.walker_collisions` | `false` | walking people keep moving and stay warm for the thermal camera, but have no collision |
+
+The launch prints the result, e.g. `collision shapes: 955 kept; removed 1953 outside the zone, 81 out
+of the rover's reach, 106 of walkers`. Visuals, thermal and depth images and the rover's physics
+(1 ms step, springs, limits) are unchanged. **The resulting real-time factor has not been measured
+yet.** Run `bash measure_physics.sh` and check `diagnosis/measure_physics.log`.
+
+Other options:
 
 ```bash
-ros2 launch vigil_sar sar_mission.launch.py fast:=true        # 4 ms physics step, no walking people
-ros2 launch vigil_sar sar_mission.launch.py hd_width:=1920 hd_height:=1080   # 4K is 25 MB per frame
+ros2 launch vigil_sar sar_mission.launch.py fast:=true        # no walking people, 1080p display camera (physics unchanged)
 ros2 launch vigil_sar sar_mission.launch.py segmentation:=false
 ```
-
-or, permanently, in `config/sar_mission.yaml`: `world.physics_step: 0.004`,
-`world.moving_people: false`, `rgb_camera.width/height`, `thermal_camera.update_rate`.
 
 ## Known limits: check these on your machine
 
 - **First real launch reached sensor creation on 2026-09-23** and exposed the gz-sensors thermal-noise segfault, now fixed (see the crash section). The rest was developed in a cloud container without ROS or Gazebo. Everything was tested offline instead: detection on ray-cast thermal images, the full SAR mission, the world builder, xacro processing and the ported cores. The first real launch should be checked for:
   - `/thermal/image_raw` arriving as `mono16` (`ros2 topic echo /thermal/image_raw --field encoding`)
   - human pixels near 30500 (305 K)
-- **Real-time factor.** A 1 ms step in a 300 m world with 20 walking people, plus a 4K camera, will run below real time. Faster options:
-  - `world.physics_step: 0.002`
-  - 1920×1080 RGB
-  - `world.moving_people: false`
+- **Real-time factor.** The full world runs below real time; see [Simulation speed](#simulation-speed).
 - **Pose source.** Pose comes from `/sim/ground_truth`, exactly as in vigil_rough_terrain; there is no SLAM.
 - **Building footprints** come from `sar_metadata.json`. That is mission-planning information, not ground truth: the casualty ground truth is never used at runtime.
 - **Walls block thermal.** Casualties inside buildings are found through doors and openings (LWIR does not see through walls). Humans placed deep inside, out of line of sight, are not detected. That is physically correct.

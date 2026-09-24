@@ -26,21 +26,23 @@ HOME = Path.home()
 VIGIL = Path(__file__).resolve().parent.parent          # ~/Documents/vigil
 
 # Where each project lives and which of ITS OWN launch files starts it. The first existing path wins:
-# the shortcut links in ~/Documents/vigil (setup_vigil.sh), then the project's real location.
+# the shortcut links in vigil/ (setup_vigil.sh), then the folder next to vigil/ (a clone of the
+# GitHub repository), then the original location on the author's PC.
+REPO = VIGIL.parent                                     # the repository root when cloned from GitHub
 # ROS_DOMAIN_ID and environment are the values each project documents for itself (run.sh / README).
 PROJECTS = {
     '1': dict(name='Military Search and Rescue', short='Military SAR',
-              roots=[VIGIL / 'military_sar/military_world/sar_ws', HOME / 'Documents/military_world/sar_ws'],
+              roots=[VIGIL / 'military_sar/military_world/sar_ws', REPO / 'military_world/sar_ws', HOME / 'Documents/military_world/sar_ws'],
               package='vigil_sar', launch='sar_mission.launch.py', domain='72', env={},
               marks=[r'GZ_PARTITION=vigil_sar$'], libs=['lib/vigil_sar/']),
     '2': dict(name='Agriculture', short='Agriculture',
-              roots=[VIGIL / 'agriculture/ros2_ws', HOME / 'Documents/robot/ros2_ws'],
+              roots=[VIGIL / 'agriculture/ros2_ws', REPO / 'ros2_ws', HOME / 'Documents/robot/ros2_ws'],
               package='agri_ugv', launch='field.launch.py', domain='91',
               env={'GZ_PARTITION': 'agri_ugv', 'ROS_LOG_DIR': '{ws}/log/runtime'},
               lock='run/simulation.lock',                      # the same guard run.sh / stop.sh use
               marks=[r'GZ_PARTITION=agri_ugv$'], libs=['lib/agri_ugv/', 'lib/agri_ugv_setup/']),
     '3': dict(name='Rock Terrain', short='Rock Terrain',
-              roots=[VIGIL / 'rock_terrain/vigil_rough_terrain_ws', HOME / 'Documents/robot/vigil_rough_terrain_ws',
+              roots=[VIGIL / 'rock_terrain/vigil_rough_terrain_ws', REPO / 'vigil_rough_terrain_ws', HOME / 'Documents/robot/vigil_rough_terrain_ws',
                      HOME / 'Documents/robot/ros2_ws/vigil_rough_terrain_ws'],
               package='vigil_rough_terrain', launch='vision_nav.launch.py', domain='71', env={},
               marks=[r'GZ_PARTITION=vigil_\d+$'], libs=['lib/vigil_rough_terrain/']),

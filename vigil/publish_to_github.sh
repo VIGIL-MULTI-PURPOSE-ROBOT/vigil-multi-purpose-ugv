@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Publish the three VIGIL projects + the master launcher to GitHub, branch main of
-#   https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/agri-ugv
+#   https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/vigil-multi-purpose-ugv   (formerly agri-ugv)
 #
-#   bash ~/Documents/vigil/publish_to_github.sh
+#   bash ~/Documents/vigil/publish_to_github.sh                     default commit message
+#   bash ~/Documents/vigil/publish_to_github.sh "Fix SAR sim speed"   your own commit message
 #
 # Repository layout (the same one ~/Documents/robot already has, plus two new folders):
 #   ros2_ws/                 <- ~/Documents/robot/ros2_ws                  (Agriculture)
@@ -17,7 +18,8 @@
 # Pushing uses YOUR GitHub login (the same one that pushed ~/Documents/robot before).
 set -euo pipefail
 
-REPO_URL="${VIGIL_REPO_URL:-https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/agri-ugv.git}"
+REPO_URL="${VIGIL_REPO_URL:-https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/vigil-multi-purpose-ugv.git}"
+MSG_TITLE="${1:-Update VIGIL simulation projects}"
 BRANCH="${VIGIL_BRANCH:-main}"
 D="$HOME/Documents"
 WORK="$D/.vigil_publish"
@@ -44,12 +46,21 @@ for s in "${SRC[@]}"; do [[ -d "$s" ]] || { echo "missing: $s"; exit 1; }; done
 
 echo "== 1/5 getting $BRANCH of $REPO_URL"
 if [[ -d "$WORK/.git" ]]; then
+  git -C "$WORK" remote set-url origin "$REPO_URL"          # the repository was renamed from agri-ugv
   git -C "$WORK" fetch origin
-  git -C "$WORK" checkout -q "$BRANCH"
-  git -C "$WORK" reset -q --hard "origin/$BRANCH"
+  if git -C "$WORK" rev-parse -q --verify "origin/$BRANCH" >/dev/null; then
+    git -C "$WORK" checkout -q -B "$BRANCH" "origin/$BRANCH"
+  else
+    git -C "$WORK" checkout -q -B "$BRANCH"
+  fi
 else
   rm -rf "$WORK"
-  git clone --branch "$BRANCH" "$REPO_URL" "$WORK"
+  git clone "$REPO_URL" "$WORK"
+  if git -C "$WORK" rev-parse -q --verify "origin/$BRANCH" >/dev/null; then
+    git -C "$WORK" checkout -q -B "$BRANCH" "origin/$BRANCH"
+  else
+    git -C "$WORK" checkout -q -B "$BRANCH"                   # empty repository: first commit
+  fi
 fi
 touch "$D/.vigil_publish/COLCON_IGNORE" 2>/dev/null || true
 grep -qx 'COLCON_IGNORE' "$WORK/.git/info/exclude" 2>/dev/null || echo 'COLCON_IGNORE' >> "$WORK/.git/info/exclude"
@@ -84,8 +95,7 @@ git diff --cached --name-only | cut -d/ -f1 | sort | uniq -c | sed 's/^/     /'
 echo "== 4/5 commit"
 read -r -p "Push these to $BRANCH of ${REPO_URL}? [y/N] " ok
 [[ "$ok" == y || "$ok" == Y ]] || { echo "Nothing pushed (the prepared clone is in $WORK)."; exit 0; }
-git commit -q -F - <<'MSG'
-Update VIGIL simulation projects
+{ echo "$MSG_TITLE"; cat; } <<'MSG' | git commit -q -F -
 
 - military_world/: military search-and-rescue world and the vigil_sar ROS 2 workspace (sar_ws)
 - vigil/: master launcher menu that starts ONE of the three independent projects
@@ -95,4 +105,4 @@ MSG
 
 echo "== 5/5 push"
 git push origin "HEAD:$BRANCH"
-echo "Done: https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/agri-ugv/tree/$BRANCH"
+echo "Done: ${REPO_URL%.git}/tree/$BRANCH"
