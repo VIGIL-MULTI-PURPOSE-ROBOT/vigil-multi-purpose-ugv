@@ -6,7 +6,7 @@ separate environments, each showing a different use, and a small menu program th
 
 | # | Environment | What the rover does there | Folder |
 |---|---|---|---|
-| 1 | **Military search and rescue** | Drives across a 300 × 300 m disaster area, then searches for people with a thermal camera | [`military_world/`](military_world) |
+| 1 | **Military search and rescue** | Drives across a disaster area, then searches for people with a thermal camera | [`military_world/`](military_world) |
 | 2 | **Agriculture** | Drives crop rows in a cotton farm; SLAM, Nav2, lighting, active suspension | [`ros2_ws/`](ros2_ws) |
 | 3 | **Rock terrain** | Detects cliffs with the depth camera, replans around them, climbs hills; 8-wheel vs 4-wheel comparison | [`vigil_rough_terrain_ws/`](vigil_rough_terrain_ws) |
 | — | **Launcher** | A menu that starts one of the three | [`vigil/`](vigil) |
