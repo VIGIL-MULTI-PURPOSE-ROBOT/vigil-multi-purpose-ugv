@@ -5,7 +5,7 @@
 Open the root `README.md`, search for `VIDEO_LINK`, and replace the URL on the line directly below that comment:
 
 ```markdown
-[demo-video]: [docs/validation.md](https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3)
+[demo-video]: https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3
 ```
 
 For example, replace `docs/validation.md` with your full YouTube URL. The “Watch the VIGIL demonstration” link uses that reference. No other URL needs to change.
