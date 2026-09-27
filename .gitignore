@@ -1,5 +1,8 @@
-.agents/
-.codex/
+# Local hidden tooling directories are private to each workspace.
+.*/
+# Keep shared GitHub configuration eligible for version control.
+!.github/
+!.github/**
 **/build/
 **/install/
 **/log/

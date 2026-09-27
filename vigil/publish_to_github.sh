@@ -37,7 +37,8 @@ declare -a SRC=("$D/robot/ros2_ws" "$D/robot/vigil_rough_terrain_ws" "$D/militar
 declare -a DST=("ros2_ws" "vigil_rough_terrain_ws" "military_world" "vigil")
 EXC_0=(--exclude=/build/ --exclude=/install/ --exclude=/log/ --exclude=/run/ --exclude=/.migration-backup/)
 EXC_1=(--exclude=/build/ --exclude=/install/ --exclude=/log/ --exclude=/run/)
-EXC_2=(--exclude=/build/ --exclude='/Claude outputs/' --exclude='*.blend1' --exclude='*.log'
+# Exclude top-level generated export folders named outputs or ending in ' outputs'.
+EXC_2=(--exclude=/build/ --exclude='/outputs/' --exclude='/* outputs/' --exclude='*.blend1' --exclude='*.log'
        --exclude=/sar_ws/build/ --exclude=/sar_ws/install/ --exclude=/sar_ws/log/
        --exclude=/sar_ws/generated/ --exclude=/sar_ws/diagnosis/ --exclude=/sar_ws/test_results/)
 EXC_3=(--exclude=/agriculture --exclude=/rock_terrain --exclude=/military_sar --exclude=/REPO_README.md)   # links; front page
