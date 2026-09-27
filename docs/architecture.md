@@ -49,6 +49,10 @@ SAR combines a depth-terrain navigation implementation with thermal detection, s
 
 Thermal detection and search behavior are application extensions. They do not replace the core requirement to validate camera-based navigation and localization.
 
+## Mining application mapping
+
+The [proposed mining application](mining.md) uses the rough-terrain pipeline as its foundation: RGB-D observations → geometric terrain grid → footprint-aware planner → wheel control, with dashboard monitoring. The current pose input remains simulator ground truth. A mining-specific world, mission configuration and validation record are not present; this is an application mapping, not a fourth implemented software stack.
+
 ## Target architecture and outstanding integration
 
 The intended next step is to feed evaluated visual/visual-inertial pose into the mapper and planner, keeping simulator ground truth as an evaluation reference. This requires frame alignment, timing, covariance, tracking-loss handling and mission-level testing; replacing a topic name alone is insufficient.

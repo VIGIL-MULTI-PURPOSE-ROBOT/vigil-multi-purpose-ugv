@@ -3,7 +3,7 @@
 **Vision-Integrated Ground Intelligence and Localization**
 **Smart India Hackathon 2026 · SIH26126 · ROS 2 Jazzy · Gazebo Harmonic**
 
-VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor terrain, plan a route and drive toward a destination. The project combines simulated cameras, terrain perception, planning, wheel control and operator dashboards across rough-terrain, agriculture and search-and-rescue environments.
+VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor terrain, plan a route and drive toward a destination. The project combines simulated cameras, terrain perception, planning, wheel control and operator dashboards across rough-terrain, agriculture and search-and-rescue environments. **Mining-site inspection and navigation** is an intended application of the rough-terrain work; its scope and remaining integration are documented below.
 
 **Current stage: simulation prototype.** Depth-based navigation is implemented; full camera-based localization across the mission pipelines remains a development goal. The scenarios have separate implementations, and several mission controllers currently use simulator ground-truth position. No physical rover deployment is demonstrated here.
 
@@ -75,15 +75,22 @@ Current recovery behavior can keep searching when no route is available. A bound
 
 *Live `cliff_front` camera capture: the overlay reports a high cliff. The goal was changed during this session, so this image illustrates perception and status rather than a controlled default-goal benchmark. [Full context](docs/validation.md#cliff-scenario-observation).*
 
-## Three mission environments
+## Mission environments and mining application
 
 | Environment | Purpose | Entry point | Current qualification |
 |---|---|---|---|
 | Rough terrain | Depth-based terrain interpretation and goal navigation | [`vigil_rough_terrain_ws/`](vigil_rough_terrain_ws/) | Live short A-to-B run captured; pose is ground truth |
 | Agriculture | Crop-row missions, mapping, perception, lighting and suspension | [`ros2_ws/`](ros2_ws/) | Partial row sweeps documented; complete field coverage and avoidance remain unvalidated |
 | Search and rescue | Navigation followed by thermal search in a disaster world | [`military_world/`](military_world/) | Component and motion records exist; full urban SAR mission remains unverified |
+| Mining-site inspection (proposed application) | Outdoor route inspection, terrain assessment and goal navigation | [Mining application guide](docs/mining.md), using the rough-terrain foundation | No dedicated mining world or validated mining mission is currently present |
 
-These are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
+These three implemented environments are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
+
+### Mining: terrain inspection and navigation
+
+The proposed mining use case applies the rover’s depth-based terrain mapping, footprint-aware route planning and operator dashboard to outdoor mine-site inspection. The intended process is to select an observation point, inspect the route, identify geometric hazards, navigate around them and record the outcome.
+
+The existing rough-terrain simulation provides a development foundation. A representative mining world, sensor-derived localization, bounded failure handling and mining-specific trials still need to be integrated and evaluated. Gas sensing, mineral identification and excavation are not implemented. [Mining objectives, architecture mapping and operating process](docs/mining.md).
 
 ## What the team built
 
@@ -146,7 +153,8 @@ The working workspace paths are preserved so existing launch files continue to r
 2. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
 3. Validate moving-obstacle response, blocked routes, sensor loss and bounded recovery.
 4. Complete the agricultural field mission and the urban SAR mission.
-5. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
+5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
+6. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
 
 ## Team, credits and licence status
 

@@ -87,3 +87,7 @@ Historical documentation contains superseded configurations and behaviors. Consu
 The JSON files were saved from the running dashboard's `/state.json`; camera images from `/camera.jpg`; dashboard images from browser screenshots. Captures were taken sequentially, so their exact timestamps and poses need not match. [File hashes](validation/capture-manifest.json) identify the committed media and status snapshots.
 
 The rough-terrain imagery includes “Rocky Terrain n4” by DarkPixel, CC BY 4.0. [Attribution](contributions.md).
+
+## Mining evidence status
+
+No dedicated mining-world run or mine-site trial was performed in this capture session. The rough-terrain and cliff images illustrate foundations relevant to the [proposed mining application](mining.md); they must not be relabelled as mining test results. Mining-specific scenario, localization, perception and mission-completion trials remain pending.

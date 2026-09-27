@@ -31,3 +31,7 @@ Validate camera dropout, stale pose, tilt events, blocked goals, unreachable rou
 ## Other missions
 
 Agriculture defaults to a crop-row controller behind a dashboard start/stop gate; mapping and Nav2 also have their own roles. SAR adds thermal search after or alongside navigation. Refer to [detailed operations](operations.md) for their controls and to [architecture](architecture.md) for their distinct pose sources.
+
+## Proposed mining workflow
+
+Select an inspection goal → check sensing and localization → observe terrain → plan around geometric hazards → navigate with operator monitoring → record results. Dedicated mine-site configuration, health checks, bounded recovery and inspection reporting remain proposed integration work. See [mining scope and process](mining.md) for the implemented foundations and outstanding steps.
