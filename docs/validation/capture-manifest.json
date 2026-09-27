@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-27",
+  "source_commit": "451fe01b1bafb96647134a837b3cb02ab88d0d97",
+  "pose_source": "/sim/ground_truth",
+  "capture_type": "live Gazebo camera output and ROS dashboard",
+  "files": [
+    {
+      "path": "docs/media/cliff-camera.jpg",
+      "sha256": "6e125d1c328042d4aa61def22b0ee8b71f8fd5dd1d0d866a142413e125572185"
+    },
+    {
+      "path": "docs/media/cliff-dashboard.png",
+      "sha256": "b274bc76919c2484fc449bcce565b3adced97036c75f1162cd84eb46142017d4"
+    },
+    {
+      "path": "docs/media/rough-terrain-camera.jpg",
+      "sha256": "e8327142fbe0ab71ec786e9669e7218e088ccfb1ad4ef7239a370b2996ab03de"
+    },
+    {
+      "path": "docs/media/rough-terrain-dashboard.png",
+      "sha256": "7d375f93fd75b3db8b23990d248544e91f95d1f9a828eea2a99007c8a4c0ba41"
+    },
+    {
+      "path": "docs/validation/cliff-state.json",
+      "sha256": "8e1987f8f52a95022a0fd20115d039a3072d45c71d139dd10b43c884b42af919"
+    },
+    {
+      "path": "docs/validation/rough-terrain-state.json",
+      "sha256": "78eb7b9844a044ed22956b030a9d3502c37ebce31a562f7d81c0050acfc406f0"
+    }
+  ]
+}
