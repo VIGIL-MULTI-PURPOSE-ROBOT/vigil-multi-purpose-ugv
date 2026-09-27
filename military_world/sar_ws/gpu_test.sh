@@ -27,4 +27,4 @@ t world_rgbd_intel   W1_world_rgbd       intel
 t world_rgbd_nvidia  W1_world_rgbd       nvidia
 t world_all_intel    W7_world_all_sensors intel
 t world_all_nvidia   W7_world_all_sensors nvidia
-say "done - tell Claude: gpu test finished"
+say "GPU test finished. Review results: $LOG"

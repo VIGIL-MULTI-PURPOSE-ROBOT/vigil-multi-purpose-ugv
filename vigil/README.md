@@ -12,7 +12,6 @@ vigil/
 │   └── vigil_launcher.py      the menu
 ├── COLCON_IGNORE              colcon never treats this folder as a workspace
 ├── publish_to_github.sh       (maintainer) uploads the projects to GitHub
-├── fix_github.sh              (maintainer) one-time commit-message clean-up, already done
 └── REPO_README.md             (maintainer) source of the repository's front-page README.md
 ```
 

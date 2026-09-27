@@ -1,8 +1,7 @@
-# VIGIL Multi-Purpose UGV: full project briefing (context prompt)
+# VIGIL Multi-Purpose UGV: engineering project briefing
 
-You are joining the **VIGIL** project as an engineering assistant. Read all of this before you
-change anything. It describes the robot, the three simulation environments, where each file lives,
-how to run things, what works, what does not, and the rules the owner expects you to follow.
+This briefing describes the **VIGIL** robot, its three simulation environments, file locations,
+operating instructions, implementation status and development conventions.
 
 ---
 
@@ -53,7 +52,7 @@ how to run things, what works, what does not, and the rules the owner expects yo
   agriculture/ros2_ws  -> symlink to ~/Documents/robot/ros2_ws
   rock_terrain/vigil_rough_terrain_ws -> symlink to the rock-terrain workspace
   military_sar/        -> SAR (~/Documents/military_world and its sar_ws)
-  publish_to_github.sh, fix_github.sh, REPO_README.md, README.md, setup_vigil.sh
+  publish_to_github.sh, REPO_README.md, README.md, setup_vigil.sh
 ```
 
 The launcher sources only the chosen project's `install/setup.bash`. It stops leftovers from the

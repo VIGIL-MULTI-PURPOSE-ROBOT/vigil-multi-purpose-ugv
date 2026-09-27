@@ -4,7 +4,7 @@
 #   cd ~/Documents/military_world/sar_ws && bash diagnose_sar.sh
 #
 # Takes about 5-10 minutes, needs no ROS, opens one Gazebo window for 40 s at the end.
-# Everything is written to sar_ws/diagnosis/sar_diagnosis.log (Claude reads that file).
+# Everything is written to sar_ws/diagnosis/sar_diagnosis.log for review.
 #
 # Each test runs the Gazebo SERVER on its own for a fixed number of steps with a
 # "sensor rig" (the rover's cameras on a fixed post at point A) so a crash can be
@@ -137,4 +137,4 @@ rc=$?; say "    exit code $rc (124 = still running after 40 s = GUI WORKED; 139 
 grep -aiE "error|segmentation|signal|stack trace|egl|ogre" "$OUT/gui_xcb.out" | sed 's/\x1b\[[0-9;]*m//g' | sort -u | head -12 | sed 's/^/    /' | tee -a "$LOG" >/dev/null
 [[ $rc -ne 124 ]] && { say "    last 30 lines:"; sed 's/\x1b\[[0-9;]*m//g' "$OUT/gui_xcb.out" | tail -30 | sed 's/^/      /' | tee -a "$LOG" >/dev/null; }
 say ""
-say "=== done. Tell Claude: diagnosis finished ($LOG) ==="
+say "=== Diagnosis finished. Review results: $LOG ==="
