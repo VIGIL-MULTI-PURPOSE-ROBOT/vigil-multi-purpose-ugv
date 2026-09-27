@@ -7,7 +7,7 @@ VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor 
 
 **Current stage: simulation prototype.** Depth-based navigation is implemented; full camera-based localization across the mission pipelines remains a development goal. The scenarios have separate implementations, and several mission controllers currently use simulator ground-truth position. No physical rover deployment is demonstrated here.
 
-[Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Maintainer guide](docs/maintaining.md)
+[Capabilities and innovation](docs/capabilities-and-innovation.md) · [Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Maintainer guide](docs/maintaining.md)
 
 ## See the system
 
@@ -37,6 +37,18 @@ SIH26126 concerns vision-based autonomous navigation for an outdoor UGV in GPS-d
 | Autonomous A-to-B operation | A live short rough-terrain run was observed reaching its goal | Repeated trials, collision instrumentation and broader scenarios |
 
 The present depth-processing pipeline uses geometric rules. It should not be described as a trained perception AI model without a corresponding model and evaluation.
+
+## Capability and innovation summary
+
+| Category | Current position |
+|---|---|
+| **Implemented in software** | Eight-wheel rover simulation; RGB-D, LiDAR, IMU and wheel interfaces; depth-based terrain classification; footprint-aware A*; motion control; mapping/localization components; mission dashboards; crop-row and SAR mission software |
+| **Demonstrated in simulation** | Short rough-terrain A-to-B navigation; live terrain overlay; cliff detection; route updates; agricultural drive/return, lighting and suspension checks; SAR motion and simulated thermal-human processing |
+| **Not yet demonstrated end-to-end** | Sensor-derived visual localization controlling every mission; complete 23-row agriculture run; complete urban SAR mission; repeated dynamic-obstacle benchmarks; dedicated mining-world mission; physical rover deployment |
+
+The main technical innovation is the connection between **camera-derived terrain geometry, the rover's physical dimensions and autonomous planning**. Instead of treating the environment as a flat free/occupied grid or treating the rover as a point, VIGIL evaluates slope, roughness, steps and drops against the rover footprint, wheel size, clearance and climbing limits. The operator dashboard also exposes the reason for route changes through states such as `CLIFF AHEAD`, `PATH BLOCKED`, `REPLANNING`, `CLIMBING`, `RECOVERY` and `GOAL_REACHED`.
+
+[Detailed capability boundaries, simulation evidence and comparison with a conventional UGV](docs/capabilities-and-innovation.md).
 
 ## System architecture
 
