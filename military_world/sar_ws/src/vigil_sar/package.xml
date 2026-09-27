@@ -5,8 +5,9 @@
   <description>Search-and-rescue UGV in military_world: the VIGIL eight-wheel rover, its terrain/cliff
     perception and A-to-B navigation (reused from vigil_rough_terrain), a 4K RGB camera, a thermal camera,
     thermal human detection/tracking, a 10-point SAR mission manager and a SAR control-station dashboard.</description>
-  <maintainer email="user@example.com">VIGIL</maintainer>
+  <maintainer email="Y-Manish@users.noreply.github.com">VIGIL Multipurpose Robot Team</maintainer>
   <license>Proprietary</license>
+  <license>CC-BY-4.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>launch_ros</exec_depend>

@@ -3,7 +3,7 @@
   <name>agri_ugv_description</name>
   <version>0.1.0</version>
   <description>CAD-based description of the VIGIL multipurpose rover for its agriculture simulation.</description>
-  <maintainer email="maintainer@example.com">VIGIL Multipurpose Robot Team</maintainer>
+  <maintainer email="Y-Manish@users.noreply.github.com">VIGIL Multipurpose Robot Team</maintainer>
   <license>Apache-2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <exec_depend>launch_ros</exec_depend>

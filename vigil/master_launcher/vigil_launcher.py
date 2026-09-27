@@ -6,7 +6,7 @@
 
 It contains no robot, world, navigation or dashboard code. For the chosen project it only:
   1. starts a clean shell (ROS variables from other workspaces removed from the environment),
-  2. sources /opt/ros/<distro>/setup.bash and THAT project's install/setup.bash (never the others),
+  2. sources /opt/ros/jazzy/setup.bash and THAT project's install/setup.bash (never the others),
   3. runs that project's own, unchanged launch file from its own workspace,
   4. gives it the terminal (Ctrl+C goes to the project), and when it ends stops anything it left
      behind and shows the menu again.
@@ -91,7 +91,7 @@ def locate(p):
             inst = ws / 'install' / p['package'] / 'share' / p['package'] / 'launch' / p['launch']
             if not (ws / 'install/setup.bash').exists() or not inst.exists():
                 return ws, src, (f"{p['short']} workspace is not built ({inst} missing).\n"
-                                 f"Build it once:  cd {ws} && source /opt/ros/<distro>/setup.bash && colcon build "
+                                 f"Build it once:  cd {ws} && source /opt/ros/jazzy/setup.bash && colcon build "
                                  f"--symlink-install")
             return ws, src.resolve(), None
     return None, None, f"{p['short']} launch file not found."
@@ -223,7 +223,7 @@ def run(key):
         return
     setup = ros_setup()
     if setup is None:
-        print('\nERROR:\nROS 2 not found (/opt/ros/<distro>/setup.bash).')
+        print('\nERROR:\nROS 2 Jazzy not found (/opt/ros/jazzy/setup.bash).')
         return
     stop_running_projects()
     print(f"\nStarting {p['name']}...")

@@ -22,9 +22,9 @@ controllers, parameters, dashboard and `ROS_DOMAIN_ID`, and each is built on its
 no code, and only one runs at a time.
 
 <p align="center">
-  <img src="military_world/preview_overview.png" width="32%" alt="Military SAR world, top view">
-  <img src="vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/validation/dashboard_cliff_front.png" width="42%" alt="Rock terrain dashboard">
-  <img src="ros2_ws/reports/cad_update/rover_preview.png" width="24%" alt="VIGIL rover CAD">
+  <img src="../military_world/preview_overview.png" width="32%" alt="Military SAR world, top view">
+  <img src="../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/validation/dashboard_cliff_front.png" width="42%" alt="Rock terrain dashboard">
+  <img src="../ros2_ws/reports/cad_update/rover_preview.png" width="24%" alt="VIGIL rover CAD">
 </p>
 <p align="center"><sub>Left: the military SAR world (top view). Middle: the rock-terrain navigation dashboard
 while it replans around a cliff. Right: the VIGIL rover model used in the simulations.</sub></p>

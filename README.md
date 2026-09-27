@@ -7,7 +7,7 @@ VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor 
 
 **Current stage: simulation prototype.** Depth-based navigation is implemented; full camera-based localization across the mission pipelines remains a development goal. The scenarios have separate implementations, and several mission controllers currently use simulator ground-truth position. No physical rover deployment is demonstrated here.
 
-[Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Update the video link](docs/maintaining.md)
+[Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Maintainer guide](docs/maintaining.md)
 
 ## See the system
 
@@ -17,7 +17,13 @@ VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor 
 
 ### Demonstration video
 
-[Watch the VIGIL demonstration](https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3)
+[Watch the VIGIL demonstration][demo-video]
+
+[![VIGIL SIH 2026 demonstration video](https://img.youtube.com/vi/WZutmP8n8Oc/hqdefault.jpg)][demo-video]
+
+The video presents the VIGIL concept and its simulation work. Simulation captures and run details are also available in the [evidence gallery](docs/validation.md).
+
+[demo-video]: https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3
 
 ## The problem we address
 
@@ -151,8 +157,8 @@ The working workspace paths are preserved so existing launch files continue to r
 5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
 6. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
 
-## Team, credits and licence status
+## Team, credits and licence
 
 Developed by the **VIGIL team**; repository maintained in the [VIGIL organization](https://github.com/VIGIL-MULTI-PURPOSE-ROBOT) with [Y-Manish](https://github.com/Y-Manish). Individual contributor history is available in GitHub.
 
-The rocky terrain uses **“Rocky Terrain n4” by DarkPixel**, licensed **CC BY 4.0**. See [attribution and licence boundaries](docs/contributions.md). No new blanket licence is assigned to team-owned code by this documentation update.
+The rocky terrain uses **“Rocky Terrain n4” by DarkPixel**, licensed **CC BY 4.0**. See [attribution and licence boundaries](docs/contributions.md). A top-level licence for team-owned code still requires explicit team approval.

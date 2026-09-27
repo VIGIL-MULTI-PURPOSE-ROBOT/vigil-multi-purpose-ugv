@@ -22,4 +22,4 @@ The supplied README draft referred to `tdf_gazebo`. That attribution has not bee
 
 ## Licence boundaries
 
-This documentation update does not choose a new licence for the team's code or CAD. Existing package metadata and third-party notices remain in place. A team-approved top-level licence is still needed before claiming a uniform open-source licence for the repository. Preserve third-party attribution independently of that decision.
+Third-party models, textures and other assets remain governed by their own notices. Preserve the package-level `ASSET_LICENSE.txt` files and attribution when redistributing the project. A top-level licence for team-owned code must be selected and approved by the team before publication.

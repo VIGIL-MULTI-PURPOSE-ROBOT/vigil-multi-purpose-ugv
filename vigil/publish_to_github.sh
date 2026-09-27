@@ -27,7 +27,7 @@ WORK="$D/.vigil_publish"
 command -v git   >/dev/null || { echo "git is not installed:  sudo apt install git"; exit 1; }
 command -v rsync >/dev/null || { echo "rsync is not installed:  sudo apt install rsync"; exit 1; }
 if [[ -z "$(git config --global user.name || true)" || -z "$(git config --global user.email || true)" ]]; then
-  echo 'Set your git name/e-mail once:  git config --global user.name "Your Name" && git config --global user.email you@example.com'
+  echo 'Set your Git identity once, for example: git config --global user.name "Y-Manish" && git config --global user.email "Y-Manish@users.noreply.github.com"'
   exit 1
 fi
 

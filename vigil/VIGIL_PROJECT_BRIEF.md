@@ -296,7 +296,7 @@ cd ~/Documents/robot/ros2_ws && ./run.sh            # browser: http://localhost:
 cd ~/Documents/military_world/sar_ws && source /opt/ros/jazzy/setup.bash && source install/setup.bash \
   && export ROS_DOMAIN_ID=72 && ros2 launch vigil_sar sar_mission.launch.py
 # Rock terrain
-cd <rock ws> && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=71 \
+cd ~/Documents/robot/vigil_rough_terrain_ws && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=71 \
   && ros2 launch vigil_rough_terrain vision_nav.launch.py
 # Menu
 vigil
