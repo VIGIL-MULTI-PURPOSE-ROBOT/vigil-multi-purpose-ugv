@@ -1,14 +1,14 @@
 # Maintaining the presentation
 
-## Update the YouTube video in one place
+## Demonstration video
 
-Open the root `README.md`, search for `VIDEO_LINK`, and replace the URL on the line directly below that comment:
+The README links to the published VIGIL demonstration:
 
 ```markdown
 [demo-video]: https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3
 ```
 
-For example, replace `docs/validation.md` with your full YouTube URL. The “Watch the VIGIL demonstration” link uses that reference. No other URL needs to change.
+To change the video later, replace only the URL on this reference-definition line in the root `README.md`. The “Watch the VIGIL demonstration” link uses it.
 
 ## Update results
 

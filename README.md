@@ -19,10 +19,9 @@ VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor 
 
 [Watch the VIGIL demonstration][demo-video]
 
-Simulation captures and run details are also available in the [evidence gallery](docs/validation.md).
+The video presents the VIGIL concept and its simulation work. Simulation captures and run details are also available in the [evidence gallery](docs/validation.md).
 
-<!-- VIDEO_LINK: Replace ONLY the URL on the following reference-definition line with your YouTube URL. -->
-[demo-video]: docs/validation.md
+[demo-video]: https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3
 
 ## The problem we address
 
