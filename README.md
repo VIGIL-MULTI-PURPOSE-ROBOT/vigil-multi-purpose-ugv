@@ -5,7 +5,7 @@
 
 VIGIL explores how an eight-wheel unmanned ground vehicle can interpret terrain, plan a route and drive toward a destination. The project combines simulated cameras, terrain perception, planning, wheel control and operator dashboards across rough-terrain, agriculture, search-and-rescue and a new underground mining environment.
 
-**Current stage: simulation prototype.** Depth-based navigation is implemented. The New Mining workspace uses RGB-D visual SLAM with wheel/IMU fusion and a Point B dashboard; other mission controllers may still use simulator ground-truth position. No physical rover deployment is demonstrated here.
+**Current stage: simulation prototype.** Depth-based navigation is implemented. The New Mining workspace uses RGB-D visual SLAM with wheel/IMU fusion and a Point B dashboard; other mission controllers may still use simulator ground-truth position.
 
 [Capabilities and innovation](docs/capabilities-and-innovation.md) · [Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Maintainer guide](docs/maintaining.md)
 
