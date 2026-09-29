@@ -1,4 +1,6 @@
-![VIGIL rover in the New Mining underground mine](cover.png)
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the New Mining environment](cover.png) | ![New Mining dashboard](Images/Dashboards/dashboard.png) |
 
 # VIGIL New Mining
 

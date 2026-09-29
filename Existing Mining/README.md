@@ -1,4 +1,6 @@
-![VIGIL rover in the Existing Mining environment](cover.png)
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the Existing Mining environment](cover.png) | ![Existing Mining dashboard](Images/Dashboards/dashboard.png) |
 
 # Existing Mining
 
@@ -9,7 +11,7 @@ This is the earlier mining project, which the VIGIL launcher lists as option 4 (
 folder next to `vigil/`, and this folder is where it is looked for after cloning. To add it, place the
 workspace here so that `src/vigil_mining/launch/mining.launch.py` exists.
 
-The picture above is a Gazebo capture of the rover in this environment. No dashboard capture is in the repository yet.
+The pictures above are a Gazebo capture of the rover in this environment and its browser dashboard.
 The rough-terrain captures are not mining results and are deliberately not used here.
 
 What the repository does say about mining:

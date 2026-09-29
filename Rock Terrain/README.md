@@ -1,4 +1,6 @@
-![VIGIL rover on the Rock Terrain](cover.png)
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the Rock Terrain environment](cover.png) | ![Rock Terrain dashboard](Images/Dashboards/dashboard.png) |
 
 # VIGIL rough-terrain rover and physical comparison
 

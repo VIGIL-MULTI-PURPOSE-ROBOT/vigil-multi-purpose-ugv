@@ -2,9 +2,9 @@
 
 Navigation across a 300 x 300 m disaster area, followed by a thermal search for people.
 
-![Military Search and Rescue world, top view](Images/Environment/preview_overview.png)
-
-*Screenshots of the rover in this world and of its dashboard have not been captured yet. Add them to `Images/`.*
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the Military Search and Rescue environment](cover.png) | ![Military Search and Rescue dashboard](Images/Dashboards/dashboard.png) |
 
 | What | Where |
 |---|---|

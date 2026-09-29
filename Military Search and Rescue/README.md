@@ -1,4 +1,6 @@
-![VIGIL rover in the Military Search and Rescue world](cover.png)
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the Military Search and Rescue environment](cover.png) | ![Military Search and Rescue dashboard](Images/Dashboards/dashboard.png) |
 
 # military_world
 

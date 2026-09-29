@@ -1,4 +1,6 @@
-![VIGIL rover in the Agriculture cotton farm](cover.png)
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the Agriculture environment](cover.png) | ![Agriculture dashboard](Images/Dashboards/dashboard.png) |
 
 # VIGIL multipurpose UGV: agriculture application
 

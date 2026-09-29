@@ -3,9 +3,9 @@
 Underground mine simulation: RGB-D visual SLAM, wheel/IMU fusion, gas/temperature/humidity sensing,
 thermal imaging and a localhost dashboard with Point B navigation.
 
-![VIGIL rover in the underground mine in Gazebo](Images/Environment/new-mining-gazebo.png)
-
-*The dashboard screenshot for this environment has not been captured yet. Add it to `Images/Dashboards/`.*
+| Environment | Dashboard |
+|---|---|
+| ![VIGIL rover in the New Mining environment](cover.png) | ![New Mining dashboard](Images/Dashboards/dashboard.png) |
 
 | What | Where |
 |---|---|
