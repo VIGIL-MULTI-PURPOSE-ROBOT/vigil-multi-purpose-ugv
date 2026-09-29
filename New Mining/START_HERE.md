@@ -3,6 +3,10 @@
 Underground mine simulation: RGB-D visual SLAM, wheel/IMU fusion, gas/temperature/humidity sensing,
 thermal imaging and a localhost dashboard with Point B navigation.
 
+![VIGIL rover in the underground mine in Gazebo](Images/Environment/new-mining-gazebo.png)
+
+*The dashboard screenshot for this environment has not been captured yet. Add it to `Images/Dashboards/`.*
+
 | What | Where |
 |---|---|
 | ROS 2 package `vigil_new_mining` | [`src/vigil_new_mining/`](src/vigil_new_mining) |

@@ -2,6 +2,10 @@
 
 Depth-camera terrain classification, cliff detection and footprint-aware A* navigation on rocky ground.
 
+| The rover on the terrain | The navigation dashboard |
+|---|---|
+| ![VIGIL rover climbing the rocky terrain in Gazebo](Images/Environment/rover-on-terrain.png) | ![Rock Terrain dashboard: camera overlay, terrain map, path and status](Images/Dashboards/dashboard_cliff_front.png) |
+
 | What | Where |
 |---|---|
 | ROS 2 package `vigil_rough_terrain` | [`src/vigil_rough_terrain/`](src/vigil_rough_terrain) |

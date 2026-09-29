@@ -2,6 +2,12 @@
 
 Crop-row missions in a simulated cotton farm: SLAM, Nav2, lighting and active suspension.
 
+| The VIGIL rover (CAD preview) | View from the rover in the cotton farm |
+|---|---|
+| ![VIGIL rover CAD preview](Images/Environment/rover_preview.png) | ![Rover camera view in the cotton farm](Images/Environment/live_camera.png) |
+
+*A dashboard screenshot for this environment has not been captured yet. Add it to `Images/Dashboards/`.*
+
 | What | Where |
 |---|---|
 | ROS 2 packages (`agri_ugv`, `agri_ugv_description`, `agri_ugv_setup`) | [`src/`](src) |

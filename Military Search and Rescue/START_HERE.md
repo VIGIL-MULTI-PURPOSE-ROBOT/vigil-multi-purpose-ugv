@@ -2,6 +2,10 @@
 
 Navigation across a 300 x 300 m disaster area, followed by a thermal search for people.
 
+![Military Search and Rescue world, top view](Images/Environment/preview_overview.png)
+
+*Screenshots of the rover in this world and of its dashboard have not been captured yet. Add them to `Images/`.*
+
 | What | Where |
 |---|---|
 | ROS 2 workspace (package `vigil_sar`) | [`sar_ws/`](sar_ws) |
