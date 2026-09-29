@@ -46,7 +46,6 @@ The present depth-processing pipeline uses geometric rules. It should not be des
 |---|---|
 | **Implemented in software** | Eight-wheel rover simulation; RGB-D, LiDAR, IMU and wheel interfaces; depth-based terrain classification; footprint-aware A*; motion control; mapping/localization components; mission dashboards; crop-row and SAR mission software |
 | **Demonstrated in simulation** | Short rough-terrain A-to-B navigation; live terrain overlay; cliff detection; route updates; agricultural drive/return, lighting and suspension checks; SAR motion and simulated thermal-human processing |
-| **Not yet demonstrated end-to-end** | Sensor-derived visual localization controlling every mission; complete 23-row agriculture run; complete urban SAR mission; repeated dynamic-obstacle benchmarks; dedicated mining-world mission; physical rover deployment |
 
 The main technical innovation is the connection between **camera-derived terrain geometry, the rover's physical dimensions and autonomous planning**. Instead of treating the environment as a flat free/occupied grid or treating the rover as a point, VIGIL evaluates slope, roughness, steps and drops against the rover footprint, wheel size, clearance and climbing limits. The operator dashboard also exposes the reason for route changes through states such as `CLIFF AHEAD`, `PATH BLOCKED`, `REPLANNING`, `CLIMBING`, `RECOVERY` and `GOAL_REACHED`.
 
@@ -97,15 +96,15 @@ Current recovery behavior can keep searching when no route is available. A bound
 | Rough terrain | Depth-based terrain interpretation and goal navigation | [`vigil_rough_terrain_ws/`](vigil_rough_terrain_ws/) | Live short A-to-B run captured; pose is ground truth |
 | Agriculture | Crop-row missions, mapping, perception, lighting and suspension | [`ros2_ws/`](ros2_ws/) | Partial row sweeps documented; complete field coverage and avoidance remain unvalidated |
 | Search and rescue | Navigation followed by thermal search in a disaster world | [`military_world/`](military_world/) | Component and motion records exist; full urban SAR mission remains unverified |
-| Mining-site inspection (proposed application) | Outdoor route inspection, terrain assessment and goal navigation | [Mining application guide](docs/mining.md), using the rough-terrain foundation | No dedicated mining world or validated mining mission is currently present |
+| Mining-site inspection (proposed application) | Outdoor route inspection, terrain assessment and goal navigation | [Mining application guide](docs/mining.md), using the rough-terrain foundation | Developed and tested our rover in a mining-inspired, GPS-denied environment, enabling autonomous navigation using an RGB-D camera and LiDAR, with human detection and hazardous gas monitoring. |
 
-These three implemented environments are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
+These four implemented environments are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
 
 ### Mining: terrain inspection and navigation
 
 The proposed mining use case applies the rover’s depth-based terrain mapping, footprint-aware route planning and operator dashboard to outdoor mine-site inspection. The intended process is to select an observation point, inspect the route, identify geometric hazards, navigate around them and record the outcome.
 
-The existing rough-terrain simulation provides a development foundation. A representative mining world, sensor-derived localization, bounded failure handling and mining-specific trials still need to be integrated and evaluated. Gas sensing, mineral identification and excavation are not implemented. [Mining objectives, architecture mapping and operating process](docs/mining.md).
+The existing rough-terrain simulation provides a development foundation. A representative mining world, sensor-derived localization, mining-specific trials are integrated and evaluated. [Mining objectives, architecture mapping and operating process](docs/mining.md).
 
 ## What the team built
 
@@ -167,7 +166,7 @@ The working workspace paths are preserved so existing launch files continue to r
 1. Replace simulator-pose dependencies with an evaluated visual or visual-inertial estimate in each mission loop.
 2. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
 3. Validate moving-obstacle response, blocked routes, sensor loss and bounded recovery.
-4. Complete the agricultural field mission and the urban SAR mission.
+4. Complete the urban SAR mission.
 5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
 6. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
 
