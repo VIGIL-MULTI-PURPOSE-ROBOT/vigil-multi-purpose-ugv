@@ -2,7 +2,7 @@
 
 [Project overview](../README.md) · [Architecture](architecture.md) · [Validation evidence](validation.md)
 
-This page answers three jury questions: what is implemented, what has been demonstrated, and what differentiates VIGIL from a conventional UGV. “Implemented” means that the software module and its interfaces exist in the repository. It does not automatically mean that the capability has passed a complete mission benchmark or been deployed on physical hardware.
+This page answers three questions: what is implemented, what has been demonstrated, and what differentiates VIGIL from a conventional UGV. “Implemented” means that the software module and its interfaces exist in the repository. It does not automatically mean that the capability has passed a complete mission benchmark or been deployed on physical hardware.
 
 ## Capabilities implemented in software
 
