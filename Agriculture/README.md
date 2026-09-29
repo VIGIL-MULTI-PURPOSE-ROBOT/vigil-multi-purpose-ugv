@@ -109,18 +109,6 @@ check_urdf /tmp/agri_ugv.urdf
 
 ## Data and important limits
 
-- The supplied world is retained as `worlds/original.world`. The runnable copy
-  patches heightmap collision pose/friction, lighting and unsupported actor
-  definitions. Existing worker meshes provide the moving obstacle. Farm assets
-  were reused from the supplied archive's extracted directory.
-- The STL is an assembly mesh without joint axes/material properties. All 90 components of the supplied
-  `full shhhh_activesuspension.stl` are retained as 21 articulated visual meshes.
-  Wheel locations and the raised rear-wheel stance follow the export. The two
-  rocker pivots are inferred from the rear cross-shaft; wheel axles are fixed to
-  each rocker. Inertia, cylinder anchors, joint dynamics and standing angle remain
-  provisional. The shell is 26.4 kg; assumed hardware/payload yields 286.11 kg total.
-  Cylinder visuals follow the rocker without a closed-loop hydraulic mechanism.
-  See [CAD update notes](CAD_UPDATE.md) for reproducibility and validation.
 - Wheel commands drive all eight joints. Only the first three wheels per side
   expose encoder feedback. Rear wheel transforms come from simulator poses for
   display only. EKF/RTAB-Map do not consume these poses; the separate row mission does use
@@ -131,10 +119,6 @@ check_urdf /tmp/agri_ugv.urdf
 - Nav2 uses Smac Hybrid-A* with 2 m minimum radius and Regulated Pure Pursuit,
   reversing enabled and heading rotation disabled. MPPI tuning is retained in
   `navigation_mppi.yaml` as an experimental alternative, not the default.
-- Frontier bounds default to map-frame `[-10,60] x [-10,60]` metres, surrounding
-  the agricultural plot from the original exploration test spawn at world `(-25,-25)`; the current row spawn is
-  `(-14.5,-13.418)` and frontier bounds need revalidation. These are an
-  operational boundary, not satellite coordinates. Unknown cells remain blocked.
 - Dijkstra computes the shortest route in an inflated eight-connected grid;
   Nav2 fits drivable paths through spaced waypoints. This does not prove the
   shortest curvature-constrained trajectory. Arrival tolerance is 0.30 m and
@@ -144,13 +128,6 @@ check_urdf /tmp/agri_ugv.urdf
   when entered; it is not a physical local photometric sensor or natural shadow
   model. A spotlight physically changes rendering. Gain boost is on
   `/camera/low_light_image`; mapping uses raw RGB aided by the real spotlight.
-- Cylinder debug force is computed from commanded joint torque by virtual work;
-  it is not a measured hydraulic pressure or a full fluid simulation.
-- Logs are under `log/`; reports/images under `reports/`; each SLAM session and
-  mission journal goes under `run/`. Keep disk space available. The resource
-  guard shuts down below 1 GiB free; a SLAM process exit shuts down the launch.
-  Unlinked observations are not retained in the database, and working memory is
-  capped at 500 graph nodes. Archived maps are not loaded into a new run.
 
 Jazzy/Harmonic pairing: https://gazebosim.org/docs/harmonic/ros_installation/
 RPP configuration: https://docs.nav2.org/jazzy/configuration_and_development/configuration_guide/controller_plugins/configuring_regulated_pp/
