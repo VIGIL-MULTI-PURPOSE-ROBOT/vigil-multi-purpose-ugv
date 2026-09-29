@@ -1,3 +1,5 @@
+![VIGIL rover in the New Mining underground mine](cover.png)
+
 # VIGIL New Mining
 
 Independent ROS 2 Jazzy and Gazebo Harmonic workspace for GPS-denied mining

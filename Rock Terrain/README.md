@@ -1,3 +1,5 @@
+![VIGIL rover on the Rock Terrain](cover.png)
+
 # VIGIL rough-terrain rover and physical comparison
 
 Standalone package; no agriculture package is required or modified. The original

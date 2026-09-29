@@ -1,3 +1,5 @@
+![VIGIL rover in the Agriculture cotton farm](cover.png)
+
 # VIGIL multipurpose UGV: agriculture application
 
 VIGIL is an eight-wheel multipurpose rover. This ROS 2 Jazzy and Gazebo

@@ -1,3 +1,5 @@
+![VIGIL rover in the Military Search and Rescue world](cover.png)
+
 # military_world
 
 Autonomous **search-and-rescue / disaster-response** simulation range for an
