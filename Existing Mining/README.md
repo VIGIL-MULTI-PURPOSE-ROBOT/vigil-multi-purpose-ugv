@@ -2,28 +2,15 @@
 |---|---|
 | ![VIGIL rover in the Existing Mining environment](cover.png) | ![Existing Mining dashboard](Images/Dashboards/dashboard.png) |
 
-# Existing Mining
+# Mining application — terrain inspection and navigation
 
-This is the earlier mining project, which the VIGIL launcher lists as option 4 (package `vigil_mining`,
-`ROS_DOMAIN_ID=73`).
+[Project overview](../README.md) · [Architecture](../docs/architecture.md) · [Validation](../docs/validation.md)
 
-**Its workspace is not currently in this repository.** The launcher looks for it in a local `mining/`
-folder next to `vigil/`, and this folder is where it is looked for after cloning. To add it, place the
-workspace here so that `src/vigil_mining/launch/mining.launch.py` exists.
+## Scope and implementation status
 
-The pictures above are a Gazebo capture of the rover in this environment and its browser dashboard.
-The rough-terrain captures are not mining results and are deliberately not used here.
+Mining is an intended application of the VIGIL rough-terrain rover: remotely observing an outdoor mine-site route and studying navigation over uneven ground, around rocks and near drops. This application maps to the existing depth-perception and navigation work in `Rock Terrain/`.
 
-## Status recorded in the project documentation
-
-Mining is an intended application of the VIGIL rough-terrain rover: remotely observing an outdoor mine-site route
-and studying navigation over uneven ground, around rocks and near drops. This maps to the depth-perception and
-navigation work in [`../Rock Terrain/`](../Rock%20Terrain).
-
-[`../docs/mining.md`](../docs/mining.md) records that **the repository currently contains a generic rocky-terrain
-simulation, not a separately implemented or validated mining environment**, and that no dedicated mining package,
-mining dashboard, mine-site trial or underground mission was found in the inspected source. That is because this
-workspace is not committed here. The rough-terrain captures stay labelled as rough-terrain captures.
+**The repository currently contains a generic rocky-terrain simulation, not a separately implemented or validated mining environment.** This page describes the proposed application and the existing components that could support it. No dedicated mining package, mining dashboard, mine-site trial or underground mission was found in the inspected source. The existing camera captures remain labelled as rough-terrain captures.
 
 ## Proposed mission objectives
 
@@ -46,7 +33,7 @@ These objectives concern navigation and visual inspection. Mineral identificatio
 | Operator monitoring | Live camera, map, goal and navigation state | Define inspection reports and intervention procedures |
 | Localization | Simulator ground-truth pose in the current rough-terrain controller | Integrate and validate visual/visual-inertial localization before claiming GPS-denied mine-site autonomy |
 
-See [the actual source interfaces](../docs/architecture.md#rough-terrain-pipeline).
+See [the actual source interfaces](../docs/architecture.md#rough-terrain-pipeline). No new sensing or mission software is introduced by this documentation addition.
 
 ## Proposed operating process
 
@@ -76,9 +63,3 @@ The [live capture record](../docs/validation.md) reports one short goal-reaching
 - Record results against a fixed scenario, source version and mission configuration.
 
 Underground navigation would require a separate scenario and validation effort. No underground readiness is claimed here.
-
-## Related
-
-- [`../docs/mining.md`](../docs/mining.md): the original page this section is taken from.
-- [`../docs/validation.md`](../docs/validation.md): the "Mining evidence status" section.
-- [`../New Mining/`](../New%20Mining): the newer, independent mining environment.
