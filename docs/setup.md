@@ -17,7 +17,7 @@ cd vigil-multi-purpose-ugv
 source /opt/ros/jazzy/setup.bash
 # Run sudo rosdep init once only if rosdep has not been initialized.
 rosdep update
-rosdep install --from-paths ros2_ws/src vigil_rough_terrain_ws/src military_world/sar_ws/src   --ignore-src -r -y --rosdistro jazzy
+rosdep install --from-paths Agriculture/src "Rock Terrain/src" "Military Search and Rescue/sar_ws/src"   --ignore-src -r -y --rosdistro jazzy
 ```
 
 ## Recommended first demonstration: rough terrain
@@ -25,7 +25,7 @@ rosdep install --from-paths ros2_ws/src vigil_rough_terrain_ws/src military_worl
 From the repository root, in a fresh terminal:
 
 ```bash
-cd vigil_rough_terrain_ws
+cd "Rock Terrain"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 source install/local_setup.bash
@@ -56,11 +56,11 @@ The launch normally cleans up stale processes belonging to VIGIL partitions. Use
 In a fresh terminal from the repository root:
 
 ```bash
-cd ros2_ws
+cd Agriculture
 ./run.sh row_mission:=true row_count:=3
 ```
 
-The script builds the workspace. Open **http://localhost:8080** and use the dashboard's **START ROBOT** control. A three-row request is a mission configuration, not a guarantee that all three rows finish. Full-row acceptance remains pending. See [acceptance](../ros2_ws/ACCEPTANCE.md).
+The script builds the workspace. Open **http://localhost:8080** and use the dashboard's **START ROBOT** control. A three-row request is a mission configuration, not a guarantee that all three rows finish. Full-row acceptance remains pending. See [acceptance](../Agriculture/ACCEPTANCE.md).
 
 ## Search and rescue
 

@@ -24,7 +24,7 @@ collision prediction and a 0.25 m confirmed-arrival tolerance.
 4. Build and run:
 
 ```bash
-cd MINNING
+cd "New Mining"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install
 ./run.sh

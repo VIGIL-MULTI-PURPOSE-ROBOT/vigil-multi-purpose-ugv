@@ -12,9 +12,9 @@ separate environments, each showing a different use, and a small menu program th
 
 | # | Environment | What the rover does there | Folder |
 |---|---|---|---|
-| 1 | **Military search and rescue** | Drives across a 300 × 300 m disaster area, then searches for people with a thermal camera | [`military_world/`](../military_world) |
-| 2 | **Agriculture** | Drives crop rows in a cotton farm; SLAM, Nav2, lighting, active suspension | [`ros2_ws/`](../ros2_ws) |
-| 3 | **Rock terrain** | Detects cliffs with the depth camera, replans around them, climbs hills; 8-wheel vs 4-wheel comparison | [`vigil_rough_terrain_ws/`](../vigil_rough_terrain_ws) |
+| 1 | **Military search and rescue** | Drives across a 300 × 300 m disaster area, then searches for people with a thermal camera | [`Military Search and Rescue/`](../Military%20Search%20and%20Rescue) |
+| 2 | **Agriculture** | Drives crop rows in a cotton farm; SLAM, Nav2, lighting, active suspension | [`Agriculture/`](../Agriculture) |
+| 3 | **Rock terrain** | Detects cliffs with the depth camera, replans around them, climbs hills; 8-wheel vs 4-wheel comparison | [`Rock Terrain/`](../Rock%20Terrain) |
 | — | **Launcher** | A menu that starts one of the three | [`vigil/`](../vigil) |
 
 The three projects are **independent**. Each has its own ROS packages, world, robot model,
@@ -22,9 +22,9 @@ controllers, parameters, dashboard and `ROS_DOMAIN_ID`, and each is built on its
 no code, and only one runs at a time.
 
 <p align="center">
-  <img src="../military_world/preview_overview.png" width="32%" alt="Military SAR world, top view">
-  <img src="../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/validation/dashboard_cliff_front.png" width="42%" alt="Rock terrain dashboard">
-  <img src="../ros2_ws/reports/cad_update/rover_preview.png" width="24%" alt="VIGIL rover CAD">
+  <img src="../Military%20Search%20and%20Rescue/preview_overview.png" width="32%" alt="Military SAR world, top view">
+  <img src="../Rock%20Terrain/src/vigil_rough_terrain/docs/validation/dashboard_cliff_front.png" width="42%" alt="Rock terrain dashboard">
+  <img src="../Agriculture/reports/cad_update/rover_preview.png" width="24%" alt="VIGIL rover CAD">
 </p>
 <p align="center"><sub>Left: the military SAR world (top view). Middle: the rock-terrain navigation dashboard
 while it replans around a cliff. Right: the VIGIL rover model used in the simulations.</sub></p>
@@ -52,7 +52,7 @@ while it replans around a cliff. Right: the VIGIL rover model used in the simula
 controlled. "Verified in Gazebo" means the result was measured in the running simulator.
 "Offline" means it was checked by Python tests without Gazebo.
 
-### Military search and rescue — `military_world/`
+### Military search and rescue — `Military Search and Rescue/`
 
 | Status | Item |
 |---|---|
@@ -70,7 +70,7 @@ controlled. "Verified in Gazebo" means the result was measured in the running si
 | ⬜ Not done | SLAM. The rover's position comes from the simulator's ground truth |
 | ⬜ Known gap | One baseline person (`SAR_StaticPerson_001`) is missing from the exported world. Re-export from Blender to restore it |
 
-### Agriculture — `ros2_ws/`
+### Agriculture — `Agriculture/`
 
 | Status | Item |
 |---|---|
@@ -80,9 +80,9 @@ controlled. "Verified in Gazebo" means the result was measured in the running si
 | ⬜ Not done | Validated obstacle avoidance (the collision-monitor inputs are off) and full-field exploration to completion |
 | ⬜ Provisional | Rover mass (286 kg) and inertia, and the rocker pivots, are inferred from an STL without joints; this is not an exact CAD twin |
 
-Details: [`ros2_ws/ACCEPTANCE.md`](../ros2_ws/ACCEPTANCE.md).
+Details: [`Agriculture/ACCEPTANCE.md`](../Agriculture/ACCEPTANCE.md).
 
-### Rock terrain — `vigil_rough_terrain_ws/`
+### Rock terrain — `Rock Terrain/`
 
 | Status | Item |
 |---|---|
@@ -91,8 +91,8 @@ Details: [`ros2_ws/ACCEPTANCE.md`](../ros2_ws/ACCEPTANCE.md).
 | ✅ Done | Depth-camera cliff detection, A* replanning, dashboard, and 13 test worlds (cliffs, slopes, narrow routes, no route, …); offline closed-loop tests pass |
 | ⬜ Not done | Nav2 on this terrain, validated contact data, and a proof that the rover can cross any terrain (earlier long routes exceeded the 38° tilt limit) |
 
-Details: [`VALIDATION.md`](../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VALIDATION.md),
-[`VISION_NAVIGATION.md`](../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md).
+Details: [`VALIDATION.md`](../Rock%20Terrain/src/vigil_rough_terrain/docs/VALIDATION.md),
+[`VISION_NAVIGATION.md`](../Rock%20Terrain/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md).
 
 ### Launcher — `vigil/`
 
@@ -119,12 +119,12 @@ vigil-multi-purpose-ugv/
 │   ├── master_launcher/vigil_launcher.py   the menu
 │   └── publish_to_github.sh           (maintainer) uploads the projects to this repository
 │
-├── military_world/                    1. MILITARY SEARCH AND RESCUE
+├── Military Search and Rescue/                    1. MILITARY SEARCH AND RESCUE
 │   ├── military_world.blend           the world in Blender (source)
 │   ├── export_gazebo.py               Blender → Gazebo exporter
 │   ├── gazebo_export/                 exported world: military_world.sdf + meshes/
 │   ├── plugins/WaypointSystem.cc      Gazebo plugin that walks the people along their routes
-│   ├── CMakeLists.txt                 builds that plugin into military_world/build/
+│   ├── CMakeLists.txt                 builds that plugin into Military Search and Rescue/build/
 │   ├── run_gazebo.sh                  opens the world alone (no rover)
 │   ├── sar_*.json / .csv              building footprints, people, routes, heat table
 │   ├── preview_*.png                  world pictures
@@ -142,7 +142,7 @@ vigil-multi-purpose-ugv/
 │           ├── dashboard/index.html       web control station
 │           └── test/                      offline tests (no Gazebo needed)
 │
-├── ros2_ws/                           2. AGRICULTURE
+├── Agriculture/                           2. AGRICULTURE
 │   ├── run.sh  stop.sh  demo.sh       build + start, stop, scripted demo
 │   ├── README.md  ACCEPTANCE.md  HACKATHON.md  CAD_UPDATE.md
 │   ├── src/agri_ugv/                  launch, config (Nav2, EKF, SLAM), scripts, farm world
@@ -151,7 +151,7 @@ vigil-multi-purpose-ugv/
 │   ├── tools/  tests/                 live checks and unit tests
 │   └── reports/                       recorded results and pictures
 │
-└── vigil_rough_terrain_ws/            3. ROCK TERRAIN
+└── Rock Terrain/            3. ROCK TERRAIN
     ├── README.md
     └── src/vigil_rough_terrain/
         ├── config/vision_nav.yaml     A, B, speeds, cliff/slope thresholds
@@ -164,7 +164,7 @@ vigil-multi-purpose-ugv/
 ```
 
 Not in the repository, because they are created on your computer: every `build/`, `install/`
-and `log/` folder, `military_world/sar_ws/generated/` (the SAR world is rebuilt at every launch),
+and `log/` folder, `Military Search and Rescue/sar_ws/generated/` (the SAR world is rebuilt at every launch),
 and `diagnosis/` (test logs).
 
 ---
@@ -192,7 +192,7 @@ cd vigil-multi-purpose-ugv
 # 4. Everything else the packages declare (Nav2, RTAB-Map, robot_localization, ...)
 sudo rosdep init 2>/dev/null; rosdep update
 source /opt/ros/jazzy/setup.bash
-rosdep install --from-paths ros2_ws/src vigil_rough_terrain_ws/src military_world/sar_ws/src \
+rosdep install --from-paths Agriculture/src "Rock Terrain/src" "Military Search and Rescue/sar_ws/src" \
   --ignore-src -r -y --rosdistro jazzy
 ```
 
@@ -206,24 +206,24 @@ Build each project **in its own fresh terminal**, so one workspace is never buil
 
 ```bash
 # 1. Military SAR: the rover workspace ...
-cd military_world/sar_ws
+cd "Military Search and Rescue/sar_ws"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_sar --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 # ... and the walking-people plugin (once)
-cd ..                                   # military_world/
+cd ..                                   # Military Search and Rescue/
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --target sar-waypoint-system -j2
 ```
 
 ```bash
 # 2. Agriculture (run.sh also rebuilds by itself every time it starts)
-cd ros2_ws
+cd Agriculture
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install
 ```
 
 ```bash
 # 3. Rock terrain
-cd vigil_rough_terrain_ws
+cd "Rock Terrain"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 ```
@@ -268,12 +268,12 @@ never builds, so do step 4 first.
 
 | Environment | Terminal commands | ROS_DOMAIN_ID |
 |---|---|---|
-| Military SAR | `cd military_world/sar_ws && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=72`<br>`ros2 launch vigil_sar sar_mission.launch.py` | 72 |
-| Agriculture | `cd ros2_ws && ./run.sh row_mission:=true row_count:=3` | 91 |
-| Rock terrain | `cd vigil_rough_terrain_ws && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=71`<br>`ros2 launch vigil_rough_terrain vision_nav.launch.py` | 71 |
+| Military SAR | `cd "Military Search and Rescue/sar_ws" && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=72`<br>`ros2 launch vigil_sar sar_mission.launch.py` | 72 |
+| Agriculture | `cd Agriculture && ./run.sh row_mission:=true row_count:=3` | 91 |
+| Rock terrain | `cd "Rock Terrain" && source /opt/ros/jazzy/setup.bash && source install/setup.bash && export ROS_DOMAIN_ID=71`<br>`ros2 launch vigil_rough_terrain vision_nav.launch.py` | 71 |
 
 To stop a project, press Ctrl+C in its terminal. If anything is left over, run
-`military_world/sar_ws/stop_sar.sh` (SAR) or `ros2_ws/stop.sh` (agriculture).
+`Military Search and Rescue/sar_ws/stop_sar.sh` (SAR) or `Agriculture/stop.sh` (agriculture).
 
 > Some of the project READMEs show commands with the author's paths (`~/Documents/...` or
 > `/home/user/Documents/...`). Replace these with the folder where you cloned this repository.
@@ -307,7 +307,7 @@ compared with real time. The rover's speed in the world is 3.0 m/s *in simulatio
   makes U-turns at the headlands.
 - `./demo.sh` (with `row_mission:=false explore:=false`) runs the presentation demo, then the
   lighting and suspension checks, and prints each result.
-- Recorded results are in `ros2_ws/reports/` (JSON and PNG).
+- Recorded results are in `Agriculture/reports/` (JSON and PNG).
 
 ### 3. Rock terrain
 
@@ -345,12 +345,12 @@ Useful launch options: `gui:=false` (no Gazebo window), `goal_x:=80 goal_y:=40` 
 ### Agriculture
 
 ```bash
-cd ros2_ws
+cd Agriculture
 ./run.sh row_mission:=true row_count:=23           # full row mission (use 3 for a short one)
 ./run.sh row_mission:=false explore:=false          # demo mode, then in a 2nd terminal:
 ./demo.sh                                           # scripted demo   (./demo.sh start = exploration)
 ./run.sh headless:=true rviz:=false                 # no windows
-./run.sh stage:=8                                   # start only up to stage N (1-12), see ros2_ws/README.md
+./run.sh stage:=8                                   # start only up to stage N (1-12), see Agriculture/README.md
 ./stop.sh
 ```
 
@@ -374,11 +374,11 @@ On the dashboard, click **Set goal B** and then a point on the map to send the r
 
 | You want to change | File |
 |---|---|
-| SAR: start/goal, operational zone, speeds, sensors, search pattern, thermal thresholds, people | `military_world/sar_ws/src/vigil_sar/config/sar_mission.yaml` |
-| SAR: gravity, physics step, acceleration/jerk limits, wheel torque, rover mass | `military_world/sar_ws/src/vigil_sar/config/physics.yaml` |
-| SAR: the world itself (buildings, people, props) | `military_world/military_world.blend`, then `bash military_world/run_gazebo.sh --reexport` (needs Blender) |
-| Agriculture: navigation, EKF, SLAM, sensors | `ros2_ws/src/agri_ugv/config/*.yaml` |
-| Rock terrain: A, B, speed, cliff / slope limits, rover footprint | `vigil_rough_terrain_ws/src/vigil_rough_terrain/config/vision_nav.yaml` |
+| SAR: start/goal, operational zone, speeds, sensors, search pattern, thermal thresholds, people | `Military Search and Rescue/sar_ws/src/vigil_sar/config/sar_mission.yaml` |
+| SAR: gravity, physics step, acceleration/jerk limits, wheel torque, rover mass | `Military Search and Rescue/sar_ws/src/vigil_sar/config/physics.yaml` |
+| SAR: the world itself (buildings, people, props) | `Military Search and Rescue/military_world.blend`, then `bash "Military Search and Rescue/run_gazebo.sh" --reexport` (needs Blender) |
+| Agriculture: navigation, EKF, SLAM, sensors | `Agriculture/src/agri_ugv/config/*.yaml` |
+| Rock terrain: A, B, speed, cliff / slope limits, rover footprint | `Rock Terrain/src/vigil_rough_terrain/config/vision_nav.yaml` |
 | Launcher menu: project paths, domain IDs | `vigil/master_launcher/vigil_launcher.py` (`PROJECTS`) |
 
 The builds use `--symlink-install`, so changes to Python and YAML files take effect at the next
@@ -390,11 +390,11 @@ launch without rebuilding. New files, and changes to `CMakeLists.txt` or `packag
 
 | Project | Command | Needs Gazebo? |
 |---|---|---|
-| Military SAR | `cd military_world/sar_ws/src/vigil_sar && python3 test/test_sar_offline.py` | no (~8 min) |
-| Military SAR | `cd military_world/sar_ws && bash test_motion.sh` (`--scenarios`, `--urban`, `--validate`) | yes; log in `diagnosis/test_motion.log` |
-| Military SAR | `cd military_world/sar_ws && bash measure_physics.sh` (simulation-speed diagnosis) | yes |
-| Agriculture | `cd ros2_ws && python3 -m pytest -q tests && python3 tools/check_structure.py` | no |
-| Rock terrain | `cd vigil_rough_terrain_ws && python3 src/vigil_rough_terrain/test/closed_loop_sim.py` | no (~4 min) |
+| Military SAR | `cd "Military Search and Rescue/sar_ws/src/vigil_sar" && python3 test/test_sar_offline.py` | no (~8 min) |
+| Military SAR | `cd "Military Search and Rescue/sar_ws" && bash test_motion.sh` (`--scenarios`, `--urban`, `--validate`) | yes; log in `diagnosis/test_motion.log` |
+| Military SAR | `cd "Military Search and Rescue/sar_ws" && bash measure_physics.sh` (simulation-speed diagnosis) | yes |
+| Agriculture | `cd Agriculture && python3 -m pytest -q tests && python3 tools/check_structure.py` | no |
+| Rock terrain | `cd "Rock Terrain" && python3 src/vigil_rough_terrain/test/closed_loop_sim.py` | no (~4 min) |
 | Rock terrain | `colcon test --packages-select vigil_rough_terrain && colcon test-result --verbose` | no |
 
 ---
@@ -407,10 +407,10 @@ launch without rebuilding. New files, and changes to `CMakeLists.txt` or `packag
 | Launcher says "workspace is not built" | Do the build for that project (section 4) |
 | Everything moves in slow motion | The simulation is running below real time; check RTF in Gazebo. Close other heavy programs and screen recorders. For SAR, run `bash measure_physics.sh` and read `diagnosis/measure_physics.log` |
 | SAR people don't walk; log says `libsar-waypoint-system.so missing` | Build the plugin (section 4, Military SAR) |
-| Gazebo crashes when the SAR world opens | `cd military_world/sar_ws && bash find_crash.sh` and see the crash section of [`sar_ws/README.md`](../military_world/sar_ws/README.md) |
-| Two rovers appear / old processes keep running | `military_world/sar_ws/stop_sar.sh` or `ros2_ws/stop.sh`, then start again |
-| Agriculture says "already has a simulation running" | Stop the other run with `ros2_ws/stop.sh`; do not delete the lock file |
+| Gazebo crashes when the SAR world opens | `cd "Military Search and Rescue/sar_ws" && bash find_crash.sh` and see the crash section of [`sar_ws/README.md`](../Military%20Search%20and%20Rescue/sar_ws/README.md) |
+| Two rovers appear / old processes keep running | `Military Search and Rescue/sar_ws/stop_sar.sh` or `Agriculture/stop.sh`, then start again |
+| Agriculture says "already has a simulation running" | Stop the other run with `Agriculture/stop.sh`; do not delete the lock file |
 
-More detail for each project: [`military_world/sar_ws/README.md`](../military_world/sar_ws/README.md),
-[`military_world/README.md`](../military_world/README.md), [`ros2_ws/README.md`](../ros2_ws/README.md),
-[`vigil_rough_terrain_ws/README.md`](../vigil_rough_terrain_ws/README.md), [`vigil/README.md`](../vigil/README.md).
+More detail for each project: [`Military Search and Rescue/sar_ws/README.md`](../Military%20Search%20and%20Rescue/sar_ws/README.md),
+[`Military Search and Rescue/README.md`](../Military%20Search%20and%20Rescue/README.md), [`Agriculture/README.md`](../Agriculture/README.md),
+[`Rock Terrain/README.md`](../Rock%20Terrain/README.md), [`vigil/README.md`](../vigil/README.md).

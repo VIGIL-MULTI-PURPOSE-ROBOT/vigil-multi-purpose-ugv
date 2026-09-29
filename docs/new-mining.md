@@ -3,7 +3,7 @@
 ![VIGIL eight-wheel rover in the textured underground mine](media/new-mining-gazebo.png)
 
 The New Mining workspace is an independent Gazebo Harmonic simulation under
-[`MINNING/`](../MINNING/). It does not replace or merge with the earlier local
+[`New Mining/`](../New%20Mining/). It does not replace or merge with the earlier local
 Mining workspace. The master launcher keeps that project at option 4 and exposes
 the new environment at option 5.
 

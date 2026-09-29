@@ -19,17 +19,17 @@ vigil/
 
 It finds them in either of these layouts:
 
-1. **A clone of the GitHub repository:** the folders next to `vigil/`, i.e. `../military_world/sar_ws`,
-   `../ros2_ws` and `../vigil_rough_terrain_ws`. Nothing to set up.
+1. **A clone of the GitHub repository:** the folders next to `vigil/`, i.e. `../Military Search and Rescue/sar_ws`,
+   `../Agriculture` and `../Rock Terrain`. Nothing to set up.
 2. **The author's PC:** the shortcut links `military_sar/`, `agriculture/` and `rock_terrain/`
    that `setup_vigil.sh` creates, which point to `~/Documents/military_world`,
    `~/Documents/robot/ros2_ws` and `~/Documents/robot/vigil_rough_terrain_ws`.
 
 | Option | Project | Sourced | Launch (the project's own, unchanged) | ROS_DOMAIN_ID |
 |---|---|---|---|---|
-| 1 Military Search and Rescue | `military_world/sar_ws` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch vigil_sar sar_mission.launch.py` | 72 |
-| 2 Agriculture | `ros2_ws` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch agri_ugv field.launch.py` (as `./run.sh`, without its rebuild) | 91 |
-| 3 Rock Terrain | `vigil_rough_terrain_ws` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch vigil_rough_terrain vision_nav.launch.py` | 71 |
+| 1 Military Search and Rescue | `Military Search and Rescue/sar_ws` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch vigil_sar sar_mission.launch.py` | 72 |
+| 2 Agriculture | `Agriculture` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch agri_ugv field.launch.py` (as `./run.sh`, without its rebuild) | 91 |
+| 3 Rock Terrain | `Rock Terrain` | `/opt/ros/jazzy` + that `install/setup.bash` | `ros2 launch vigil_rough_terrain vision_nav.launch.py` | 71 |
 
 ## Setup (once)
 

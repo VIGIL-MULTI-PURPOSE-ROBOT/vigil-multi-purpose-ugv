@@ -9,7 +9,7 @@ These images were captured from **Gazebo and the running ROS dashboard**, not ge
 The capture machine already had ROS 2 Jazzy, Gazebo Harmonic and the required rough-terrain runtime dependencies. A fresh clone was built with:
 
 ```bash
-cd vigil_rough_terrain_ws
+cd "Rock Terrain"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 source install/local_setup.bash
@@ -63,10 +63,10 @@ These captures illustrate the actual terrain overlay, map and state reporting. T
 
 | Record | Scope |
 |---|---|
-| [Agriculture acceptance](../ros2_ws/ACCEPTANCE.md) | Integrated demo and earlier component measurements; later crop-row failures and limits are explicitly recorded |
-| [Rough-terrain mechanical validation](../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VALIDATION.md) | Specific suspension and eight-wheel/four-wheel comparison conditions |
-| [Terrain algorithm history](../vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md) | Offline synthetic-depth tests and subsequent algorithm/configuration revisions |
-| [SAR documentation](../military_world/sar_ws/README.md) | Thermal search, navigation and mission operation |
+| [Agriculture acceptance](../Agriculture/ACCEPTANCE.md) | Integrated demo and earlier component measurements; later crop-row failures and limits are explicitly recorded |
+| [Rough-terrain mechanical validation](../Rock%20Terrain/src/vigil_rough_terrain/docs/VALIDATION.md) | Specific suspension and eight-wheel/four-wheel comparison conditions |
+| [Terrain algorithm history](../Rock%20Terrain/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md) | Offline synthetic-depth tests and subsequent algorithm/configuration revisions |
+| [SAR documentation](../Military%20Search%20and%20Rescue/sar_ws/README.md) | Thermal search, navigation and mission operation |
 | [Preserved project status](operations.md#1-project-status--what-is-done-and-what-is-not) | Earlier project-wide claims and outstanding work, dated 24 September |
 
 Historical documentation contains superseded configurations and behaviors. Consult the current source/configuration for active thresholds; do not combine measurements from different versions into a single benchmark.

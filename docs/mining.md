@@ -4,7 +4,7 @@
 
 ## Scope and implementation status
 
-Mining is an intended application of the VIGIL rough-terrain rover: remotely observing an outdoor mine-site route and studying navigation over uneven ground, around rocks and near drops. This application maps to the existing depth-perception and navigation work in `vigil_rough_terrain_ws/`.
+Mining is an intended application of the VIGIL rough-terrain rover: remotely observing an outdoor mine-site route and studying navigation over uneven ground, around rocks and near drops. This application maps to the existing depth-perception and navigation work in `Rock Terrain/`.
 
 **The repository currently contains a generic rocky-terrain simulation, not a separately implemented or validated mining environment.** This page describes the proposed application and the existing components that could support it. No dedicated mining package, mining dashboard, mine-site trial or underground mission was found in the inspected source. The existing camera captures remain labelled as rough-terrain captures.
 
