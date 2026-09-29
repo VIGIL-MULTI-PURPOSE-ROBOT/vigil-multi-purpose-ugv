@@ -83,6 +83,3 @@ The eight-wheel platform and navigation rules are connected through physical par
 
 States such as `CLIFF AHEAD`, `PATH BLOCKED`, `REPLANNING`, `SAFE PATH FOUND`, `CLIMBING`, `RECOVERY` and `GOAL_REACHED` show the operator why behavior changed. This improves reviewability during a demonstration and provides a basis for later safety monitoring.
 
-## Concise jury answer
-
-> VIGIL’s main innovation is the integration of depth-based terrain understanding, vehicle-geometry-aware planning and an eight-wheel mobility platform. A conventional UGV often follows GPS coordinates, teleoperation commands or a flat free-versus-obstacle map. VIGIL estimates slope, roughness, steps, drops and cliffs, then evaluates them using the rover’s footprint, wheel dimensions, clearance and climbing limits before producing motion commands. The perception-to-control flow has been demonstrated in Gazebo across rough-terrain and supporting agriculture/SAR scenarios. The repository clearly separates these demonstrated results from remaining work: some mission controllers still use simulator ground-truth pose, complete camera-based localization and repeated mission benchmarks are pending, and physical deployment has not yet been demonstrated.
