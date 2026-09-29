@@ -71,23 +71,9 @@ These captures illustrate the actual terrain overlay, map and state reporting. T
 
 Historical documentation contains superseded configurations and behaviors. Consult the current source/configuration for active thresholds; do not combine measurements from different versions into a single benchmark.
 
-## Remaining validation priorities
-
-- Evaluate visual/visual-inertial localization and feed its output into mission control.
-- Measure localization error against ground truth used only as a reference.
-- Repeat fixed A-to-B trials and report successes / attempts, collisions and human interventions.
-- Validate obstacle response, including moving obstacles and agricultural headland turns.
-- Check sensor loss, stale pose, no-route outcomes and bounded recovery.
-- Separate processing latency, simulation time and wall-clock time.
-- Complete full-field agricultural and full urban SAR missions.
-- Validate robot contact, mass/inertia and physical-hardware behavior.
-
 ## Capture provenance
 
 The JSON files were saved from the running dashboard's `/state.json`; camera images from `/camera.jpg`; dashboard images from browser screenshots. Captures were taken sequentially, so their exact timestamps and poses need not match. [File hashes](validation/capture-manifest.json) identify the committed media and status snapshots.
 
 The rough-terrain imagery includes “Rocky Terrain n4” by DarkPixel, CC BY 4.0. [Attribution](contributions.md).
 
-## Mining evidence status
-
-No dedicated mining-world run or mine-site trial was performed in this capture session. The rough-terrain and cliff images illustrate foundations relevant to the [proposed mining application](mining.md); they must not be relabelled as mining test results. Mining-specific scenario, localization, perception and mission-completion trials remain pending.
