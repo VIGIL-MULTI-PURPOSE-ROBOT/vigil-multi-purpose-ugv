@@ -169,9 +169,3 @@ The working workspace paths are preserved so existing launch files continue to r
 4. Complete the urban SAR mission.
 5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
 6. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
-
-## Team, credits and licence
-
-Developed by the **VIGIL team**; repository maintained in the [VIGIL organization](https://github.com/VIGIL-MULTI-PURPOSE-ROBOT) with [Y-Manish](https://github.com/Y-Manish). Individual contributor history is available in GitHub.
-
-The rocky terrain uses **“Rocky Terrain n4” by DarkPixel**, licensed **CC BY 4.0**. See [attribution and licence boundaries](docs/contributions.md). A top-level licence for team-owned code still requires explicit team approval.
