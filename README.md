@@ -100,6 +100,10 @@ Current recovery behavior can keep searching when no route is available. A bound
 
 These four implemented environments are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
 
+[![VIGIL simulation launcher menu listing the five environments](docs/media/vigil-launcher-menu.png)](docs/media/vigil-launcher-menu.png)
+
+*The `vigil` launcher menu: one command lists the five environments and starts the one you choose.*
+
 ### Mining: terrain inspection and navigation
 
 The proposed mining use case applies the rover’s depth-based terrain mapping, footprint-aware route planning and operator dashboard to outdoor mine-site inspection. The intended process is to select an observation point, inspect the route, identify geometric hazards, navigate around them and record the outcome.
