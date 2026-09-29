@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VIGIL master launcher - a menu that starts ONE of three independent ROS 2 / Gazebo projects.
+"""VIGIL master launcher - a menu that starts one independent ROS 2 / Gazebo project.
 
     vigil                                             (after  bash ~/Documents/vigil/setup_vigil.sh)
     python3 ~/Documents/vigil/master_launcher/vigil_launcher.py
@@ -46,6 +46,15 @@ PROJECTS = {
                      HOME / 'Documents/robot/ros2_ws/vigil_rough_terrain_ws'],
               package='vigil_rough_terrain', launch='vision_nav.launch.py', domain='71', env={},
               marks=[r'GZ_PARTITION=vigil_\d+$'], libs=['lib/vigil_rough_terrain/']),
+    '4': dict(name='Existing Mining', short='Existing Mining',
+              roots=[VIGIL / 'mining'], package='vigil_mining', launch='mining.launch.py', domain='73',
+              env={'GZ_PARTITION': 'vigil_mining', 'ROS_LOG_DIR': '{ws}/log/runtime'},
+              marks=[r'GZ_PARTITION=vigil_mining$'], libs=['lib/vigil_mining/']),
+    '5': dict(name='New Mining', short='New Mining',
+              roots=[VIGIL / 'MINNING', REPO / 'MINNING'], package='vigil_new_mining',
+              launch='mining.launch.py', domain='74',
+              env={'GZ_PARTITION': 'vigil_new_mining', 'ROS_LOG_DIR': '{ws}/log/runtime'},
+              marks=[r'GZ_PARTITION=vigil_new_mining$'], libs=['lib/vigil_new_mining/']),
 }
 
 # Variables a sourced ROS workspace sets. They are removed before sourcing, so a workspace sourced in
@@ -66,7 +75,9 @@ Select Environment:
 1. Military Search and Rescue
 2. Agriculture
 3. Rock Terrain
-4. Exit
+4. Existing Mining
+5. New Mining
+6. Exit
 """
 
 
@@ -269,17 +280,17 @@ def main():
     while True:
         print(BANNER)
         try:
-            choice = input('Select option [1-4]: ').strip()
+            choice = input('Select option [1-6]: ').strip()
         except (EOFError, KeyboardInterrupt):
             print('\nExiting...')
             return 0
-        if choice == '4':
+        if choice == '6':
             print('Exiting...')
             return 0
         if choice in PROJECTS:
             run(choice)
         else:
-            print(f'\nInvalid option "{choice}". Enter 1, 2, 3 or 4.')
+            print(f'\nInvalid option "{choice}". Enter 1, 2, 3, 4, 5 or 6.')
 
 
 if __name__ == '__main__':

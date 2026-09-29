@@ -3,11 +3,13 @@
 **Vision-Integrated Ground Intelligence and Localization**
 **Smart India Hackathon 2026 · SIH26126 · ROS 2 Jazzy · Gazebo Harmonic**
 
-VIGIL explores how an eight-wheel unmanned ground vehicle can interpret outdoor terrain, plan a route and drive toward a destination. The project combines simulated cameras, terrain perception, planning, wheel control and operator dashboards across rough-terrain, agriculture and search-and-rescue environments. **Mining-site inspection and navigation** is an intended application of the rough-terrain work; its scope and remaining integration are documented below.
+VIGIL explores how an eight-wheel unmanned ground vehicle can interpret terrain, plan a route and drive toward a destination. The project combines simulated cameras, terrain perception, planning, wheel control and operator dashboards across rough-terrain, agriculture, search-and-rescue and a new underground mining environment.
 
-**Current stage: simulation prototype.** Depth-based navigation is implemented; full camera-based localization across the mission pipelines remains a development goal. The scenarios have separate implementations, and several mission controllers currently use simulator ground-truth position. No physical rover deployment is demonstrated here.
+**Current stage: simulation prototype.** Depth-based navigation is implemented. The New Mining workspace uses RGB-D visual SLAM with wheel/IMU fusion and a Point B dashboard; other mission controllers may still use simulator ground-truth position. No physical rover deployment is demonstrated here.
 
 [Capabilities and innovation](docs/capabilities-and-innovation.md) · [Architecture](docs/architecture.md) · [How it works](docs/navigation-workflow.md) · [Run a demo](docs/setup.md) · [Evidence and limitations](docs/validation.md) · [Detailed operations](docs/operations.md) · [Maintainer guide](docs/maintaining.md)
+
+[New Mining environment and dashboard](docs/new-mining.md)
 
 ## See the system
 

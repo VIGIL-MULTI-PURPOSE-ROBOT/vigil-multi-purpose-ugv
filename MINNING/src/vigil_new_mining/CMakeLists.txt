@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.8)
+project(vigil_new_mining)
+find_package(ament_cmake REQUIRED)
+install(DIRECTORY launch config worlds models urdf meshes dashboard rviz DESTINATION share/${PROJECT_NAME})
+install(PROGRAMS scripts/drive.py scripts/mining_runtime.py scripts/navigation_core.py DESTINATION lib/${PROJECT_NAME})
+ament_package()

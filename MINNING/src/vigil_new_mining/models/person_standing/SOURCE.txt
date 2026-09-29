@@ -1,0 +1,1 @@
+Standing person by Marina Kollmitz, created with MakeHuman. Source: https://github.com/osrf/gazebo_models/tree/master/person_standing

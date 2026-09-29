@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!-- Original CAD geometry with passive, independently sprung wheel carriers. -->
+<robot name="agri_ugv" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="simulation" default="false"/>
+  <xacro:arg name="standing_angle" default="-0.06283185307179587"/>
+  <xacro:arg name="controllers_file" default="$(find vigil_new_mining)/config/controllers.yaml"/>
+  <xacro:include filename="$(find vigil_new_mining)/urdf/cad_geometry.xacro"/>
+  <xacro:property name="standing" value="$(arg standing_angle)"/>
+  <material name="aluminum"><color rgba="0.65 0.67 0.70 1"/></material>
+  <material name="rubber"><color rgba="0.07 0.07 0.08 1"/></material>
+  <xacro:macro name="inertia" params="mass x y z">
+    <inertial><mass value="${mass}"/><inertia ixx="${mass*(y*y+z*z)/12}" ixy="0" ixz="0" iyy="${mass*(x*x+z*z)/12}" iyz="0" izz="${mass*(x*x+y*y)/12}"/></inertial>
+  </xacro:macro>
+  <xacro:macro name="box" params="name mass x y z color">
+    <link name="${name}"><xacro:inertia mass="${mass}" x="${x}" y="${y}" z="${z}"/>
+      <visual><geometry><box size="${x} ${y} ${z}"/></geometry><material name="${color}"/></visual>
+      <collision><geometry><box size="${x} ${y} ${z}"/></geometry></collision>
+    </link>
+  </xacro:macro>
+  <link name="base_footprint"/>
+  <link name="base_link">
+    <inertial><origin xyz="-0.0753 0 -0.1264"/><mass value="26.4"/>
+      <inertia ixx="${26.4*(0.5**2+0.3523**2)/12}" ixy="0" ixz="0" iyy="${26.4*(1.0737**2+0.3523**2)/12}" iyz="0" izz="${26.4*(1.0737**2+0.5**2)/12}"/>
+    </inertial>
+    <xacro:cad_visual part="body"/>
+    <collision><origin xyz="-0.0753 0 -0.1264"/><geometry><box size="1.0737 0.5 0.3523"/></geometry></collision>
+  </link>
+  <joint name="body_reference" type="fixed"><parent link="base_footprint"/><child link="base_link"/><origin xyz="0 0 0.5872"/></joint>
+  <link name="payload"><xacro:inertia mass="65.71" x="0.85" y="0.40" z="0.22"/></link>
+  <joint name="payload_mount" type="fixed"><parent link="base_link"/><child link="payload"/><origin xyz="-0.05 0 -0.13"/></joint>
+  <!-- Positive suspension displacement is bump (wheel upward). The original CAD
+       axle components move with each carrier; overlapping guides retain attachment.
+       Zero displacement preserves every original wheel centre and body reference. -->
+  <xacro:macro name="wheel" params="side index xyz radius width mass">
+    <xacro:property name="spring_ref" value="${([0.008518, -0.067440, -0.107188, -0.024440] if side == 'L' else [0.022243, -0.059360, -0.103577, -0.024440])[int(index)-1]}"/>
+    <xacro:property name="wy" value="${float(xyz.split()[1])}"/>
+    <xacro:property name="guide_y" value="${(0.065 if side == 'L' else -0.065)-wy}"/>
+    <link name="${side}${index}_guide">
+      <xacro:inertia mass="0.6" x="0.045" y="0.045" z="0.30"/>
+      <visual><origin xyz="0 ${guide_y} 0.08"/><geometry><box size="0.045 0.045 0.30"/></geometry><material name="aluminum"/></visual>
+      <collision><origin xyz="0 ${guide_y} 0.08"/><geometry><box size="0.045 0.045 0.30"/></geometry></collision>
+    </link>
+    <joint name="${side}${index}_guide_mount" type="fixed"><parent link="${side}_rocker_link"/><child link="${side}${index}_guide"/><origin xyz="${xyz}"/></joint>
+    <link name="${side}${index}_carrier">
+      <xacro:inertia mass="1.5" x="0.05" y="${2*fabs(wy)}" z="0.22"/>
+      <xacro:cad_visual part="${side}${index}_axle"/>
+      <visual><origin xyz="0 ${guide_y} 0"/><geometry><box size="0.028 0.028 0.22"/></geometry><material name="aluminum"/></visual>
+      <collision><origin xyz="0 ${-wy/2} 0" rpy="${pi/2} 0 0"/><geometry><cylinder radius="0.018" length="${fabs(wy)}"/></geometry></collision>
+    </link>
+    <joint name="${side}${index}_suspension" type="prismatic">
+      <parent link="${side}${index}_guide"/><child link="${side}${index}_carrier"/>
+      <axis xyz="0 0 1"/><limit lower="-0.10" upper="0.12" effort="4000" velocity="2.0"/>
+      <dynamics damping="650" friction="0"/>
+    </joint>
+    <gazebo reference="${side}${index}_suspension"><springStiffness>8000</springStiffness><springReference>${spring_ref}</springReference></gazebo>
+    <link name="${side}${index}_wheel">
+      <inertial><mass value="${mass}"/><inertia ixx="${mass*(3*radius*radius+width*width)/12}" ixy="0" ixz="0" iyy="${mass*radius*radius/2}" iyz="0" izz="${mass*(3*radius*radius+width*width)/12}"/></inertial>
+      <xacro:cad_visual part="${side}${index}_tyre" material="rubber"/>
+      <xacro:cad_visual part="${side}${index}_hub"/>
+      <collision><origin rpy="${pi/2} 0 0"/><geometry><cylinder radius="${radius}" length="${width}"/></geometry></collision>
+    </link>
+    <joint name="${side}${index}_joint" type="continuous"><parent link="${side}${index}_carrier"/><child link="${side}${index}_wheel"/><axis xyz="0 1 0"/><limit effort="400" velocity="15"/><dynamics damping="0.05" friction="0.2"/></joint>
+    <gazebo reference="${side}${index}_wheel"><mu1>0.85</mu1><mu2>0.85</mu2><kp>1000000</kp><kd>300</kd><minDepth>0.001</minDepth><maxVel>0.1</maxVel></gazebo>
+    <gazebo reference="${side}${index}_wheel">
+      <sensor name="${side}${index}_contact" type="contact">
+        <always_on>true</always_on><update_rate>50</update_rate>
+        <topic>/suspension/contacts/${side}${index}</topic>
+        <contact><collision>${side}${index}_wheel_collision</collision><topic>/suspension/contacts/${side}${index}</topic></contact>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+  <xacro:macro name="side" params="name sign">
+    <link name="${name}_rocker_link">
+      <inertial><origin xyz="0.57 0 -0.13"/><mass value="9.4"/><inertia ixx="0.02263" ixy="0" ixz="0" iyy="1.34146" iyz="0" izz="1.32835"/></inertial>
+      <xacro:cad_visual part="${name}_suspended_rocker"/>
+      <!-- Conservative beam contact proxy; detailed CAD is visual only. -->
+      <collision><origin xyz="0.65 0 -0.25"/><geometry><box size="0.85 0.08 0.065"/></geometry></collision>
+    </link>
+    <joint name="${name}_rocker" type="revolute"><parent link="base_link"/><child link="${name}_rocker_link"/>
+      <origin xyz="-0.5697 ${sign*0.30} -0.135" rpy="0 ${-standing} 0"/><axis xyz="0 1 0"/>
+      <limit lower="-0.20" upper="0.20" effort="4000" velocity="1.0"/><dynamics damping="300"/>
+    </joint>
+    <gazebo reference="${name}_rocker"><springStiffness>3500</springStiffness><springReference>${0.066739 if name == 'L' else 0.066028}</springReference></gazebo>
+    <xacro:if value="${sign > 0}"><xacro:cad_L_wheels/></xacro:if>
+    <xacro:unless value="${sign > 0}"><xacro:cad_R_wheels/></xacro:unless>
+  </xacro:macro>
+  <xacro:side name="L" sign="${1}"/><xacro:side name="R" sign="${-1}"/>
+  <link name="camera_link"><xacro:inertia mass="0.15" x="0.03" y="0.124" z="0.03"/><xacro:cad_visual part="camera" material="rubber" pitch="-0.1745"/></link>
+  <joint name="camera_mount" type="fixed"><parent link="base_link"/><child link="camera_link"/><origin xyz="0.4672 0 0.0119" rpy="0 0.1745 0"/></joint>
+  <link name="camera_optical_frame"/>
+  <joint name="camera_optical_joint" type="fixed"><parent link="camera_link"/><child link="camera_optical_frame"/><origin rpy="${-pi/2} 0 ${-pi/2}"/></joint>
+  <link name="lidar_link"><xacro:inertia mass="0.8" x="0.07" y="0.07" z="0.06"/><xacro:cad_visual part="lidar" material="rubber"/></link>
+  <joint name="lidar_mount" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="-0.5865 0 0.497"/></joint>
+  <link name="imu_link"><xacro:inertia mass="0.05" x="0.03" y="0.03" z="0.01"/></link>
+  <joint name="imu_mount" type="fixed"><parent link="base_link"/><child link="imu_link"/><origin xyz="-0.0753 0 -0.1264"/></joint>
+  <xacro:if value="$(arg simulation)"><xacro:include filename="$(find vigil_new_mining)/urdf/simulation.xacro"/></xacro:if>
+  <!-- Added for vision navigation: optional segmentation camera (default off). -->
+  <xacro:arg name="vision_sensors" default="false"/>
+  <xacro:if value="$(arg vision_sensors)"><xacro:include filename="$(find vigil_new_mining)/urdf/vision_sensors.xacro"/></xacro:if>
+</robot>

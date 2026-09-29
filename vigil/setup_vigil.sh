@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup of the VIGIL master launcher. Changes nothing inside the three projects.
+# One-time setup of the VIGIL master launcher. Changes nothing inside the projects.
 #   bash vigil/setup_vigil.sh      (from the repository root, or ~/Documents/vigil/setup_vigil.sh)
 #  1. makes the launcher executable
 #  2. installs the `vigil` command (~/.local/bin/vigil -> ~/Documents/vigil/vigil)
@@ -26,8 +26,8 @@ link() {  # link <shortcut> <real project folder>
 }
 REPO="$(dirname "$VIGIL")"
 if [[ -d "$REPO/military_world/sar_ws" && -d "$REPO/ros2_ws" && -d "$REPO/vigil_rough_terrain_ws" ]]; then
-  # a clone of the GitHub repository: the launcher finds the three projects next to vigil/
-  echo "projects:  $REPO/{military_world,ros2_ws,vigil_rough_terrain_ws} (no links needed)"
+  # A clone of the GitHub repository: versioned projects are next to vigil/.
+  echo "projects:  $REPO/{military_world,ros2_ws,vigil_rough_terrain_ws,MINNING} (no links needed)"
 else
   link agriculture/ros2_ws                 "$HOME/Documents/robot/ros2_ws"
   if [[ -d "$HOME/Documents/robot/vigil_rough_terrain_ws" ]]; then
@@ -36,6 +36,7 @@ else
     link rock_terrain/vigil_rough_terrain_ws "$HOME/Documents/robot/ros2_ws/vigil_rough_terrain_ws"
   fi
   link military_sar/military_world         "$HOME/Documents/military_world"
+  link MINNING                             "$HOME/Documents/vigil/MINNING"
 fi
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) echo "ready: type  vigil" ;;

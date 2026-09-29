@@ -1,0 +1,66 @@
+Panels:
+- Class: rviz_common/Displays
+  Name: Displays
+Visualization Manager:
+  Class: ''
+  Global Options:
+    Fixed Frame: map
+    Background Color: 20; 24; 29
+  Displays:
+  - Class: rviz_default_plugins/Grid
+    Name: Reference grid
+    Enabled: true
+  - Class: rviz_default_plugins/TF
+    Name: TF
+    Enabled: true
+  - Class: rviz_default_plugins/RobotModel
+    Name: Eight wheel robot
+    Enabled: true
+    Description Source: Topic
+    Description Topic:
+      Value: /robot_description
+  - Class: rviz_default_plugins/PointCloud2
+    Name: Visual SLAM accumulated map
+    Enabled: true
+    Topic:
+      Value: /cloud_map
+    Size (m): 0.04
+  - Class: rviz_default_plugins/Map
+    Name: Visual SLAM navigation projection
+    Enabled: true
+    Topic:
+      Value: /map
+    Size (m): 0.04
+  - Class: rviz_default_plugins/Path
+    Name: Exploration path
+    Enabled: true
+    Topic:
+      Value: /mining/path
+    Size (m): 0.04
+  - Class: rviz_default_plugins/Path
+    Name: Robot trajectory
+    Enabled: true
+    Topic:
+      Value: /mining/trajectory
+    Size (m): 0.04
+  - Class: rviz_default_plugins/Odometry
+    Name: Visual odometry
+    Enabled: true
+    Topic:
+      Value: /odom
+    Size (m): 0.04
+  - Class: rviz_default_plugins/Odometry
+    Name: Wheel odometry
+    Enabled: true
+    Topic:
+      Value: /wheel/odom
+    Size (m): 0.04
+  - Class: rviz_default_plugins/MarkerArray
+    Name: Detected humans and hazards
+    Enabled: true
+    Topic:
+      Value: /mining/markers
+    Size (m): 0.04
+Window Geometry:
+  Width: 1200
+  Height: 800

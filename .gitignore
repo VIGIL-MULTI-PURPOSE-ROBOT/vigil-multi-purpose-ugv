@@ -14,3 +14,9 @@
 .env
 .env.*
 .DS_Store
+# Licensed third-party mine data is installed locally and is never redistributed.
+MINNING/src/vigil_new_mining/models/mine/meshes/*.obj
+MINNING/src/vigil_new_mining/models/mine/meshes/*.stl
+MINNING/src/vigil_new_mining/models/mine/meshes/*.mtl
+MINNING/src/vigil_new_mining/models/mine/materials/textures/*.png
+MINNING/src/vigil_new_mining/config/yolov3-tiny.weights

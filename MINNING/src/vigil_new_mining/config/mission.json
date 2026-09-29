@@ -1,0 +1,24 @@
+{
+  "spawn": [
+    1.0,
+    -23.0,
+    1.241,
+    2.2
+  ],
+  "gas_zones": [
+    {
+      "x": -15,
+      "y": -2,
+      "sigma": 3,
+      "peak_ppm": 18000
+    },
+    {
+      "x": 13,
+      "y": 13,
+      "sigma": 2,
+      "peak_ppm": 6000
+    }
+  ],
+  "temperature_base": 19,
+  "humidity_base": 62
+}
