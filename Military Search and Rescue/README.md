@@ -590,26 +590,6 @@ a world that has already been configured.
 4. **Weather is a table, not a simulation.** Fog/rain/dust/snowfall need
    Gazebo `<scene><fog>` and sensor noise models configured from
    `sar_metadata.json`. Blender volumetrics stay in Blender.
-5. **ROS 2 Humble + Gazebo Harmonic is not an upstream-supported pair.**
-   Harmonic pairs with Jazzy; Humble's binary `ros_gz` targets Fortress. If
-   you stay on Humble you are building `ros_gz` from source against
-   Harmonic. The world itself is version-agnostic, so this is a bridge
-   problem -- but budget for it before demo week.
-6. **Prop physics is configured here, not validated here.** Mass and
-   inertia are computed analytically and written into each model.sdf, but
-   nothing in this pipeline runs a Gazebo step. Expect to tune
-   `max_step_size`, contact `max_vel` and `min_depth` once you spawn
-   them — a 4.5 kg cone on a mesh terrain is exactly the mass range where
-   a soft contact solver jitters.
-7. **Vegetation is low-poly and untextured.** Good LiDAR silhouettes and
-   real occlusion; it will not win a render competition. That trade was
-   made on purpose in favour of simulation rate.
-8. **No texture maps.** Flat materials only. Feature-based visual SLAM will
-   find geometry (walls, trunks, containers, rubble, the comms mast) but
-   little surface texture. If you are testing a descriptor-based VO
-   front-end, add textures before drawing conclusions.
-9. **The base apron is genuinely flat** by design, so the
-   `no_large_perfectly_flat_areas` check tolerates it.
 
 ## 20. How to regenerate
 
