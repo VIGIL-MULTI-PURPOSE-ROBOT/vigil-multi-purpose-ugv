@@ -10,8 +10,7 @@ Use commit history and linked source modules when presenting individual contribu
 
 ## External foundations
 
-ROS 2, Gazebo Harmonic, ros2_control, robot_localization, RTAB-Map and Nav2 provide external middleware, simulation, estimation and navigation components. Describe the team's configuration/integration separately from authorship of those projects.
-
+ROS 2, Gazebo Harmonic, ros2_control, robot_localization, RTAB-Map and Nav2 provide external middleware, simulation, estimation and navigation components.
 ## Rocky terrain credit
 
 This work is based on [“Rocky Terrain n4”](https://sketchfab.com/3d-models/rocky-terrain-n4-95939b2b45d14c4b8858180b5497398a) by [DarkPixel](https://sketchfab.com/darkpixel8), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The terrain is scaled/adapted for simulation. The new rough-terrain captures depict this asset.
