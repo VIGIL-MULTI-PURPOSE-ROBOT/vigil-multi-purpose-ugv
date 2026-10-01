@@ -5,6 +5,8 @@ The default `agri_ugv` spawned in the existing cotton farm now uses
 `660776500e243604f17f388921b051b83f0a0db94dda5d01ccfc34054a9ba37e`).
 The agricultural world and launch command are unchanged.
 
+**CAD model location:** <https://a360.co/4cynHuB>
+
 ```bash
 cd /home/user/Documents/robot/ros2_ws
 ./run.sh
