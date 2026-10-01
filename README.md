@@ -137,7 +137,7 @@ The existing rough-terrain simulation provides a development foundation. A repre
 - An agricultural simulation with mapping, crop-row mission logic, perception and monitoring.
 - Mission worlds, test scenarios and recorded engineering checks.
 
-The team reports mechanical design work in AutoCAD and Fusion 360. The checked-in [CAD adaptation notes](Agriculture/CAD_UPDATE.md) describe the simulated geometry and its assumptions; an exact as-built mechanical twin is not established.
+The team reports mechanical design work in AutoCAD and Fusion 360 ([view the shared design](https://a360.co/4cynHuB)). The checked-in [CAD adaptation notes](Agriculture/CAD_UPDATE.md) describe the simulated geometry and its assumptions; an exact as-built mechanical twin is not established.
 
 ROS 2, Gazebo, RTAB-Map, Nav2 and third-party terrain assets are external foundations, not team-authored algorithms. See [contributions and attribution](docs/contributions.md).
 
