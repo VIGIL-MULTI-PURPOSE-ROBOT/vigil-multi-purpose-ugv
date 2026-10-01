@@ -53,7 +53,7 @@ The main technical innovation is the connection between **camera-derived terrain
 
 ## System architecture
 
-The diagram below describes the **current rough-terrain demonstration**, the clearest entry point into perception-to-control behavior. [The architecture guide](docs/architecture.md) explains how the other implementations differ.
+The diagram below describes the clearest entry point into perception-to-control behavior. [The architecture guide](docs/architecture.md) explains how the other implementations differ.
 
 ```mermaid
 flowchart LR
