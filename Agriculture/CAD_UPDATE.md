@@ -35,20 +35,6 @@ Stop with Ctrl-C before starting another run. `run.sh` builds automatically.
 - Existing eight-wheel drive commands, six encoder interfaces, sensor topics,
   total assumed mass (286.11 kg), and autonomy interfaces are retained.
 
-## Engineering limits
-
-The STL has no joint graph, material assignments, masses, or hydraulic
-specifications. The rocker pivots are inferred from the rear cross-shaft.
-Masses, inertia, spring/damping values, joint limits, and actuator control remain
-simulation assumptions. Cylinder visuals are rigidly attached to the rocker;
-they do not simulate a closed-loop cylinder/rod linkage. Collision shapes use
-wheel cylinders and conservative chassis/beam boxes, not detailed STL contact.
-
-This is the agriculture rover update, not the separate four-versus-eight-wheel
-terrain comparison. It does not claim eight independent passive wheel arms.
-The previous empirical 1.3 m effective skid-steer track calibration is retained
-in drive/odometry; this is not the physical CAD track. Crop clearance, headland
-turning and complete autonomous missions need revalidation with the new stance.
 
 ## Reproduce and check
 
