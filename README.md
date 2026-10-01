@@ -27,6 +27,25 @@ The video presents the VIGIL concept and its simulation work. Simulation capture
 
 [demo-video]: https://youtu.be/WZutmP8n8Oc?si=ThVBvrjVecI3OAJ3
 
+## Repository Layout
+
+```text
+vigil-multi-purpose-ugv/
+├── README.md                    Project overview and video link
+├── STRUCTURE.md                 Which folder holds which environment
+├── docs/                        Architecture, workflow, setup and evidence
+│   ├── media/                   Simulation captures
+│   └── validation/              Captured machine-readable status
+├── vigil/                       Launcher menu for the five environments
+├── Military Search and Rescue/  SAR world, assets and ROS workspace
+├── Agriculture/                 Agriculture ROS workspace
+├── Rock Terrain/                Rough-terrain ROS workspace
+├── Existing Mining/             Existing mining application notes and captures
+└── New Mining/                  Underground mine ROS workspace
+```
+
+Each environment folder has its own `README.md`. Build outputs, installation folders and logs remain excluded from version control.
+
 ## The problem we address
 
 SIH26126 concerns vision-based autonomous navigation for an outdoor UGV in GPS-denied conditions. The central engineering tasks are finding traversable ground, estimating position from visual observations, and avoiding obstacles while reaching a destination.
@@ -148,22 +167,6 @@ ros2 launch vigil_rough_terrain vision_nav.launch.py
 ```
 
 Open **http://localhost:8080** to view the camera, terrain map, path and mission state. Stop with **Ctrl+C** in the launch terminal. [Other scenarios and troubleshooting](docs/setup.md).
-
-## Repository guide
-
-```text
-vigil-multi-purpose-ugv/
-├── README.md                   Project overview and video link
-├── docs/                       Architecture, workflow, setup and evidence
-│   ├── media/                  New live simulation captures
-│   └── validation/             Captured machine-readable status
-├── vigil/                      Existing environment launcher
-├── vigil_rough_terrain_ws/      Rough-terrain ROS workspace
-├── ros2_ws/                    Agriculture ROS workspace
-└── military_world/             SAR world, assets and ROS workspace
-```
-
-The working workspace paths are preserved so existing launch files continue to resolve assets. Build outputs, installation folders and logs remain excluded from version control.
 
 ## Next engineering milestones
 
