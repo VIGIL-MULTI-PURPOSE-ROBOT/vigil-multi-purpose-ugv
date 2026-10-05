@@ -175,4 +175,6 @@ Open **http://localhost:8080** to view the camera, terrain map, path and mission
 3. Validate moving-obstacle response, blocked routes, sensor loss and bounded recovery.
 4. Complete the urban SAR mission.
 5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
-6. Validate mechanical assumptions and transfer the autonomy stack to physical hardware.
+6. Cooperative Multi-Robot Operation: Enable multiple UGVs to share maps, terrain observations, hazards, and mission assignments for faster coverage of large or dangerous areas.
+7. Long-Range Communication: Integrate communication technologies such as LoRa, mesh networking, or private 5G for remote monitoring and control in mines, farms, forests, and disaster zones.
+
