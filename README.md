@@ -170,7 +170,7 @@ Open **http://localhost:8080** to view the camera, terrain map, path and mission
 
 ## Next engineering milestones
 
-1. Replace simulator-pose dependencies with an evaluated visual or visual-inertial estimate in each mission loop.
+1. Simulation-to-Real Dataset Validation: Extend the simulation-based framework by integrating real-world off-road datasets such as RUGD and RELLIS-3D. This will enable systematic evaluation of terrain segmentation, traversability prediction, and perception robustness under realistic environmental conditions.
 2. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
 3. Validate moving-obstacle response, blocked routes, sensor loss and bounded recovery.
 4. Complete the urban SAR mission.
