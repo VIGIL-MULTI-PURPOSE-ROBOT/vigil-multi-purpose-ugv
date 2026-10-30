@@ -169,6 +169,22 @@ virtual display, so the host does not need a native ROS installation. See the
 [cross-platform guide](docs/cross-platform.md) for requirements, configuration
 and current limitations.
 
+To use the VIGIL terminal menu, install its command once and then select
+**3. Rock Terrain**:
+
+```console
+# Linux or macOS
+bash vigil/setup_vigil.sh
+vigil --docker
+```
+
+```powershell
+# Windows PowerShell
+Set-ExecutionPolicy -Scope Process Bypass
+.\vigil\setup_vigil.ps1
+vigil --docker
+```
+
 ### Native Ubuntu
 
 Use **Ubuntu 24.04, ROS 2 Jazzy and Gazebo Harmonic**. Install the dependencies in [setup](docs/setup.md) before running these commands.

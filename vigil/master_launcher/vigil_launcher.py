@@ -228,6 +228,9 @@ def script(p, ws, setup):
 
 
 def run(key):
+    if key == '3' and '--gpu' in sys.argv[1:]:
+        subprocess.run([sys.executable, str(REPO / 'docker/run_gpu.py')], check=False)
+        return
     if key == '3' and (DOCKER_MODE or ros_setup() is None):
         run_docker()
         return
@@ -313,7 +316,7 @@ def run_docker():
 
 def main():
     if '--help' in sys.argv[1:] or '-h' in sys.argv[1:]:
-        print('Usage: vigil [--docker]\n\n--docker  run Rock Terrain with the portable Docker runtime')
+        print('Usage: vigil [--docker | --gpu]\n\n--docker  portable browser desktop\n--gpu     Linux GPU Docker with native Gazebo window')
         return 0
     while True:
         print(BANNER)

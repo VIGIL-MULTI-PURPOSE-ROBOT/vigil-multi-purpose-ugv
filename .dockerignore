@@ -1,0 +1,16 @@
+.git
+.github
+**/build
+**/install
+**/log
+**/__pycache__
+**/*.pyc
+Agriculture
+Existing Mining
+Mechanical Design
+Military Search and Rescue
+New Mining
+docs
+vigil
+Rock Terrain/docs
+Rock Terrain/reports

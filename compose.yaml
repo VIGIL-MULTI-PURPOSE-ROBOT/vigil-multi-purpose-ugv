@@ -1,0 +1,33 @@
+services:
+  vigil:
+    build:
+      context: .
+    image: vigil-rough-terrain:local
+    ports:
+      - "127.0.0.1:${VIGIL_DESKTOP_PORT:-6080}:6080"
+      - "127.0.0.1:${VIGIL_DASHBOARD_PORT:-8080}:8080"
+    environment:
+      ROS_DOMAIN_ID: "${VIGIL_ROS_DOMAIN_ID:-71}"
+      LIBGL_ALWAYS_SOFTWARE: "1"
+      VIGIL_DESKTOP_SIZE: "${VIGIL_DESKTOP_SIZE:-1600x900x24}"
+      VIGIL_SCENARIO: "${VIGIL_SCENARIO:-}"
+    shm_size: "2gb"
+    command:
+      - ros2
+      - launch
+      - vigil_rough_terrain
+      - vision_nav.launch.py
+      - gui:=true
+      - "camera_width:=${VIGIL_CAMERA_WIDTH:-960}"
+      - "camera_height:=${VIGIL_CAMERA_HEIGHT:-720}"
+      - "camera_rate:=${VIGIL_CAMERA_RATE:-5}"
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - "import urllib.request; [urllib.request.urlopen(url, timeout=3) for url in ('http://127.0.0.1:6080/', 'http://127.0.0.1:8080/')]"
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s

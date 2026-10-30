@@ -14,6 +14,14 @@
 .env
 .env.*
 .DS_Store
+
+# Machine-local shortcuts created by the VIGIL setup scripts.
+# These are absolute symlinks on Linux and are not portable to Windows/macOS.
+vigil/MINNING
+vigil/agriculture/ros2_ws
+vigil/military_sar/military_world
+vigil/rock_terrain/vigil_rough_terrain_ws
+
 # Licensed third-party mine data is installed locally and is never redistributed.
 New Mining/src/vigil_new_mining/models/mine/meshes/*.obj
 New Mining/src/vigil_new_mining/models/mine/meshes/*.stl

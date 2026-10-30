@@ -18,6 +18,22 @@ run the same way on Linux, macOS and Windows without installing ROS on the host.
 
 ## Start
 
+Clone the repository into a normal user folder (not `C:\Windows\System32`),
+then enter it. For example, in PowerShell:
+
+```powershell
+Set-Location $HOME\Documents
+git clone https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/vigil-multi-purpose-ugv.git
+Set-Location .\vigil-multi-purpose-ugv
+```
+
+On Linux or macOS, the equivalent first-time commands are:
+
+```console
+git clone https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/vigil-multi-purpose-ugv.git
+cd vigil-multi-purpose-ugv
+```
+
 ### VIGIL terminal menu
 
 Install the one-word launcher once. On Linux or macOS:

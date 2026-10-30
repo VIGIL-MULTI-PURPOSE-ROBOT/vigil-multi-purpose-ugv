@@ -4,8 +4,7 @@
 #  1. makes the launcher executable
 #  2. installs the `vigil` command (~/.local/bin/vigil -> ~/Documents/vigil/vigil)
 #  3. in a clone of the GitHub repository: nothing more (the projects are next to vigil/);
-#     otherwise creates SHORTCUT LINKS to the three projects (they stay where they are; nothing is moved or
-#     copied, so their builds and absolute paths keep working):
+#     otherwise creates SHORTCUT LINKS to locally installed projects (they stay where they are):
 #        agriculture/ros2_ws                 -> ~/Documents/robot/ros2_ws
 #        rock_terrain/vigil_rough_terrain_ws -> ~/Documents/robot/vigil_rough_terrain_ws
 #        military_sar/military_world         -> ~/Documents/military_world
@@ -26,9 +25,9 @@ link() {  # link <shortcut> <real project folder>
   fi
 }
 REPO="$(dirname "$VIGIL")"
-if [[ -d "$REPO/military_world/sar_ws" && -d "$REPO/ros2_ws" && -d "$REPO/vigil_rough_terrain_ws" ]]; then
-  # A clone of the GitHub repository: versioned projects are next to vigil/.
-  echo "projects:  $REPO/{military_world,ros2_ws,vigil_rough_terrain_ws,MINNING} (no links needed)"
+if [[ -d "$REPO/Military Search and Rescue" && -d "$REPO/Agriculture" && -d "$REPO/Rock Terrain" ]]; then
+  # A current repository clone: the launcher resolves these folders directly.
+  echo "projects:  repository clone detected (no local shortcut links needed)"
 else
   link agriculture/ros2_ws                 "$HOME/Documents/robot/ros2_ws"
   if [[ -d "$HOME/Documents/robot/vigil_rough_terrain_ws" ]]; then
