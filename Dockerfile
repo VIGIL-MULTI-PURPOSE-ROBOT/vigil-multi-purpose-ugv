@@ -33,14 +33,23 @@ RUN apt-get update \
 WORKDIR /opt/vigil_ws
 COPY ["Rock Terrain/src/", "src/"]
 
-RUN . /opt/ros/jazzy/setup.sh \
+# A Windows checkout may use CRLF even when a user's global Git settings
+# override repository attributes. Linux cannot execute a CRLF shebang and
+# reports the misleading error "No such file or directory". Normalize every
+# executable source script inside the image before colcon installs it.
+RUN find src -type f \( -name '*.py' -o -name '*.sh' -o -name '*.bash' \) \
+        -exec sed -i 's/\r$//' {} + \
+    && . /opt/ros/jazzy/setup.sh \
     && colcon build \
         --merge-install \
         --packages-select vigil_rough_terrain \
-        --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
+        --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3 \
+    && test -x install/lib/vigil_rough_terrain/ugv_dashboard.py \
+    && python3 -c "from pathlib import Path; p=Path('install/lib/vigil_rough_terrain/ugv_dashboard.py'); assert b'\\r' not in p.read_bytes().split(b'\\n', 1)[0]"
 
 COPY docker/vigil-entrypoint.sh /usr/local/bin/vigil-entrypoint
-RUN chmod +x /usr/local/bin/vigil-entrypoint \
+RUN sed -i 's/\r$//' /usr/local/bin/vigil-entrypoint \
+    && chmod +x /usr/local/bin/vigil-entrypoint \
     && ln -sf vnc.html /usr/share/novnc/index.html
 
 ENV LIBGL_ALWAYS_SOFTWARE=1 \
