@@ -29,6 +29,7 @@ VIGIL = Path(__file__).resolve().parent.parent          # ~/Documents/vigil
 # the shortcut links in vigil/ (setup_vigil.sh), then the folder next to vigil/ (a clone of the
 # GitHub repository), then the original location on the author's PC.
 REPO = VIGIL.parent                                     # the repository root when cloned from GitHub
+DOCKER_MODE = '--docker' in sys.argv[1:]
 # ROS_DOMAIN_ID and environment are the values each project documents for itself (run.sh / README).
 PROJECTS = {
     '1': dict(name='Military Search and Rescue', short='Military SAR',
@@ -227,6 +228,9 @@ def script(p, ws, setup):
 
 
 def run(key):
+    if key == '3' and (DOCKER_MODE or ros_setup() is None):
+        run_docker()
+        return
     p = PROJECTS[key]
     ws, launch, err = locate(p)
     if err:
@@ -276,7 +280,41 @@ def run(key):
     print(f"\n{p['name']} stopped (exit code {rc}). Returning to the menu.")
 
 
+def run_docker():
+    """Run the portable Rock Terrain profile on hosts without a native ROS installation."""
+    compose = REPO / 'compose.yaml'
+    if not compose.exists():
+        print(f'\nERROR:\nPortable runtime not found ({compose} missing).')
+        return
+    try:
+        check = subprocess.run(['docker', 'compose', 'version'], stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL, check=False)
+    except FileNotFoundError:
+        print('\nERROR:\nDocker is not installed or is not available on PATH.')
+        return
+    if check.returncode != 0:
+        print('\nERROR:\nDocker Compose is not installed. Run: docker compose version')
+        return
+
+    print('\nStarting Rock Terrain with Docker...')
+    print('Gazebo desktop: http://localhost:6080/?autoconnect=true&resize=scale')
+    print('VIGIL dashboard: http://localhost:8080')
+    print('Use Set goal B on the dashboard to command the rover.')
+    print('Press Ctrl+C to stop it and return to this menu.\n')
+    rc = 1
+    try:
+        rc = subprocess.run(['docker', 'compose', 'up', '--build'], cwd=str(REPO), check=False).returncode
+    except KeyboardInterrupt:
+        rc = 130
+    finally:
+        subprocess.run(['docker', 'compose', 'down'], cwd=str(REPO), check=False)
+    print(f'\nDocker simulation stopped (exit code {rc}). Returning to the menu.')
+
+
 def main():
+    if '--help' in sys.argv[1:] or '-h' in sys.argv[1:]:
+        print('Usage: vigil [--docker]\n\n--docker  run Rock Terrain with the portable Docker runtime')
+        return 0
     while True:
         print(BANNER)
         try:

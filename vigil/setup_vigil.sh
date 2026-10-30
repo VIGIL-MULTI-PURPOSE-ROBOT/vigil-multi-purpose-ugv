@@ -10,7 +10,8 @@
 #        rock_terrain/vigil_rough_terrain_ws -> ~/Documents/robot/vigil_rough_terrain_ws
 #        military_sar/military_world         -> ~/Documents/military_world
 set -eu
-VIGIL="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+SELF="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
+VIGIL="$(cd "$(dirname "$SELF")" && pwd)"
 chmod +x "$VIGIL/vigil" "$VIGIL/master_launcher/vigil_launcher.py"
 mkdir -p "$HOME/.local/bin"
 ln -sfn "$VIGIL/vigil" "$HOME/.local/bin/vigil"

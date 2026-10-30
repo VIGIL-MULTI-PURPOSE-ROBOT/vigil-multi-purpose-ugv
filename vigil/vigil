@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 # `vigil` command: the master launcher menu (works from any directory, also through a symlink).
-exec python3 "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/master_launcher/vigil_launcher.py" "$@"
+self="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
+exec python3 "$(dirname "$self")/master_launcher/vigil_launcher.py" "$@"

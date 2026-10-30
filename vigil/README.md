@@ -7,7 +7,9 @@ are and are built on their own.
 ```
 vigil/
 ├── vigil                      the `vigil` command (runs the launcher)
+├── vigil.cmd                  Windows command wrapper
 ├── setup_vigil.sh             one-time: installs `vigil` in ~/.local/bin
+├── setup_vigil.ps1            one-time Windows PowerShell setup
 ├── master_launcher/
 │   └── vigil_launcher.py      the menu
 ├── COLCON_IGNORE              colcon never treats this folder as a workspace
@@ -33,9 +35,18 @@ It finds them in either of these layouts:
 
 ## Setup (once)
 
+Linux or macOS:
+
 ```bash
 bash vigil/setup_vigil.sh             # from the repository root
 # if it asks: echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+```
+
+Windows PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\vigil\setup_vigil.ps1
 ```
 
 ## Run
@@ -45,6 +56,18 @@ vigil
 # or, without setup:
 python3 vigil/master_launcher/vigil_launcher.py
 ```
+
+On a computer without native ROS, option 3 automatically starts Rock Terrain
+through Docker. To force Docker on a computer that also has ROS installed:
+
+```console
+vigil --docker
+```
+
+The Docker runtime displays Gazebo at
+`http://localhost:6080/?autoconnect=true&resize=scale` and the interactive VIGIL
+dashboard at `http://localhost:8080`. Click **Set goal B**, then click the map to
+command a new destination while the simulation is running.
 
 Type 1, 2 or 3. **Ctrl+C** stops the running project. The launcher then stops anything the project
 left behind and shows the menu again. Before a project starts, processes still running from any of

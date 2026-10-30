@@ -18,6 +18,28 @@ run the same way on Linux, macOS and Windows without installing ROS on the host.
 
 ## Start
 
+### VIGIL terminal menu
+
+Install the one-word launcher once. On Linux or macOS:
+
+```console
+bash vigil/setup_vigil.sh
+vigil --docker
+```
+
+On Windows PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\vigil\setup_vigil.ps1
+vigil --docker
+```
+
+Choose **3. Rock Terrain**. The launcher builds and starts Docker, prints both
+browser addresses, and removes the container when you press `Ctrl+C`.
+
+### Direct Docker command
+
 From the repository root:
 
 ```console
