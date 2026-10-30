@@ -154,6 +154,23 @@ Historical records are retained with their original scope. New screenshots demon
 
 ## Quick start
 
+### Any desktop operating system (Docker)
+
+On Linux, macOS or Windows with Docker installed, run from the repository root:
+
+```console
+docker compose up --build
+```
+
+Open **http://localhost:6080/?autoconnect=true&resize=scale** for the complete
+Gazebo desktop and **http://localhost:8080** for the rough-terrain dashboard.
+The container includes ROS 2 Jazzy, Gazebo Harmonic and a software-rendered
+virtual display, so the host does not need a native ROS installation. See the
+[cross-platform guide](docs/cross-platform.md) for requirements, configuration
+and current limitations.
+
+### Native Ubuntu
+
 Use **Ubuntu 24.04, ROS 2 Jazzy and Gazebo Harmonic**. Install the dependencies in [setup](docs/setup.md) before running these commands.
 
 ```bash
