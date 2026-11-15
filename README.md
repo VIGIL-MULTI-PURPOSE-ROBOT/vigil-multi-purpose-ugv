@@ -154,37 +154,6 @@ Historical records are retained with their original scope. New screenshots demon
 
 ## Quick start
 
-### Any desktop operating system (Docker)
-
-On Linux, macOS or Windows with Docker installed, run from the repository root:
-
-```console
-docker compose up --build
-```
-
-Open **http://localhost:6080/?autoconnect=true&resize=scale** for the complete
-Gazebo desktop and **http://localhost:8080** for the rough-terrain dashboard.
-The container includes ROS 2 Jazzy, Gazebo Harmonic and a software-rendered
-virtual display, so the host does not need a native ROS installation. See the
-[cross-platform guide](docs/cross-platform.md) for requirements, configuration
-and current limitations.
-
-To use the VIGIL terminal menu, install its command once and then select
-**3. Rock Terrain**:
-
-```console
-# Linux or macOS
-bash vigil/setup_vigil.sh
-vigil --docker
-```
-
-```powershell
-# Windows PowerShell
-Set-ExecutionPolicy -Scope Process Bypass
-.\vigil\setup_vigil.ps1
-vigil --docker
-```
-
 ### Native Ubuntu
 
 Use **Ubuntu 24.04, ROS 2 Jazzy and Gazebo Harmonic**. Install the dependencies in [setup](docs/setup.md) before running these commands.
@@ -210,4 +179,3 @@ Open **http://localhost:8080** to view the camera, terrain map, path and mission
 5. Develop and evaluate the [mining-site inspection application](docs/mining.md) using a representative world and documented mission criteria.
 6. Cooperative Multi-Robot Operation: Enable multiple UGVs to share maps, terrain observations, hazards, and mission assignments for faster coverage of large or dangerous areas.
 7. Long-Range Communication: Integrate communication technologies such as LoRa, mesh networking, or private 5G for remote monitoring and control in mines, farms, forests, and disaster zones.
-
