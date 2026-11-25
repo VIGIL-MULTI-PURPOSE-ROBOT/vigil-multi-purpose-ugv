@@ -49,12 +49,21 @@ PROJECTS = {
     '4': dict(name='Existing Mining', short='Existing Mining',
               roots=[VIGIL / 'mining', REPO / 'Existing Mining'], package='vigil_mining', launch='mining.launch.py', domain='73',
               env={'GZ_PARTITION': 'vigil_mining', 'ROS_LOG_DIR': '{ws}/log/runtime'},
-              marks=[r'GZ_PARTITION=vigil_mining$'], libs=['lib/vigil_mining/']),
+              marks=[r'GZ_PARTITION=vigil_mining$'], libs=['lib/vigil_mining/'],
+              missing_note=('Existing Mining has no ROS package (vigil_mining) in this repository; '
+                            'the folder holds documentation and images only.\n'
+                            'For a runnable mining simulation choose option 5 (New Mining). '
+                            'See "Existing Mining/README.md".')),
     '5': dict(name='New Mining', short='New Mining',
               roots=[VIGIL / 'MINNING', REPO / 'New Mining', REPO / 'MINNING'], package='vigil_new_mining',
               launch='mining.launch.py', domain='74',
               env={'GZ_PARTITION': 'vigil_new_mining', 'ROS_LOG_DIR': '{ws}/log/runtime'},
-              marks=[r'GZ_PARTITION=vigil_new_mining$'], libs=['lib/vigil_new_mining/']),
+              marks=[r'GZ_PARTITION=vigil_new_mining$'], libs=['lib/vigil_new_mining/'],
+              # Same licensed-asset check as "New Mining/run.sh" (these files are git-ignored).
+              requires=['src/vigil_new_mining/models/mine/meshes/mine_collision.stl',
+                        'src/vigil_new_mining/models/mine/meshes/mine_u1_v1.obj',
+                        'src/vigil_new_mining/models/mine/materials/textures/tex_u1_v1_diffuse.png'],
+              requires_note='See "New Mining/src/vigil_new_mining/models/mine/README.md" before building.'),
 }
 
 # Variables a sourced ROS workspace sets. They are removed before sourcing, so a workspace sourced in
@@ -99,13 +108,19 @@ def locate(p):
         src = ws / 'src' / p['package'] / 'launch' / p['launch']
         if src.exists():
             ws = ws.resolve()
+            # Files the project's own start script insists on (e.g. licensed assets kept out of git).
+            missing = [r for r in p.get('requires', []) if not (ws / r).is_file()]
+            if missing:
+                return ws, src, (f"{p['short']} is missing required local file(s):\n  "
+                                 + '\n  '.join(str(ws / r) for r in missing)
+                                 + (f"\n{p['requires_note']}" if p.get('requires_note') else ''))
             inst = ws / 'install' / p['package'] / 'share' / p['package'] / 'launch' / p['launch']
             if not (ws / 'install/setup.bash').exists() or not inst.exists():
                 return ws, src, (f"{p['short']} workspace is not built ({inst} missing).\n"
-                                 f"Build it once:  cd {ws} && source /opt/ros/jazzy/setup.bash && colcon build "
+                                 f"Build it once:  cd \"{ws}\" && source /opt/ros/jazzy/setup.bash && colcon build "
                                  f"--symlink-install")
             return ws, src.resolve(), None
-    return None, None, f"{p['short']} launch file not found."
+    return None, None, p.get('missing_note', f"{p['short']} launch file not found.")
 
 
 # ------------------------------------------------------------------------ processes

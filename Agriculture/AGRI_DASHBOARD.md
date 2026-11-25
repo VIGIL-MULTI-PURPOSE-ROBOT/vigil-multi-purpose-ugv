@@ -6,7 +6,7 @@ Everything lives in the `agri_ugv` package of this workspace, and all settings a
 ## Run
 
 ```bash
-cd ros2_ws
+cd Agriculture
 chmod +x src/agri_ugv/scripts/*.py            # once, after new scripts were added
 ./run.sh                                      # builds, then starts Gazebo + RViz + dashboard
 # or: vigil -> 2 Agriculture   (build first: colcon build --symlink-install)

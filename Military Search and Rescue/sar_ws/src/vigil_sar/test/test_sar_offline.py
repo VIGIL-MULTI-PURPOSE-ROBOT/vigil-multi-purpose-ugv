@@ -644,8 +644,12 @@ class OverlayTests(unittest.TestCase):
 
 # ============================================================ physics / rover model (no Gazebo)
 PHYS = load_config(PKG / 'config/physics.yaml').get('physics', {})
-ROUGH = Path(os.environ.get('VIGIL_ROUGH_TERRAIN', str(Path.home() / 'Documents/robot/vigil_rough_terrain_ws'
-                                                                   '/src/vigil_rough_terrain')))
+# Rough-terrain package to compare against: $VIGIL_ROUGH_TERRAIN, else the copy in this repository
+# ("Rock Terrain/" next to "Military Search and Rescue/"), else the author's original location.
+_ROUGH_IN_REPO = PKG.parents[3] / 'Rock Terrain/src/vigil_rough_terrain'   # vigil_sar/src/sar_ws/<SAR>/<repo>
+ROUGH = Path(os.environ.get('VIGIL_ROUGH_TERRAIN', str(
+    _ROUGH_IN_REPO if _ROUGH_IN_REPO.is_dir()
+    else Path.home() / 'Documents/robot/vigil_rough_terrain_ws/src/vigil_rough_terrain')))
 
 
 class PhysicsConfigTests(unittest.TestCase):

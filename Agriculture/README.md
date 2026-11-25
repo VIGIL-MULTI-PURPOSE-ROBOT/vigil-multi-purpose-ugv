@@ -10,13 +10,13 @@ farm; it does not limit the platform to agricultural use.
 
 ## Current workspace and default mission
 
-All commands below assume you begin at the repository root; `cd ros2_ws` enters
-the workspace. Its three packages, meshes and farm assets live in `src/`.
+All commands below assume you begin at the repository root; `cd Agriculture` enters
+the workspace (it was called `ros2_ws` on the author's PC). Its three packages, meshes and farm assets live in `src/`.
 
 The default launcher now selects the crop-row controller:
 
 ```bash
-cd ros2_ws
+cd Agriculture
 ./run.sh row_mission:=true row_count:=23
 ```
 
@@ -37,12 +37,12 @@ Historical reports describe earlier configurations and should be read with
 A runnable **provisional** 286.11 kg, eight-wheel rover in the supplied cotton-farm
 world. All twelve implementation stages are present. Full-field exploration
 completion and an exact CAD digital twin are **not yet validated**. See
-`HACKATHON.md` for presentation commands and `ACCEPTANCE.md` for measured results.
+`ACCEPTANCE.md` for measured results (`HACKATHON.md` is not in this repository; see `../docs/DEMO_PLAN.md`).
 
 ## Start the simulation
 
 ```bash
-cd ros2_ws
+cd Agriculture
 ./stop.sh
 ./run.sh row_mission:=false explore:=false
 ```
@@ -55,7 +55,7 @@ Allow approximately 30 seconds for rendering, controllers and map startup.
 In another terminal:
 
 ```bash
-cd ros2_ws
+cd Agriculture
 ./demo.sh
 ```
 
@@ -75,7 +75,7 @@ Every `run.sh stage:=N` starts a fresh simulator. Stop the preceding run first.
 Diagnostic commands need the setup below in their terminal:
 
 ```bash
-cd ros2_ws
+cd Agriculture
 source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 export ROS_DOMAIN_ID=91 GZ_PARTITION=agri_ugv

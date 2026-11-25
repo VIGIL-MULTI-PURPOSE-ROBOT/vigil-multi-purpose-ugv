@@ -17,7 +17,7 @@ cd vigil-multi-purpose-ugv
 source /opt/ros/jazzy/setup.bash
 # Run sudo rosdep init once only if rosdep has not been initialized.
 rosdep update
-rosdep install --from-paths Agriculture/src "Rock Terrain/src" "Military Search and Rescue/sar_ws/src"   --ignore-src -r -y --rosdistro jazzy
+rosdep install --from-paths Agriculture/src "Rock Terrain/src" "Military Search and Rescue/sar_ws/src" "New Mining/src"   --ignore-src -r -y --rosdistro jazzy
 ```
 
 ## Recommended first demonstration: rough terrain
