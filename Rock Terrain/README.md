@@ -95,8 +95,8 @@ python3 src/vigil_rough_terrain/test/closed_loop_sim.py
 
 Rocker motion in this package is passive (springs/dampers in the URDF). Active hydraulic levelling is
 implemented only in `Agriculture/` (`src/agri_ugv/scripts/suspension.py`, `hydraulics.py`). Unused,
-byte-identical copies of those two scripts were removed from this package on the
-`vigil-final-consolidation` branch; they remain in the Git history.
+byte-identical copies of those two scripts were removed from this package in commit `5419b16`
+(26 Nov 2026); they remain in the Git history.
 
 ## Safety and failure handling (25 Nov 2026)
 
@@ -110,6 +110,6 @@ python3 -m pytest -q src/vigil_rough_terrain/test/test_navigation_safety.py
 ```
 
 Gazebo regression (offline tests, build, 6 scenarios × 3 trials, with evidence and a Git check):
-`bash tools/regression/vigil_regression.sh`. See [tools/regression/README.md](tools/regression/README.md),
+`bash tools/regression/vigil_regression.sh` (from this folder; it runs on whatever branch is checked out). See [tools/regression/README.md](tools/regression/README.md),
 [../docs/IMPROVEMENT_REPORT.md](../docs/IMPROVEMENT_REPORT.md) and
 [../docs/REGRESSION_RESULTS.md](../docs/REGRESSION_RESULTS.md).

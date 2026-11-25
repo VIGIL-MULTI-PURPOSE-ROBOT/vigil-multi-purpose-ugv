@@ -1,6 +1,12 @@
 # Technical changelog: Rock Terrain navigation (25 November 2026)
 
 Branch `vigil-audit-2026-11-25`, on top of commit `4f9c8c1` plus the uncommitted audit changes. Nothing was committed.
+
+> **Note added 26 November 2026:** the sentence above was accurate when this changelog was written. These changes were
+> committed afterwards as `b97a503` and `89a832c` on `vigil-audit-2026-11-25`, and carried unchanged into
+> `vigil-final-consolidation`, which adds `5419b16` (cleanup) and `c158740` (README). The rest of this changelog is
+> left as originally written.
+
 The scope is `Rock Terrain/` only; no other environment was modified.
 See [IMPROVEMENT_REPORT.md](IMPROVEMENT_REPORT.md) for the evidence behind each change and [REGRESSION_RESULTS.md](REGRESSION_RESULTS.md) for results.
 

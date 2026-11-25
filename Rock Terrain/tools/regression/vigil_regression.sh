@@ -13,7 +13,8 @@
 #     --light-camera          camera_width:=960 camera_height:=720 camera_rate:=5
 #     --no-offline            skip the offline pytest / closed-loop suites
 #     --baseline DIR          baseline evidence dir (default: newest ~/vigil-baseline-validation/2026*)
-#     --branch NAME           expected branch (default vigil-audit-2026-11-25)
+#     --branch NAME           stop unless the checkout is on branch NAME (default: no branch
+#                             requirement; the current branch is recorded in the evidence)
 # Evidence: /tmp/vigil-regression/<stamp>/  copied to ~/vigil-baseline-validation/regression-<stamp>/
 set -uo pipefail
 
@@ -21,7 +22,7 @@ SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RT="$(cd "$SELF_DIR/../.." && pwd)"                  # "Rock Terrain"
 REPO="$(cd "$RT/.." && pwd)"
 PKG="$RT/src/vigil_rough_terrain"
-EXPECTED_BRANCH="vigil-audit-2026-11-25"
+EXPECTED_BRANCH=""                                   # empty = run on whatever branch is checked out
 SCENARIOS="cliff_front flat hill_choice narrow_route too_narrow no_route"
 TRIALS=3; GUI=true; LIGHT=false; OFFLINE=true; BASELINE=""
 while [ $# -gt 0 ]; do
@@ -32,8 +33,9 @@ while [ $# -gt 0 ]; do
     --light-camera) LIGHT=true; shift ;;
     --no-offline) OFFLINE=false; shift ;;
     --baseline) BASELINE="$2"; shift 2 ;;
-    --branch) EXPECTED_BRANCH="$2"; shift 2 ;;
-    -h|--help) sed -n 2,17p "$0"; exit 0 ;;
+    --branch) [ -n "${2:-}" ] || { echo "--branch needs a branch name"; exit 2; }
+              EXPECTED_BRANCH="$2"; shift 2 ;;
+    -h|--help) sed -n 2,18p "$0"; exit 0 ;;
     *) echo "unknown option $1"; exit 2 ;;
   esac
 done
@@ -109,7 +111,12 @@ say "1. Git state ($REPO)"
 git_snapshot before
 cat "$OUT/git_before/branch.txt" "$OUT/git_before/status.txt"
 BR="$(cat "$OUT/git_before/branch.txt")"
-[ "$BR" = "$EXPECTED_BRANCH" ] || { note "STOP: branch is '$BR', expected '$EXPECTED_BRANCH'. Nothing was run."; exit 3; }
+if [ -n "$EXPECTED_BRANCH" ]; then
+  [ "$BR" = "$EXPECTED_BRANCH" ] || { note "STOP: branch is '$BR', expected '$EXPECTED_BRANCH'. Nothing was run."; exit 3; }
+  note "branch check: on '$BR' as required by --branch"
+else
+  note "branch check: none requested; running on '${BR:-detached HEAD}'"
+fi
 CODE_ID="$(cat "$OUT/git_before/head.txt" | cut -c1-12)+worktree:$(cut -c1-12 "$OUT/git_before/diff_tracked.sha256")"
 echo "$CODE_ID" > "$OUT/code_id.txt"; echo "code under test: $CODE_ID"
 

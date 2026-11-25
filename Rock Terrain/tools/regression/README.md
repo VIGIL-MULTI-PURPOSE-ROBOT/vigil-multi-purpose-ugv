@@ -24,6 +24,10 @@ bash "Rock Terrain/tools/regression/vigil_regression.sh" --trials 1 --scenarios 
 Options: `--trials N`, `--scenarios "..."`, `--no-gui`, `--light-camera`, `--no-offline`,
 `--baseline DIR`, `--branch NAME`. A full 6 × 3 run takes about 60–90 minutes of wall time.
 
+By default the runner tests whatever branch is checked out and records the branch, commit and uncommitted
+changes in the evidence. `--branch NAME` adds a hard check: if the checkout is not on `NAME`, the runner
+stops with exit code 3 before building or launching anything.
+
 ## What it guarantees
 
 - **Git:** no writing Git command is run. Branch, HEAD, `main`, stash, status and content hashes are recorded before and after, and any change is reported.

@@ -34,7 +34,9 @@ VIGIL is an eight-wheel unmanned ground vehicle (UGV) developed in simulation. I
 
 **SIH26126** concerns vision-based autonomous navigation for an outdoor UGV in GPS-denied conditions: finding traversable ground, estimating position from visual observations, and avoiding hazards while reaching a destination.
 
-<!-- TEAM: add the official SIH26126 title, ministry/organization and theme exactly as published on the SIH portal. They are not recorded in this repository and could not be verified, so they are deliberately not filled in. -->
+Title as recorded in the team's audit notes: *Vision Based Autonomous Navigation for Unmanned Ground Vehicle for Outdoor environment*. **Not yet verified** against the official SIH portal.
+
+<!-- TEAM: confirm the exact title, ministry/organization and theme as published on the SIH portal, then remove the "not yet verified" note. -->
 
 | Requirement | What exists in this repository | Still to be done |
 |---|---|---|
@@ -157,8 +159,11 @@ python3 -m pytest -q tools/regression/test_metrics.py                          #
 **Full Gazebo regression** (offline suites, build, 6 scenarios × 3 trials, with evidence and a Git check):
 
 ```bash
-bash "Rock Terrain/tools/regression/vigil_regression.sh"
+bash "Rock Terrain/tools/regression/vigil_regression.sh"                           # runs on the current branch
+bash "Rock Terrain/tools/regression/vigil_regression.sh" --trials 1 --scenarios flat   # quick check
 ```
+
+The runner records the branch and commit it tested. Add `--branch NAME` to make it refuse to run on any other branch.
 
 Other environments: [setup](docs/setup.md) and [operations](docs/operations.md).
 

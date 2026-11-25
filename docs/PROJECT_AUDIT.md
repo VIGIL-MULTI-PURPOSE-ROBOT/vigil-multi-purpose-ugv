@@ -1,6 +1,6 @@
 # VIGIL repository audit
 
-SIH26126, *Vision Based Autonomous Navigation for Unmanned Ground Vehicle for Outdoor environment*.
+SIH26126, *Vision Based Autonomous Navigation for Unmanned Ground Vehicle for Outdoor environment* (title as recorded by the team; **not verified** against the official SIH portal).
 Audit date: 25 November 2026. This audit inspected the code and ran the offline test suites. **It did not run ROS 2 or Gazebo.** Runtime claims below come from the repository's own earlier records, and they are labelled that way.
 
 [Validation report](VALIDATION_REPORT.md) · [Demo plan](DEMO_PLAN.md) · [Project overview](../README.md)
@@ -96,7 +96,7 @@ ugv_dashboard.py    http://localhost:8080
 | Dynamic-obstacle avoidance | PARTIALLY IMPLEMENTED (SAR) | Offline tests pass. Uses simulator segmentation labels and ground-truth pose. |
 | Thermal human detection | IMPLEMENTED (SAR, simulated thermal camera) | Offline tests pass; full mission not verified |
 | Gas / temperature / humidity monitoring | Simulated values only (New Mining) | A configured field is sampled at the simulator's true position. These are not sensor models. |
-| Active hydraulic levelling | IMPLEMENTED (Agriculture) | `test_hydraulics.py` passes. The Rock Terrain copies are unused (see §7). |
+| Active hydraulic levelling | IMPLEMENTED (Agriculture) | `test_hydraulics.py` passes. The unused Rock Terrain copies were later removed (see §7, #10). |
 | Bounded safe-stop on unreachable goal / sensor loss | IMPLEMENTED 25 Nov 2026 (offline tests and Gazebo simulation regression, 18/18 PASS; not tested on hardware) | Was NOT IMPLEMENTED when audited; see [IMPROVEMENT_REPORT.md](IMPROVEMENT_REPORT.md) |
 | Existing Mining environment | PLANNED | No package |
 | Real hardware | PLANNED | Simulation only |
@@ -114,8 +114,8 @@ ugv_dashboard.py    http://localhost:8080
 | 7 | Low | `Agriculture/README.md` and `AGRI_DASHBOARD.md` said `cd ros2_ws` and referenced a missing `HACKATHON.md`. `Rock Terrain/README.md` used `/home/user/...` paths and listed 10 of 13 scenarios. | **Fixed** |
 | 8 | Low | `vigil/README.md` described 3 projects, listed files that don't exist (`COLCON_IGNORE`, `REPO_README.md`) and had a broken `#4-build` link. | **Fixed** |
 | 9 | Low | `docs/setup.md` rosdep command omitted `New Mining/src`. | **Fixed** |
-| 10 | Low | `Rock Terrain/.../scripts/suspension.py` and `hydraulics.py` are byte-identical copies of the Agriculture files. They are not installed or launched, they subscribe to `imu/with_covariance` (not bridged there), and they target an unconfigured `suspension_controller`. | Documented in `Rock Terrain/README.md`; not deleted |
-| 11 | Low (clutter) | 17 files under `Agriculture/.autonomy_backup/`, `.navfix_backup/` and `.coverage_dynamic_backup/` are tracked even though `.gitignore` ignores `.*/`. | Not deleted (needs owner approval) |
+| 10 | Low | `Rock Terrain/.../scripts/suspension.py` and `hydraulics.py` are byte-identical copies of the Agriculture files. They are not installed or launched, they subscribe to `imu/with_covariance` (not bridged there), and they target an unconfigured `suspension_controller`. | At audit time: documented, not deleted. **Update 26 Nov 2026:** removed in commit `5419b16` ("Remove unused backups and duplicate files"); still in Git history |
+| 11 | Low (clutter) | 17 files under `Agriculture/.autonomy_backup/`, `.navfix_backup/` and `.coverage_dynamic_backup/` are tracked even though `.gitignore` ignores `.*/`. | At audit time: not deleted (needed owner approval). **Update 26 Nov 2026:** all 17 removed in commit `5419b16`; still in Git history |
 | 11b | Low (test coverage) | Two SAR tests that check the SAR rover and physics match the rough-terrain package looked only in the author's `~/Documents/robot/vigil_rough_terrain_ws`, so they were silently skipped in any clone. | **Fixed:** `test_sar_offline.py` now prefers the repository's `Rock Terrain/` copy (and `$VIGIL_ROUGH_TERRAIN` still overrides). Both tests now run and pass. |
 | 12 | Info | `Agriculture/.../gazebo_gui.config` fails `xmllint` | Expected: Gazebo GUI configs have several root elements by design. Not a defect. |
 | 13 | Info | Duplicated cores and meshes across workspaces (about 82 MB of meshes in 3 copies) | Recommendation below |
@@ -129,5 +129,5 @@ No hard-coded secrets were found. pyflakes reports no undefined names across all
 3. **Add repeated runtime trials with metrics:** goal reached, time, path length, minimum clearance and recoveries for `flat`, `cliff_front`, `narrow_route` and `hill_choice`, at least 5 runs each, using the same structure as `test/closed_loop_sim.py`.
 4. **Add noise to the offline test:** depth noise, dropouts and pose drift. Today it passes with perfect sensing.
 5. **Fix `publish_to_github.sh`** before using it again (issue 6).
-6. With owner approval, remove the tracked backup folders and the unused suspension copies in Rock Terrain.
+6. ~~With owner approval, remove the tracked backup folders and the unused suspension copies in Rock Terrain.~~ Done in commit `5419b16` (26 Nov 2026).
 7. Longer term, move the shared rover description and the terrain/planner cores into one package that the workspaces depend on.
