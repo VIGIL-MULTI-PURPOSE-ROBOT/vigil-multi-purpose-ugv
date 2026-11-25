@@ -28,3 +28,9 @@ New Mining/src/vigil_new_mining/models/mine/meshes/*.stl
 New Mining/src/vigil_new_mining/models/mine/meshes/*.mtl
 New Mining/src/vigil_new_mining/models/mine/materials/textures/*.png
 New Mining/src/vigil_new_mining/config/yolov3-tiny.weights
+
+# Merge/patch leftovers and generator backups (e.g. the old *.dae.orig cotton meshes).
+*.orig
+*.rej
+# Review patches exported next to the repository root are local artefacts.
+/*.patch

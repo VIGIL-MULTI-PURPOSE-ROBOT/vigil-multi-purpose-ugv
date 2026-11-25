@@ -91,12 +91,12 @@ ros2 launch vigil_rough_terrain vision_nav.launch.py scenario:=cliff_front
 python3 src/vigil_rough_terrain/test/closed_loop_sim.py
 ```
 
-## Files present but not used by these launches
+## Suspension
 
-`scripts/suspension.py` and `scripts/hydraulics.py` are copies of the agriculture active-suspension
-controller. They are not installed by `CMakeLists.txt` and no launch file starts them. This package
-configures no `suspension_controller` and does not bridge `imu/with_covariance`. Rocker motion here is
-passive (springs/dampers in the URDF). Active levelling is implemented only in `Agriculture/`.
+Rocker motion in this package is passive (springs/dampers in the URDF). Active hydraulic levelling is
+implemented only in `Agriculture/` (`src/agri_ugv/scripts/suspension.py`, `hydraulics.py`). Unused,
+byte-identical copies of those two scripts were removed from this package on the
+`vigil-final-consolidation` branch; they remain in the Git history.
 
 ## Safety and failure handling (25 Nov 2026)
 

@@ -22,7 +22,7 @@ controllers, parameters, dashboard and `ROS_DOMAIN_ID`, and each is built on its
 no code, and only one runs at a time.
 
 <p align="center">
-  <img src="../Military%20Search%20and%20Rescue/preview_overview.png" width="32%" alt="Military SAR world, top view">
+  <img src="../Military%20Search%20and%20Rescue/Images/Environment/preview_overview.png" width="32%" alt="Military SAR world, top view">
   <img src="../Rock%20Terrain/src/vigil_rough_terrain/docs/validation/dashboard_cliff_front.png" width="42%" alt="Rock terrain dashboard">
   <img src="../Agriculture/reports/cad_update/rover_preview.png" width="24%" alt="VIGIL rover CAD">
 </p>

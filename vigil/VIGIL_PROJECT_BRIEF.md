@@ -17,7 +17,9 @@ operating instructions, implementation status and development conventions.
 3. **No cheating in simulation.** Never teleport the robot, set its pose directly, or fake distance
    checks or collisions. Motion must come from ROS 2 commands → ros2_control / Gazebo physics.
 4. **Back up before modifying.** Copy the original files into a dated backup folder in that
-   workspace (for example `.autonomy_backup/2026-09-24/`, `.navfix_backup/2026-09-24/`).
+   workspace (for example `.autonomy_backup/<date>/`), and keep it out of Git (`.gitignore` ignores
+   hidden folders). The September 2026 Agriculture backups were removed from the repository on the
+   `vigil-final-consolidation` branch; they remain in the Git history.
 5. **Test honestly.** Say clearly what was verified in Gazebo, what was only checked offline
    (Python tests without Gazebo), and what was not tested.
 6. **Reports:** the owner usually asks for a fixed report format (for example "Root cause / Files
@@ -218,7 +220,7 @@ crop_row_driver.py --/crop_row/cmd_vel_request--> row_start_gate.py (forwards on
   moisture, perception and autonomy sections.
 - Nav2 config is `config/navigation.yaml`. EKF and SLAM have their own YAML files.
 - Docs: `README.md`, `ACCEPTANCE.md`, `AGRI_DASHBOARD.md`, `HACKATHON.md`, `CAD_UPDATE.md`.
-- Backups: `.autonomy_backup/2026-09-24/` and `.navfix_backup/2026-09-24/`.
+- Backups: local only (hidden folders are ignored by Git); the 24 Sep 2026 copies are in the Git history.
 
 **Latest fix: "robot not moving / not doing rows"** (24 Sep; offline-tested, needs a Gazebo run)
 - Root causes found in the runtime logs:
