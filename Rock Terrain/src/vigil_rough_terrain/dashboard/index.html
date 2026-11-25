@@ -125,7 +125,9 @@ const STATE_COLORS = {
   'NAVIGATING': 'var(--safe)', 'SAFE PATH FOUND': 'var(--safe)', 'GOAL REACHED': 'var(--accent)',
   'CLIFF DETECTED': 'var(--danger)', 'NO SAFE PATH': 'var(--danger)', 'EMERGENCY STOP': 'var(--danger)',
   'REPLANNING': 'var(--warn)', 'PATH UPDATED': 'var(--uneven)', 'WAITING': 'var(--muted)', 'NEW GOAL': 'var(--info)',
-  'CLIMBING': '#aa96ff', 'CLIFF_AVOIDANCE': 'var(--warn)', 'RECOVERY': 'var(--uneven)', 'GOAL_REACHED': 'var(--accent)'
+  'CLIMBING': '#aa96ff', 'CLIFF_AVOIDANCE': 'var(--warn)', 'RECOVERY': 'var(--uneven)', 'GOAL_REACHED': 'var(--accent)',
+  'HOLD': 'var(--warn)', 'SAFETY STOP': 'var(--danger)', 'GOAL_UNREACHABLE': 'var(--danger)',
+  'RECOVERY_LIMIT_REACHED': 'var(--danger)', 'SENSOR_TIMEOUT': 'var(--danger)', 'LOCALIZATION_LOST': 'var(--danger)'
 };
 const TERR_COLORS = { 'SAFE': 'var(--safe)', 'UNEVEN': 'var(--uneven)', 'POSSIBLE DROP': 'var(--warn)',
   'STEEP': '#aa6e3c', 'OBSTACLE': '#dd44dd', 'CLIMBABLE': '#aa96ff', 'HIGH CLIFF': 'var(--danger)', 'UNKNOWN': 'var(--muted)' };
@@ -216,6 +218,10 @@ function decision(n, t) {
   if (st === 'CLIFF_AVOIDANCE') return 'SEARCH ROUTE TO B';
   if (st === 'RECOVERY') return 'RECOVER · REPLAN';
   if (st === 'NO SAFE PATH' || st === 'EMERGENCY STOP') return 'STOP SAFELY';
+  if (st === 'GOAL_UNREACHABLE' || st === 'RECOVERY_LIMIT_REACHED' || st === 'SENSOR_TIMEOUT' ||
+      st === 'LOCALIZATION_LOST') return 'STOPPED · ' + st.replace(/_/g, ' ') + ' · SEND NEW GOAL';
+  if (st === 'HOLD') return 'HOLD · WAITING FOR FRESH DATA';
+  if (st === 'SAFETY STOP') return 'SAFETY STOP · REPLAN';
   if (st === 'CLIFF DETECTED' || st === 'REPLANNING') return 'AVOID · REPLAN';
   if (st === 'WAITING') return 'SETTLING';
   if (Math.abs(n.cmd_v || 0) < 1e-3 && Math.abs(n.cmd_w || 0) > 1e-3) return 'TURN IN PLACE';

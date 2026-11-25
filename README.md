@@ -11,6 +11,8 @@ VIGIL explores how an eight-wheel unmanned ground vehicle can interpret terrain,
 
 [New Mining environment and dashboard](docs/new-mining.md)
 
+**For evaluators:** [Project audit and feature status](docs/PROJECT_AUDIT.md) · [Validation report (exact commands and outcomes)](docs/VALIDATION_REPORT.md) · [2–3 minute demo plan](docs/DEMO_PLAN.md)
+
 ## See the system
 
 ![Live Gazebo rough-terrain navigation: camera overlay, traversability map, path and goal-reached status](docs/media/rough-terrain-dashboard.png)
@@ -53,7 +55,7 @@ SIH26126 concerns vision-based autonomous navigation for an outdoor UGV in GPS-d
 | Requirement | What exists in this repository | Remaining evidence or work |
 |---|---|---|
 | Detect paths and hazards | Depth-based terrain classification; agricultural geometry and vegetation processing | Benchmark detection accuracy under varied outdoor conditions |
-| Visual localization without GPS | Agriculture includes wheel/IMU odometry and RTAB-Map mapping | Validate visual localization in the actual mission control loop; replace ground-truth pose dependencies |
+| Visual localization without GPS | New Mining navigates on an RTAB-Map + EKF pose (RGB-D visual odometry, wheel and IMU); Agriculture includes wheel/IMU odometry and RTAB-Map mapping. Rough terrain and SAR navigate on simulator ground truth | Measure localization error against ground truth; replace ground-truth pose in the rough-terrain, SAR and agriculture row-mission loops |
 | Plan and avoid collisions | Footprint-aware A* in rough terrain/SAR; Nav2 and a separate crop-row controller in agriculture | Controlled obstacle-avoidance trials, especially moving obstacles and headland turns |
 | Autonomous A-to-B operation | A live short rough-terrain run was observed reaching its goal | Repeated trials, collision instrumentation and broader scenarios |
 
@@ -102,7 +104,7 @@ flowchart LR
 6. **Update:** refresh the terrain map and replan or recover when progress is blocked.
 7. **Report:** show pose, terrain, decisions and goal status in the dashboard.
 
-Current recovery behavior can keep searching when no route is available. A bounded, validated safe-stop policy remains important future work. [Detailed workflow](docs/navigation-workflow.md).
+Since 25 November 2026 the rough-terrain navigator has bounded failure handling: when no route exists, recoveries run out, or the terrain map or pose goes stale, it stops at zero velocity and reports `GOAL_UNREACHABLE`, `RECOVERY_LIMIT_REACHED`, `SENSOR_TIMEOUT` or `LOCALIZATION_LOST`. This is verified in offline tests and in a Gazebo simulation regression on 25 Nov 2026 (6 scenarios × 3 trials: 18/18 PASS, minimum footprint clearance to a cliff edge 0.15 m; simulation only, not tested on hardware) ([improvement report](docs/IMPROVEMENT_REPORT.md), [regression results](docs/REGRESSION_RESULTS.md)). [Detailed workflow](docs/navigation-workflow.md).
 
 ![Live depth-camera overlay identifying the cliff in the test world](docs/media/cliff-camera.jpg)
 
@@ -112,12 +114,13 @@ Current recovery behavior can keep searching when no route is available. A bound
 
 | Environment | Purpose | Entry point | Current qualification |
 |---|---|---|---|
-| Rough terrain | Depth-based terrain interpretation and goal navigation | [`vigil_rough_terrain_ws/`](vigil_rough_terrain_ws/) | Live short A-to-B run captured; pose is ground truth |
-| Agriculture | Crop-row missions, mapping, perception, lighting and suspension | [`ros2_ws/`](ros2_ws/) | Partial row sweeps documented; complete field coverage and avoidance remain unvalidated |
-| Search and rescue | Navigation followed by thermal search in a disaster world | [`military_world/`](military_world/) | Component and motion records exist; full urban SAR mission remains unverified |
-| Mining-site inspection (proposed application) | Outdoor route inspection, terrain assessment and goal navigation | [Mining application guide](docs/mining.md), using the rough-terrain foundation | Developed and tested our rover in a mining-inspired, GPS-denied environment, enabling autonomous navigation using an RGB-D camera and LiDAR, with human detection and hazardous gas monitoring. |
+| Rough terrain | Depth-based terrain interpretation and goal navigation | [`Rock Terrain/`](Rock%20Terrain/) | Live short A-to-B run captured; pose is simulator ground truth |
+| Agriculture | Crop-row missions, mapping, perception, lighting and suspension | [`Agriculture/`](Agriculture/) | Partial row sweeps documented; complete field coverage and avoidance remain unvalidated |
+| Search and rescue | Navigation followed by thermal search in a disaster world | [`Military Search and Rescue/`](Military%20Search%20and%20Rescue/) | Component and motion records exist; full urban SAR mission remains unverified; pose is simulator ground truth |
+| New Mining (underground) | Point-B navigation in an underground mine with RGB-D visual odometry, RTAB-Map and wheel/IMU EKF | [`New Mining/`](New%20Mining/) | Navigation-core unit tests pass; repeated end-to-end missions not yet recorded. Gas, temperature and humidity are synthetic values computed from the simulator position, not sensor models. Needs licensed mine assets that are not in the repository |
+| Existing Mining (proposed application) | Outdoor route inspection using the rough-terrain foundation | [Mining application guide](docs/mining.md) | Documentation and images only; no ROS package in this repository |
 
-These four implemented environments are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time.
+The four environments with code are separate ROS workspaces. They reuse the rover concept but do not yet form one shared autonomy package. Start one environment at a time. Localization differs by environment; see the [project audit](docs/PROJECT_AUDIT.md#4-localization-by-environment).
 
 [![VIGIL simulation launcher menu listing the five environments](docs/media/vigil-launcher-menu.png)](docs/media/vigil-launcher-menu.png)
 
@@ -147,8 +150,9 @@ ROS 2, Gazebo, RTAB-Map, Nav2 and third-party terrain assets are external founda
 |---|---|---|
 | Rough-terrain package built successfully | [27 September capture record](docs/validation.md) | Buildability on the capture environment |
 | Default rough-terrain run reported `GOAL_REACHED` | [Live status JSON](docs/validation/rough-terrain-state.json) | One observed short mission using simulator pose; event at 11.4 s simulation time |
-| Historical agricultural integrated demo | [Acceptance record](ros2_ws/ACCEPTANCE.md) | Short drive/return, lighting and suspension checks; not full-field completion |
-| Historical eight-wheel comparison and offline terrain tests | [Validation](vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VALIDATION.md) · [Algorithm records](vigil_rough_terrain_ws/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md) | Results for specified setups; not universal terrain capability |
+| Historical agricultural integrated demo | [Acceptance record](Agriculture/ACCEPTANCE.md) | Short drive/return, lighting and suspension checks; not full-field completion |
+| Historical eight-wheel comparison and offline terrain tests | [Validation](Rock%20Terrain/src/vigil_rough_terrain/docs/VALIDATION.md) · [Algorithm records](Rock%20Terrain/src/vigil_rough_terrain/docs/VISION_NAVIGATION.md) | Results for specified setups; not universal terrain capability |
+| Offline test suites re-run on 25 November 2026 (no ROS/Gazebo) | [Validation report](docs/VALIDATION_REPORT.md) | Algorithm-level checks with idealized sensing; not runtime simulation evidence |
 
 Historical records are retained with their original scope. New screenshots demonstrate observed runtime state, not new guarantees. [Full evidence, screenshots and remaining gaps](docs/validation.md).
 
@@ -160,7 +164,7 @@ Use **Ubuntu 24.04, ROS 2 Jazzy and Gazebo Harmonic**. Install the dependencies 
 
 ```bash
 git clone https://github.com/VIGIL-MULTI-PURPOSE-ROBOT/vigil-multi-purpose-ugv.git
-cd vigil-multi-purpose-ugv/vigil_rough_terrain_ws
+cd "vigil-multi-purpose-ugv/Rock Terrain"
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 source install/local_setup.bash

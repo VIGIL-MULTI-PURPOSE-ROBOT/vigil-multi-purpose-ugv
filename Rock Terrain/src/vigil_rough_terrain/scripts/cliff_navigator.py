@@ -9,6 +9,10 @@ Subscribes: /vision/terrain_classes, /vision/slope, /vision/roughness, /sim/grou
             /navigation/goal and /goal_pose (geometry_msgs/PoseStamped, e.g. RViz 2D goal)
 Publishes:  /cmd_vel, /navigation/path, /navigation/previous_path,
             /navigation/status (JSON string)
+
+Safety (2026-11-25): /cmd_vel is published every tick, and is zero while waiting, while the pose or
+terrain map is stale (HOLD) and in every terminal state (GOAL_REACHED, GOAL_UNREACHABLE,
+RECOVERY_LIMIT_REACHED, SENSOR_TIMEOUT, LOCALIZATION_LOST). A new goal restarts navigation.
 """
 import json
 import os
@@ -36,7 +40,9 @@ class CliffNavigator(Node):
         self.tp = Params.from_nested(cfg)
         self.nav = NavigatorCore(self.tp, cfg['navigation'])
         self.pose = None
+        self.pose_t = None
         self.speed = 0.0
+        self.reported_state = None
         self.published_version = -1
         self.published_prev = None
         self.slope = self.rough = None
@@ -61,14 +67,23 @@ class CliffNavigator(Node):
     def on_map(self, m):
         cls = grid_to_numpy(m)
         ok = lambda a: a if a is not None and a.shape == cls.shape else None  # noqa: E731
-        self.nav.update_map(np.where(cls < 0, 0, cls).astype(np.uint8), ok(self.slope), ok(self.rough))
+        self.nav.update_map(np.where(cls < 0, 0, cls).astype(np.uint8), ok(self.slope), ok(self.rough),
+                            t=self.now())
 
     def on_odom(self, m):
-        self.pose = odom_to_pose(m)
+        pose = odom_to_pose(m)
+        if not (np.isfinite([pose.x, pose.y, pose.z]).all() and np.isfinite(pose.R).all()):
+            self.get_logger().warn('ignoring non-finite pose', throttle_duration_sec=2.0)
+            return
+        self.pose = pose
+        self.pose_t = self.now()
         t = m.twist.twist.linear
         self.speed = float(np.hypot(t.x, t.y))
 
     def on_goal(self, m):
+        if not (np.isfinite(m.pose.position.x) and np.isfinite(m.pose.position.y)):
+            self.get_logger().warn('ignoring non-finite goal')
+            return
         self.nav.set_goal(m.pose.position.x, m.pose.position.y, self.now())
         self.get_logger().info(f'new goal B = ({m.pose.position.x:.2f}, {m.pose.position.y:.2f})')
 
@@ -76,15 +91,25 @@ class CliffNavigator(Node):
         return self.get_clock().now().nanoseconds * 1e-9
 
     def tick(self):
-        if self.pose is None:
-            return
-        v, w = self.nav.tick(self.now(), self.pose)
+        v, w = self.nav.tick(self.now(), self.pose, self.pose_t)
         tw = Twist()
         tw.linear.x, tw.angular.z = float(v), float(w)
         self.cmd.publish(tw)
+        if self.nav.state != self.reported_state:
+            self.reported_state = self.nav.state
+            if self.nav.state in self.nav.FAILURES:
+                self.get_logger().error(f'{self.nav.state}: {self.nav.failure_reason}')
+            elif self.nav.state in ('GOAL_REACHED', 'HOLD'):
+                self.get_logger().info(f'{self.nav.state}: {self.nav.status().get("reason", "")}')
+        if self.pose is None:
+            st = self.nav.status()
+            st.update(pose_age=None)
+            self.pub_status.publish(String(data=json.dumps(st)))
+            return
         st = self.nav.status(self.pose)
         st.update(x=round(self.pose.x, 2), y=round(self.pose.y, 2), heading_deg=round(np.degrees(self.pose.yaw), 1),
-                  speed=round(self.speed, 3), tilt=round(self.pose.tilt_deg, 1))
+                  speed=round(self.speed, 3), tilt=round(self.pose.tilt_deg, 1),
+                  pose_age=round(self.now() - self.pose_t, 2))
         self.pub_status.publish(String(data=json.dumps(st)))
         if self.nav.path_version != self.published_version or self.nav.previous_path is not self.published_prev:
             self.republish_paths()

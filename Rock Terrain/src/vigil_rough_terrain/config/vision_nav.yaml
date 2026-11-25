@@ -96,6 +96,10 @@
       min_hits: 2
       use_segmentation: true
       publish_rate: 5.0          # Hz for grids/status (camera runs at 10 Hz)
+      # terrain_mapper only integrates a depth frame once, and stops publishing grids if the newest
+      # depth frame or pose is older than this (sim time), so the navigator sees stale data as stale.
+      depth_timeout: 1.0         # s
+      pose_timeout: 0.5          # s
       pixel_stride: 2            # column/row stride for the edge scan
 
     navigation:
@@ -149,8 +153,76 @@
       # Recovery (stuck / tilt limit / boxed in)
       stuck_timeout: 10.0        # s commanding forward with < 0.25 m motion
       blocked_timeout: 4.0       # s with a hazard right in front
-      recovery_reverse: 0.8      # m reversed (only over non-hazard ground)
+      recovery_reverse: 0.8      # m reversed (only over OBSERVED non-hazard ground)
       recovery_turn_time: 2.5    # s turning towards the best heading
+
+      # --- Replanning hysteresis (added 2026-11-25, see docs/IMPROVEMENT_REPORT.md) ---
+      # A blocked/hazard replan runs only on NEW terrain data (A* on an unchanged map returns the
+      # same route) or after this interval. Baseline: 180 of 210 plans were < 0.15 s apart.
+      min_replan_interval: 1.0   # s
+      # Within this distance of the robot a route may keep the robot's CURRENT clearance instead of
+      # the full safety_margin (same rule A* uses for leaving the margin band); never less than 0.
+      escape_radius: 1.3         # m
+      # --- Cliff safety (added 2026-11-25) ---
+      # Motion shield: every command is projected shield_horizon s ahead; the body must keep
+      # min(shield_margin, current clearance) from any mapped CLIFF/OBSTACLE cell.
+      shield_margin: 0.10        # m (one map cell)
+      shield_horizon: 0.6        # s (0.36 m at cruise, = drive.py stopping distance)
+      # Slow down near hazard edges: linear from 1.0 at circumscribed_radius + band to
+      # hazard_min_speed_factor at inscribed_radius (robot-centre distance to CLIFF/OBSTACLE).
+      # At 0.30 m/s: 0.09 m braking (0.5 m/s^2) + 0.09 m for 0.3 s camera/map latency.
+      hazard_slow_band: 0.6      # m
+      hazard_min_speed_factor: 0.5
+      # Unknown / possible-drop cells within this distance of a mapped drop block turns in place
+      # and arcs (the forward camera never saw the robot's sides/rear). Reversing treats ALL
+      # unknown terrain as blocked.
+      unknown_near_cliff: 1.0    # m
+      # --- Stopping distance (added 2026-11-25 after the Gazebo regression) ---
+      # The wheels do not follow a command instantly: scripts/drive.py ramps them at 0.01 per
+      # 20 ms = 0.5 m/s^2 and 0.5 rad/s^2. In Gazebo the robot coasted ~0.15 m after a stop
+      # command and its footprint overhung the plateau edge by ~0.1 m. The motion shield now
+      # predicts: previous command for command_latency, the new command for shield_horizon,
+      # then braking at these rates; the footprint must keep the margin the whole way.
+      drive_linear_accel: 0.5    # m/s^2, = drive.py (change both together)
+      drive_angular_accel: 0.5   # rad/s^2, = drive.py
+      command_latency: 0.15      # s, navigator tick + cmd_vel transport before drive.py reacts
+      # Do not outrun the map: forward speed is capped so the robot can stop (perception_latency +
+      # command_latency, then braking) before reaching terrain not yet known to be safe
+      # (unobserved / possible drop / cliff / obstacle). creep_speed is the floor.
+      perception_latency: 0.3    # s, depth frame -> terrain map -> navigator (map at 5 Hz)
+      creep_speed: 0.15          # m/s
+      # Proven ground: cells the robot has stood on while level (tilt < proven_max_tilt).
+      # UNKNOWN cells touched by the footprint count as observed ground (the robot may reverse
+      # along its own track, incl. the never-seen spawn area); CLIFF / POSSIBLE_DROP cells deeper
+      # than proven_drop_inset inside the footprint are mapping artefacts (a level robot is
+      # standing on them) and are cleared for navigation. Real edges are never deep inside it.
+      proven_max_tilt: 10.0      # deg
+      proven_drop_inset: 0.30    # m from every side of the footprint
+      # A recovery manoeuvre that cannot move at all (no observed ground behind, no safe turn)
+      # gives no new information; after this many in a row stop with RECOVERY_LIMIT_REACHED
+      # instead of using up max_recoveries while standing still.
+      null_recovery_limit: 2
+      # Motion shield found no safe motion, the robot has come to rest and a new terrain map still
+      # allows nothing: start the (bounded) recovery after this long instead of blocked_timeout.
+      shield_rest_timeout: 0.5   # s
+      # Inside the safety band (clearance below shield_margin) a motion may not reduce the body's
+      # continuous clearance by more than this (interpolated distance field; 0.05 m margin levels
+      # alone let slow motions creep to 0 m: Gazebo 25 Nov 20:54, too_narrow t1).
+      band_clearance_tolerance: 0.005   # m
+      # --- Bounded failure handling (added 2026-11-25) ---
+      max_recoveries: 6          # recovery manoeuvres per goal -> RECOVERY_LIMIT_REACHED
+      route_search_timeout: 60.0 # s continuously without an adoptable route to B -> GOAL_UNREACHABLE
+      unreachable_confirm_time: 10.0  # s with NO route even through unknown terrain ...
+      unreachable_confirm_maps: 3     # ... and over at least this many new maps -> GOAL_UNREACHABLE
+      no_progress_failure_time: 75.0  # s without >= progress_min_step net gain towards B -> GOAL_UNREACHABLE
+      progress_min_step: 0.5     # m
+      map_stale_time: 1.0        # s without a terrain map -> HOLD (zero velocity)
+      sensor_timeout: 5.0        # s without a terrain map -> SENSOR_TIMEOUT (terminal)
+      pose_stale_time: 0.5       # s without a valid pose -> HOLD (zero velocity)
+      localization_timeout: 3.0  # s without a valid pose -> LOCALIZATION_LOST (terminal)
+      # Before the FIRST pose / FIRST terrain map arrives (simulator, spawner and bridge starting)
+      # the robot waits at zero velocity for up to this long, then reports the missing input.
+      startup_timeout: 30.0      # s
 
     dashboard:
       port: 8080

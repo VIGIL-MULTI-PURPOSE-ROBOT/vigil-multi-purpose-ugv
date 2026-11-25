@@ -359,7 +359,7 @@ class TerrainMapper:
         VO = void[::-1][::st, ::st]
         D = dirs[::-1][::st, ::st]
         rows, cols = V.shape
-        events = []  # (x_ref, y_ref, z_ref, x_land, y_land, drop, theta, is_void)
+        events = []  # (x_ref, y_ref, z_ref, x_land, y_land, drop, theta, is_void, ref_is_robot_front)
         clears = []
         maxd = p.cliff_detection_distance
         ox, oy, oz = float(origin[0]), float(origin[1]), float(origin[2])
@@ -368,6 +368,7 @@ class TerrainMapper:
         Dx, Dy, Dz = D[..., 0].tolist(), D[..., 1].tolist(), D[..., 2].tolist()
         for c in range(cols):
             rx, ry, rz = fx, fy, gz0
+            front_ref = True   # no ground seen yet in this column: the reference is the robot's front
             void_done = False
             for r in range(rows):
                 if Vl[r][c]:
@@ -385,14 +386,16 @@ class TerrainMapper:
                         #  - it loses dz over dh horizontally, so somewhere the
                         #    slope is at least atan(dz/dh) (mean-value theorem)
                         theta = max(theta, math.atan2(dz, dh))
-                        events.append((rx, ry, rz, x, y, dz, theta, False))
+                        events.append((rx, ry, rz, x, y, dz, theta, False, front_ref))
                         rx, ry, rz = x, y, z
+                        front_ref = False
                     elif z - rz > p.max_climb_step + dh * tan_s:
                         pass  # elevated (rock top / wall): keep the ground reference
                     else:
                         if dh < 2.5 * p.resolution and abs(dz) < p.max_safe_drop:
                             clears.append((rx, ry))
                         rx, ry, rz = x, y, z
+                        front_ref = False
                 elif VOl[r][c] and not void_done:
                     dz_ray = Dz[r][c]
                     hor = math.hypot(Dx[r][c], Dy[r][c])
@@ -411,7 +414,7 @@ class TerrainMapper:
                     zf = oz + dz_ray * t_far
                     theta = math.atan2(-dz_ray, hor)
                     lx, ly = ox + Dx[r][c] * min(t_far, t_hit * 3), oy + Dy[r][c] * min(t_far, t_hit * 3)
-                    events.append((rx, ry, rz, lx, ly, rz - zf, theta, True))
+                    events.append((rx, ry, rz, lx, ly, rz - zf, theta, True, front_ref))
                     void_done = True
         self._apply_events(events, clears)
 
@@ -424,12 +427,18 @@ class TerrainMapper:
             ok = self.inside(i, j)
             self.edge_drop[i[ok], j[ok]] = 0.0
             self.edge_theta[i[ok], j[ok]] = 0.0
-        for rx, ry, rz, lx, ly, drop, theta, _void in events:
+        for rx, ry, rz, lx, ly, drop, theta, _void, front_ref in events:
             i, j = self.cell(rx, ry)
             if not self.inside(i, j):
                 continue
-            self.edge_drop[i, j] = max(self.edge_drop[i, j], drop)
-            self.edge_theta[i, j] = max(self.edge_theta[i, j], theta)
+            # If no ground was seen in this column yet, the reference is the robot's own front: the
+            # drop lies somewhere between the bumper and the landing point, not AT the bumper. Do
+            # not paint the robot's own cell as a confirmed edge (it produced isolated false HIGH
+            # CLIFF cells under the robot); the shadow below still marks every UNOBSERVED cell of
+            # that strip, so an unseen drop right ahead stays a hazard.
+            if not front_ref:
+                self.edge_drop[i, j] = max(self.edge_drop[i, j], drop)
+                self.edge_theta[i, j] = max(self.edge_theta[i, j], theta)
             L = math.hypot(lx - rx, ly - ry)
             if L < 1e-6:
                 continue

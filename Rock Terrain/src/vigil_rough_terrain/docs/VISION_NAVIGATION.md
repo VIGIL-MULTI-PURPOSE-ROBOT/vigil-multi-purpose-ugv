@@ -37,7 +37,7 @@ OdometryPublisher ───/sim/ground_truth (base_footprint pose)────�
 |---|---|---|
 | SAFE | observed, gentle | cost 1 |
 | UNEVEN | slope > 10°, roughness > 3 cm or step > 6 cm, still within limits | +2 per cell |
-| POSSIBLE DROP | ground disappears behind an edge but the camera can't yet prove it is steeper than 25° | +25 per cell (not blocked) |
+| POSSIBLE DROP | ground disappears behind an edge but the camera can't yet prove it is steeper than 25° | +25 per cell (not blocked); the motion shield never lets the footprint + margin onto it |
 | STEEP | footprint-scale slope > 25° | robot centre may not enter |
 | OBSTACLE | step up > 0.17 m (boulder, wall) | inflated by robot size |
 | HIGH CLIFF | drop > 0.17 m, confirmed steeper than 25° | inflated by robot size |
@@ -133,8 +133,9 @@ velocity, and takes pitch/roll from its 6 wheel contacts. Checks include
 | real rock terrain (25 × 25 m version), spawn → B | GOAL REACHED | |
 
 The ROS nodes were also run end-to-end with a stand-in rclpy (no ROS was
-available in the build sandbox). **They have not yet been run in real Gazebo.**
-Watch the first run for encoding or QoS differences.
+available in the build sandbox). The table above is that original offline record. The full stack
+has since been run in Gazebo: the 25 Nov 2026 regression passed 18/18 (simulation only; see
+`docs/REGRESSION_RESULTS.md` at the repository root).
 
 ## Known limits (honest)
 
@@ -187,10 +188,37 @@ A 28° hill costs about 2.2× flat ground, so a detour is only taken if it is sh
 3. **Hill-climbing replan**: STEEP allowed at `steep_climb_cost`; cliffs stay hard → state **CLIMBING**.
 4. **CLIFF_AVOIDANCE**: score 24 short headings on progress toward B (×3), slope, revisits
    and turning, then drive the best one. This repeats, with occasional full replans.
-5. **RECOVERY**: reverse 0.8 m over non-hazard ground, turn toward the best heading, then replan.
-   Triggered by: stuck (driving but no motion for 10 s), a hazard in front for 4 s, or tilt ≥ 38°.
+5. **RECOVERY**: reverse 0.8 m over *observed* non-hazard ground, turn toward the best heading,
+   then replan. Triggered by: stuck (driving but no motion for 10 s), a hazard in front for 4 s,
+   a persistent motion-shield veto, or tilt ≥ 38°.
 
-The mission ends only at **GOAL_REACHED**. The rover never drives into a HIGH CLIFF / OBSTACLE.
+**Bounded failure handling (25 Nov 2026).** The original "never give up" design, where the mission
+ended only at GOAL_REACHED, was replaced. The rover now stops, publishes zero velocity and reports a
+reason in one of these terminal states:
+
+- `GOAL_UNREACHABLE`: no route even through unexplored terrain (confirmed over 10 s and 3 new
+  maps), or no adoptable route for 60 s, or no ≥ 0.5 m net progress toward B for 75 s.
+- `RECOVERY_LIMIT_REACHED`: more than 6 recovery manoeuvres for one goal.
+- `SENSOR_TIMEOUT` / `LOCALIZATION_LOST`: terrain map or pose stale for 5 s / 3 s. The rover sits in
+  `HOLD` at zero velocity before that.
+
+A new goal on `/navigation/goal` or `/goal_pose` restarts navigation. Every motion command also
+passes a motion shield. The shield projects the command for 0.6 s and then **brakes the way
+`drive.py` really does** (0.5 m/s², 0.5 rad/s², plus 0.15 s command latency). The body must stay
+at least 0.10 m from mapped CLIFF, OBSTACLE and POSSIBLE DROP cells the whole way. If the
+command fails, the shield tries it at half and quarter speed, then turning only, then stops.
+
+Other motion rules:
+- **Speed cap:** forward speed is limited so the rover can always stop before terrain the camera
+  has not confirmed as safe (0.3 s perception latency). The minimum is a 0.15 m/s creep.
+- **Turns:** unknown terrain near a mapped drop counts as blocked.
+- **Proven ground:** ground the rover has stood on while level counts as observed, so it can
+  reverse along its own track. A "cliff" cell deep under its own body is ignored as a mapping
+  artefact.
+
+These rules were added after the first Gazebo regression showed the footprint overhanging an edge
+by about 0.1 m when the robot coasted after a stop. See `docs/IMPROVEMENT_REPORT.md` and
+`docs/TECHNICAL_CHANGELOG.md` at the repository root.
 
 ### Climbing
 
@@ -202,7 +230,8 @@ The mission ends only at **GOAL_REACHED**. The rover never drives into a HIGH CL
 ### States
 
 WAITING, NAVIGATING, REPLANNING (reason: HILL AHEAD / CLIFF AHEAD / PATH BLOCKED / TILT LIMIT),
-CLIMBING, CLIFF_AVOIDANCE, RECOVERY, GOAL_REACHED.
+CLIMBING, CLIFF_AVOIDANCE, RECOVERY, HOLD, SAFETY STOP (transient), GOAL_REACHED, and the terminal
+failures GOAL_UNREACHABLE, RECOVERY_LIMIT_REACHED, SENSOR_TIMEOUT and LOCALIZATION_LOST.
 
 ### New map topics
 
@@ -219,7 +248,7 @@ terrain_mapper and used by cliff_navigator.
 | **hill_choice (38° face, 22° flanks)** | climbed a 22° flank, never the 38° face, GOAL_REACHED |
 | **big_rocks (15–21 cm)** | GOAL_REACHED; rocks classified as cost, never OBSTACLE |
 | cliff_front, cliff_right, narrow_route | GOAL_REACHED around the cliffs |
-| too_narrow (1.2 m bridge), no_route | B is physically unreachable without crossing a cliff: the rover **keeps searching and never stops, never falls** |
+| too_narrow (1.2 m bridge), no_route | B is physically unreachable without crossing a cliff. Original design: kept searching indefinitely. Since 25 Nov 2026: searches, then ends in a terminal safe stop (`GOAL_UNREACHABLE` / `RECOVERY_LIMIT_REACHED`) with zero velocity, never falls |
 
 ### Terrain resized to 20 × 20 m
 

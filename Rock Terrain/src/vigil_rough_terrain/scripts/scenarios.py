@@ -86,13 +86,15 @@ SCENARIOS = {
         objects=_cliff(holes=[(4.0, 6.5, -4.0, 0.9), (4.0, 6.5, 2.9, 4.0)]), spawn_z=CLIFF_H, goal=(10.0, 0.0),
         expect=dict(outcome='GOAL_REACHED', bridge=(0.9, 2.9))),
     'too_narrow': dict(
-        desc='Only a 1.2 m bridge (robot 1.12 m + 2x0.15 m margin needs 1.42 m): refuse.',
+        desc='Only a 1.2 m bridge (robot 1.12 m + 2x0.15 m margin needs 1.42 m): refuse, stop safely.',
         objects=_cliff(holes=[(4.0, 6.5, -4.0, 1.4), (4.0, 6.5, 2.6, 4.0)]), spawn_z=CLIFF_H, goal=(10.0, 0.0),
-        expect=dict(outcome='SEARCHING'), max_time=120.0),
+        # bounded failure handling: must end in a terminal SAFE STOP (GOAL_UNREACHABLE or
+        # RECOVERY_LIMIT_REACHED, zero velocity), never GOAL_REACHED and never fall in
+        expect=dict(outcome='SAFE_STOP'), max_time=120.0),
     'no_route': dict(
-        desc='Chasm across the whole plateau: never falls in, never stops, keeps searching (CLIFF_AVOIDANCE).',
+        desc='Chasm across the whole plateau: never falls in, searches (CLIFF_AVOIDANCE), then stops safely.',
         objects=_cliff(holes=[(4.0, 6.5, -4.0, 4.0)]), spawn_z=CLIFF_H, goal=(10.0, 0.0),
-        expect=dict(outcome='SEARCHING', state='CLIFF_AVOIDANCE'), max_time=120.0),
+        expect=dict(outcome='SAFE_STOP', state='CLIFF_AVOIDANCE'), max_time=120.0),
     'steep_hill': dict(
         desc='28 deg hill across the whole route (above the 25 deg comfort limit, below the 33 deg '
              'climbing limit): must climb it, slowly, and reach B.',

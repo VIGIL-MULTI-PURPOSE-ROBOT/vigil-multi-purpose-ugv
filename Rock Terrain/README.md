@@ -11,7 +11,7 @@ length and width ×0.72, height ×0.36, so cliffs and hills are half as high as 
 ## Build
 
 ```bash
-cd /home/user/Documents/robot/vigil_rough_terrain_ws
+cd "Rock Terrain"            # from the repository root
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
 source install/local_setup.bash
@@ -72,7 +72,7 @@ dashboard. Everything above is unchanged; this only runs with the new launch fil
 Full details, thresholds and test results: `src/vigil_rough_terrain/docs/VISION_NAVIGATION.md`.
 
 ```bash
-cd /home/user/Documents/robot/vigil_rough_terrain_ws
+cd "Rock Terrain"            # from the repository root
 chmod +x src/vigil_rough_terrain/scripts/*.py src/vigil_rough_terrain/test/*.py
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select vigil_rough_terrain --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3
@@ -83,10 +83,33 @@ export ROS_DOMAIN_ID=71
 ros2 launch vigil_rough_terrain vision_nav.launch.py
 # open http://localhost:8080
 
-# test worlds: flat small_rocks moderate_slope small_drop cliff_front cliff_left
-#              cliff_right narrow_route too_narrow no_route
+# test worlds (scripts/scenarios.py): flat small_rocks moderate_slope small_drop cliff_front
+#   cliff_left cliff_right narrow_route too_narrow no_route steep_hill hill_choice big_rocks
 ros2 launch vigil_rough_terrain vision_nav.launch.py scenario:=cliff_front
 
-# offline test of the detection + planning logic (no Gazebo, ~4 min)
+# offline test of the detection + planning logic (no ROS/Gazebo, ~3-4 min, needs numpy, scipy, opencv, pyyaml)
 python3 src/vigil_rough_terrain/test/closed_loop_sim.py
 ```
+
+## Files present but not used by these launches
+
+`scripts/suspension.py` and `scripts/hydraulics.py` are copies of the agriculture active-suspension
+controller. They are not installed by `CMakeLists.txt` and no launch file starts them. This package
+configures no `suspension_controller` and does not bridge `imu/with_covariance`. Rocker motion here is
+passive (springs/dampers in the URDF). Active levelling is implemented only in `Agriculture/`.
+
+## Safety and failure handling (25 Nov 2026)
+
+The navigator stops at zero velocity with a published reason (`GOAL_UNREACHABLE`,
+`RECOVERY_LIMIT_REACHED`, `SENSOR_TIMEOUT`, `LOCALIZATION_LOST`) instead of searching indefinitely.
+Every command passes a motion shield. Send a new goal to `/navigation/goal` or `/goal_pose` to
+restart. Unit tests:
+
+```bash
+python3 -m pytest -q src/vigil_rough_terrain/test/test_navigation_safety.py
+```
+
+Gazebo regression (offline tests, build, 6 scenarios × 3 trials, with evidence and a Git check):
+`bash tools/regression/vigil_regression.sh`. See [tools/regression/README.md](tools/regression/README.md),
+[../docs/IMPROVEMENT_REPORT.md](../docs/IMPROVEMENT_REPORT.md) and
+[../docs/REGRESSION_RESULTS.md](../docs/REGRESSION_RESULTS.md).

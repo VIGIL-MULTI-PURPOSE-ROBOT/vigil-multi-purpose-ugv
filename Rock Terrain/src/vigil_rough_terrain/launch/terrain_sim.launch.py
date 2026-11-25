@@ -32,15 +32,34 @@ def generate_launch_description():
                             '-topic', 'robot_description',
                             '-x', LaunchConfiguration('spawn_x'), '-y', LaunchConfiguration('spawn_y'),
                             '-z', LaunchConfiguration('spawn_z'), '-Y', '0'])
-    controllers = Node(package='controller_manager', executable='spawner', output='screen',
+    # Controller spawner with bounded retries. On the Legion (25 Nov 2026, 2 of 18 launches) the
+    # controller manager's response to the spawner's list_controllers call was lost ("failed to
+    # send response ... (timeout)"); with a 100 s service-call timeout and no retry the wheel
+    # controller was never activated and the rover could not move. A normal spawn takes ~4 s.
+    max_attempts = 4
+
+    def spawner_chain(attempt):
+        spawner = Node(package='controller_manager', executable='spawner', output='screen',
                        arguments=['joint_state_broadcaster', 'wheel_controller',
                                   '--controller-manager-timeout', '120',
-                                  '--switch-timeout', '90', '--service-call-timeout', '100'])
+                                  '--switch-timeout', '90', '--service-call-timeout', '20'])
+
+        def finished(event, context):
+            if event.returncode == 0:
+                return [LogInfo(msg=f'Controllers active (spawner attempt {attempt}/{max_attempts}).')]
+            if attempt >= max_attempts:
+                return [LogInfo(msg=f'Controller spawner failed {max_attempts} times (last exit code '
+                                    f'{event.returncode}): the wheels cannot be driven - shutting down.'),
+                        EmitEvent(event=Shutdown(reason='wheel controller could not be activated'))]
+            return [LogInfo(msg=f'Controller spawner attempt {attempt}/{max_attempts} failed (exit code '
+                                f'{event.returncode}) - retrying.')] + spawner_chain(attempt + 1)
+        return [RegisterEventHandler(OnProcessExit(target_action=spawner, on_exit=finished)), spawner]
+
     def spawned(event, context):
         if event.returncode != 0:
             return [LogInfo(msg='Rover spawn failed.'),
                     EmitEvent(event=Shutdown(reason='Rover spawn failed'))]
-        return [controllers]
+        return spawner_chain(1)
     sim = ExecuteProcess(cmd=['gz', 'sim', '-s', '-r', '-v', '2',
                               LaunchConfiguration('world')], output='screen')
     gui = ExecuteProcess(cmd=['gz', 'sim', '-g', '-v', '2'],

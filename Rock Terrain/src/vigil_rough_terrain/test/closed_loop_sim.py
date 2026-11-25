@@ -5,7 +5,15 @@ Renders synthetic depth images by ray-casting a height field built from the same
 scenario geometry as the Gazebo test worlds, feeds them through TerrainMapper and
 NavigatorCore, integrates the commanded motion and sets pitch/roll/z from the
 six ground-bearing wheel contact points. It checks each scenario's expected
-outcome and that the robot body never ends up over a drop.
+outcome, that the robot body never ends up over a drop, that the footprint keeps MIN_CLEARANCE
+from the true drop edges, and that unreachable goals end in a terminal safe stop (zero velocity).
+
+Drive model (default): like scripts/drive.py in Gazebo, the wheels do not follow a command
+instantly. A command takes effect one control tick (0.1 s) later and the actual speed then
+slews towards it at drive_linear_accel (m/s^2) / drive_angular_accel (rad/s^2), 0.01 per
+20 ms tick in drive.py = 0.5. So the robot COASTS after a stop command (0.36 m from 0.6 m/s),
+which the Gazebo regression showed matters near cliff edges. --ideal-drive restores the old
+idealised model (the robot moves exactly as commanded, stops instantly) for comparison only.
 
     python3 test/closed_loop_sim.py                 # all scenarios
     python3 test/closed_loop_sim.py cliff_front     # one scenario
@@ -28,7 +36,46 @@ PKG = HERE.parent
 sys.path.insert(0, str(PKG / 'scripts'))
 from terrain_core import Params, TerrainMapper, CameraModel, Pose, rpy_to_matrix, CLASS_NAMES, CLIFF  # noqa: E402
 from planner_core import NavigatorCore, path_length  # noqa: E402
-from scenarios import SCENARIOS  # noqa: E402
+from scenarios import SCENARIOS, CLIFF_H  # noqa: E402
+
+# Minimum distance (m) between the robot footprint rectangle and the TRUE drop edge of a cliff
+# scenario. Stricter than body_over_drop; the original planner reached 0.10 m offline.
+MIN_CLEARANCE = 0.10
+
+
+def drop_clearance(sc, tp, res=0.05):
+    """Distance from the footprint rectangle (tp.robot_length x tp.robot_width, centred at
+    footprint_center_x) to the nearest edge of the plateau top, from the exact scenario geometry.
+    0 = part of the footprint is over the drop."""
+    from scipy.ndimage import distance_transform_edt
+    x0, y0 = -6.0, -8.0
+    nx, ny = int(24 / res), int(16 / res)
+    X, Y = np.meshgrid(x0 + (np.arange(nx) + .5) * res, y0 + (np.arange(ny) + .5) * res, indexing='ij')
+    top = np.zeros_like(X, bool)
+    for o in sc['objects']:
+        if o.get('type') != 'box' or abs(o.get('pitch', 0)) > 1e-6:
+            continue
+        (cx, cy, cz), (sx, sy, sz) = o['pos'], o['size']
+        if cz + sz / 2 >= CLIFF_H - 0.1:
+            top |= (abs(X - cx) <= sx / 2) & (abs(Y - cy) <= sy / 2)
+    d = distance_transform_edt(top) * res
+    L, W, cxo, n = tp.robot_length, tp.robot_width, tp.footprint_center_x, 12
+    u = np.linspace(-1, 1, n)
+    loc = np.concatenate([np.stack([cxo + L / 2 * u, np.full(n, W / 2)], 1),
+                          np.stack([cxo + L / 2 * u, np.full(n, -W / 2)], 1),
+                          np.stack([np.full(n, cxo + L / 2), W / 2 * u], 1),
+                          np.stack([np.full(n, cxo - L / 2), W / 2 * u], 1)])
+
+    def clearance(x, y, yaw):
+        c, s = math.cos(yaw), math.sin(yaw)
+        px, py = x + c * loc[:, 0] - s * loc[:, 1], y + s * loc[:, 0] + c * loc[:, 1]
+        i = np.floor((px - x0) / res).astype(int)
+        j = np.floor((py - y0) / res).astype(int)
+        ok = (i >= 0) & (i < d.shape[0]) & (j >= 0) & (j < d.shape[1])
+        v = np.zeros(len(px))
+        v[ok] = d[i[ok], j[ok]]
+        return float(v.min())
+    return clearance
 
 HRES = 0.02
 # Ground-bearing wheel contact points in base_footprint (wheels 1-3 per side).
@@ -177,8 +224,12 @@ class HeightField:
         plane = pose.ground_z(p) + pose.R[2, 0] * X + pose.R[2, 1] * Y
         return bool((z < plane - thresh).mean() > 0.05)
 
+def slew(cur, target, step):
+    return cur + max(-step, min(step, target - cur))
+
+
 def run(name, sc, cfg, max_time=None, dt=0.1, cam_period=0.5, speed=None, verbose=True,
-        hf=None, start=(0.0, 0.0, 0.0), save_png=None):
+        hf=None, start=(0.0, 0.0, 0.0), save_png=None, ideal_drive=False):
     tp = Params.from_nested(cfg)
     max_time = max_time or sc.get('max_time', 160.0)
     nav = dict(cfg['navigation'])
@@ -198,13 +249,19 @@ def run(name, sc, cfg, max_time=None, dt=0.1, cam_period=0.5, speed=None, verbos
     t, next_cam = 0.0, 0.0
     traj, max_tilt, over_drop, states = [], 0.0, 0, []
     stopped, stop_streak, max_streak, active = 0, 0, 0, 0
+    terminal_t, moved_after_terminal, min_clear = None, 0.0, math.inf
+    # drive model state: command waiting for the next control tick, actual wheel-level speed
+    pending, act_v, act_w = (0.0, 0.0), 0.0, 0.0
+    a_lin = nav.get('drive_linear_accel', 0.5) * dt
+    a_ang = nav.get('drive_angular_accel', 0.5) * dt
+    clear_fn = drop_clearance(sc, tp) if sc.get('spawn_z', 0.0) >= CLIFF_H - 1e-6 else None
     t_wall = time.time()
     while t < max_time:
         pose, resid = hf.wheel_pose(x, y, yaw, tp)
         if t >= next_cam:
             depth = hf.render_depth(cam, pose, tp)
             mapper.process(depth, pose, cam)
-            navc.update_map(mapper.classes, mapper.slope_deg, mapper.roughness)
+            navc.update_map(mapper.classes, mapper.slope_deg, mapper.roughness, t=t)
             next_cam += cam_period
         v, w = navc.tick(t, pose)
         st = navc.status(pose)
@@ -214,19 +271,36 @@ def run(name, sc, cfg, max_time=None, dt=0.1, cam_period=0.5, speed=None, verbos
         if hf.body_over_drop(pose, tp):
             over_drop += 1
         traj.append((round(t, 2), x, y))
+        if clear_fn is not None and navc.state != 'WAITING':
+            min_clear = min(min_clear, clear_fn(x, y, yaw))
         if navc.state == 'GOAL_REACHED':
             break
-        if navc.state != 'WAITING':
+        if navc.state in navc.TERMINAL:          # terminal failure: must hold zero velocity
+            if terminal_t is None:
+                terminal_t = t
+            moved_after_terminal += abs(v) * dt + abs(w) * dt
+            if t - terminal_t >= 5.0:
+                break
+        elif navc.state != 'WAITING':
             active += 1
-            if abs(v) < 1e-6 and abs(w) < 1e-6:
+            # idle = the robot is not moving. With the drive model a zero command is followed by
+            # braking (still moving), so this checks the ACTUAL motion; in the ideal-drive mode the
+            # two are identical (the original rule).
+            mv, mw = (v, w) if ideal_drive else (act_v, act_w)
+            if abs(mv) < 1e-6 and abs(mw) < 1e-6:
                 stopped += 1
                 stop_streak += 1
                 max_streak = max(max_streak, stop_streak)
             else:
                 stop_streak = 0
-        x += v * math.cos(yaw) * dt
-        y += v * math.sin(yaw) * dt
-        yaw += w * dt
+        if ideal_drive:
+            act_v, act_w = v, w
+        else:  # one tick of latency, then acceleration-limited (drive.py)
+            act_v, act_w = slew(act_v, pending[0], a_lin), slew(act_w, pending[1], a_ang)
+            pending = (v, w)
+        x += act_v * math.cos(yaw) * dt
+        y += act_v * math.sin(yaw) * dt
+        yaw += act_w * dt
         t += dt
     ys = np.array([p[2] for p in traj]); xs = np.array([p[1] for p in traj])
     res = dict(scenario=name, outcome=navc.state, sim_time=round(t, 1), wall=round(time.time() - t_wall, 1),
@@ -235,10 +309,13 @@ def run(name, sc, cfg, max_time=None, dt=0.1, cam_period=0.5, speed=None, verbos
                min_y=round(float(ys.min()), 2), max_y=round(float(ys.max()), 2),
                final=(round(x, 2), round(y, 2)), states=states,
                cliff_cells=int((mapper.classes == CLIFF).sum()),
-               stopped_fraction=round(stopped / max(1, active), 3), longest_stop_s=round(max_streak * dt, 1))
+               stopped_fraction=round(stopped / max(1, active), 3), longest_stop_s=round(max_streak * dt, 1),
+               failure_reason=navc.failure_reason, terminal_t=terminal_t,
+               moved_after_terminal=round(moved_after_terminal, 4),
+               min_clearance=None if clear_fn is None else round(min_clear, 3))
     exp = sc.get('expect', {})
-    if exp.get('outcome') == 'SEARCHING':  # B unreachable: must still be moving/searching at the end
-        ok = res['outcome'] != 'GOAL_REACHED' and over_drop == 0
+    if exp.get('outcome') == 'SAFE_STOP':  # B unreachable: a terminal safe stop, never GOAL_REACHED
+        ok = (res['outcome'] in navc.FAILURES and over_drop == 0 and res['moved_after_terminal'] == 0.0)
     else:
         ok = res['outcome'] == exp.get('outcome', res['outcome']) and over_drop == 0
     if 'max_hazard_replans' in exp:
@@ -249,8 +326,19 @@ def run(name, sc, cfg, max_time=None, dt=0.1, cam_period=0.5, speed=None, verbos
         ok &= res['max_abs_y'] >= exp['min_abs_y']
     if 'min_y' in exp:
         ok &= res['max_y'] >= exp['min_y']
-    # never give up: the motors must not sit idle (short 0.1 s gaps between manoeuvres are fine)
-    ok &= res['longest_stop_s'] <= 1.0
+    # Before a terminal state the motors must not sit idle (short 0.1 s gaps between manoeuvres are
+    # fine). Goal scenarios keep the original strict 1.0 s rule. In the unreachable (SAFE_STOP)
+    # scenarios a safety stop may hold for blocked_timeout, and a recovery that finds neither observed
+    # ground to reverse onto nor a clear turn adds one more blocked_timeout before escalating; a
+    # longer idle streak would mean the navigator froze instead of escalating to a terminal state.
+    idle_limit = 1.0
+    if exp.get('outcome') == 'SAFE_STOP':
+        idle_limit = 2 * nav.get('blocked_timeout', 4.0) + 1.0
+    res['idle_limit_s'] = idle_limit
+    ok &= res['longest_stop_s'] <= idle_limit
+    # footprint clearance to the true drop edges (scenario geometry, cliff scenarios only)
+    if res['min_clearance'] is not None:
+        ok &= res['min_clearance'] >= MIN_CLEARANCE
     if 'min_tilt' in exp:
         ok &= res['max_tilt'] >= exp['min_tilt']
     if 'max_tilt' in exp:
@@ -301,6 +389,8 @@ def main():
     ap.add_argument('names', nargs='*')
     ap.add_argument('--terrain', action='store_true', help='run on the real rock terrain (A->B of the comparison)')
     ap.add_argument('--png', default=None)
+    ap.add_argument('--ideal-drive', action='store_true',
+                    help='old idealised drive (instant response); for comparison only, not a pass criterion')
     a = ap.parse_args()
     cfg = load_cfg()
     results = []
@@ -308,15 +398,16 @@ def main():
         hf = HeightField.from_stl(PKG / 'models/rocky_terrain_n4/meshes/terrain_collision.stl')
         sc = dict(goal=(cfg['navigation']['goal_x'], cfg['navigation']['goal_y']), objects=[],
                   expect=dict(outcome='GOAL_REACHED'))
-        results.append(run('rock_terrain', sc, cfg, hf=hf, start=(-5.4, -3.6, 0.0), max_time=200, save_png=a.png))
+        results.append(run('rock_terrain', sc, cfg, hf=hf, start=(-5.4, -3.6, 0.0), max_time=200, save_png=a.png,
+                           ideal_drive=a.ideal_drive))
     else:
         for name in (a.names or SCENARIOS):
-            results.append(run(name, SCENARIOS[name], cfg, save_png=a.png))
+            results.append(run(name, SCENARIOS[name], cfg, save_png=a.png, ideal_drive=a.ideal_drive))
     print('\nSUMMARY')
     for r in results:
-        print(f"  {'PASS' if r['pass'] else 'FAIL'}  {r['scenario']:<15} {r['outcome']:<14} "
-              f"hazard_replans={r['hazard_replans']} y=[{r['min_y']},{r['max_y']}] tilt={r['max_tilt']} "
-              f"over_drop={r['body_over_drop_steps']}")
+        print(f"  {'PASS' if r['pass'] else 'FAIL'}  {r['scenario']:<15} {r['outcome']:<22} t={r['sim_time']:<6} "
+              f"replans={r['replans']} hazard_replans={r['hazard_replans']} y=[{r['min_y']},{r['max_y']}] "
+              f"tilt={r['max_tilt']} over_drop={r['body_over_drop_steps']} clearance={r['min_clearance']}")
     sys.exit(0 if all(r['pass'] for r in results) else 1)
 
 

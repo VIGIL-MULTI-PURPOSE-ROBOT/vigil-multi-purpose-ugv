@@ -58,6 +58,13 @@ class TerrainMapperNode(Node):
         self.nav_status = {}
         self.last_process = -1.0
         self.processing_ms = 0.0
+        # stale-input protection (sim time): integrate each depth frame once, and stop publishing
+        # grids when depth or pose stops arriving, so the navigator sees a stale map as stale
+        self.depth_seq = self.done_seq = 0
+        self.depth_t = self.pose_t = None
+        self.depth_timeout = float(cfg['terrain'].get('depth_timeout', 1.0))
+        self.pose_timeout = float(cfg['terrain'].get('pose_timeout', 0.5))
+        self.stale_warned = False
         s = qos_profile_sensor_data
         self.create_subscription(Image, '/camera/depth_image', self.on_depth, s)
         self.create_subscription(Image, '/camera/image', self.on_rgb, s)
@@ -80,9 +87,14 @@ class TerrainMapperNode(Node):
         self.create_timer(1.0 / rate, self.step)
         self.get_logger().info('terrain_mapper ready: waiting for /camera/depth_image and /sim/ground_truth')
 
+    def now(self):
+        return self.get_clock().now().nanoseconds * 1e-9
+
     def on_depth(self, m):
         try:
             self.depth = image_to_numpy(m)
+            self.depth_seq += 1
+            self.depth_t = self.now()
         except ValueError as e:
             self.get_logger().warn(str(e), throttle_duration_sec=5.0)
 
@@ -113,7 +125,10 @@ class TerrainMapperNode(Node):
             self.get_logger().info(f'camera intrinsics fx={m.k[0]:.1f} {m.width}x{m.height}')
 
     def on_odom(self, m):
-        self.pose = odom_to_pose(m)
+        pose = odom_to_pose(m)
+        if all(np.isfinite([pose.x, pose.y, pose.z])) and np.isfinite(pose.R).all():
+            self.pose = pose
+            self.pose_t = self.now()
 
     def on_status(self, m):
         try:
@@ -124,6 +139,24 @@ class TerrainMapperNode(Node):
     def step(self):
         if self.depth is None or self.pose is None:
             return
+        now = self.now()
+        stale = []
+        if now - self.depth_t > self.depth_timeout:
+            stale.append(f'depth {now - self.depth_t:.1f} s old')
+        if now - self.pose_t > self.pose_timeout:
+            stale.append(f'pose {now - self.pose_t:.1f} s old')
+        if stale:
+            # publish nothing: the navigator's map-age check then holds / stops the robot
+            if not self.stale_warned:
+                self.get_logger().warn('terrain map NOT updated: ' + ', '.join(stale))
+                self.stale_warned = True
+            return
+        if self.stale_warned:
+            self.get_logger().info('terrain inputs fresh again')
+            self.stale_warned = False
+        if self.depth_seq == self.done_seq:
+            return  # no new depth frame since the last integration (never integrate a frame twice)
+        self.done_seq = self.depth_seq
         if self.cam is None or self.cam.w != self.depth.shape[1]:
             self.cam = CameraModel(self.p, K=self.K, width=self.depth.shape[1], height=self.depth.shape[0])
         t0 = self.get_clock().now()

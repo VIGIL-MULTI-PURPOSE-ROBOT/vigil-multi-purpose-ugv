@@ -16,5 +16,9 @@ if(BUILD_TESTING)
   # Offline ray-cast test of cliff detection + planning over all 10 scenarios (~4 min, no Gazebo).
   add_test(NAME vision_nav_closed_loop COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/closed_loop_sim.py)
   set_tests_properties(vision_nav_closed_loop PROPERTIES TIMEOUT 1200)
+  # Unit tests of the navigation safety / bounded-failure logic (pytest, no Gazebo, ~10 s).
+  add_test(NAME navigation_safety_unit
+           COMMAND ${Python3_EXECUTABLE} -m pytest -q -p no:cacheprovider ${CMAKE_CURRENT_SOURCE_DIR}/test/test_navigation_safety.py)
+  set_tests_properties(navigation_safety_unit PROPERTIES TIMEOUT 300)
 endif()
 ament_package()
