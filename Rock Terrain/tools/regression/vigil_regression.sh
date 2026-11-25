@@ -15,6 +15,11 @@
 #     --baseline DIR          baseline evidence dir (default: newest ~/vigil-baseline-validation/2026*)
 #     --branch NAME           stop unless the checkout is on branch NAME (default: no branch
 #                             requirement; the current branch is recorded in the evidence)
+#     --truth-isolation       VIGIL 2.0: simulator truth bridged only as /eval/* and no segmentation
+#                             oracle (launch arg truth_isolation:=true); the monitor reads /eval/ground_truth
+#     --eval                  VIGIL 2.0: per trial, run the isolated evaluator + GPS-denied guard
+#                             (tools/vigil_eval/evaluator.py) and record a ROS bag (see --no-bag)
+#     --no-bag                with --eval: do not record the ROS bag
 # Evidence: /tmp/vigil-regression/<stamp>/  copied to ~/vigil-baseline-validation/regression-<stamp>/
 set -uo pipefail
 
@@ -22,9 +27,11 @@ SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RT="$(cd "$SELF_DIR/../.." && pwd)"                  # "Rock Terrain"
 REPO="$(cd "$RT/.." && pwd)"
 PKG="$RT/src/vigil_rough_terrain"
+EVAL_DIR="$REPO/tools/vigil_eval"
 EXPECTED_BRANCH=""                                   # empty = run on whatever branch is checked out
 SCENARIOS="cliff_front flat hill_choice narrow_route too_narrow no_route"
 TRIALS=3; GUI=true; LIGHT=false; OFFLINE=true; BASELINE=""
+TRUTH_ISO=false; EVAL=false; BAG=true
 while [ $# -gt 0 ]; do
   case "$1" in
     --scenarios) SCENARIOS="$2"; shift 2 ;;
@@ -35,7 +42,10 @@ while [ $# -gt 0 ]; do
     --baseline) BASELINE="$2"; shift 2 ;;
     --branch) [ -n "${2:-}" ] || { echo "--branch needs a branch name"; exit 2; }
               EXPECTED_BRANCH="$2"; shift 2 ;;
-    -h|--help) sed -n 2,18p "$0"; exit 0 ;;
+    --truth-isolation) TRUTH_ISO=true; shift ;;
+    --eval) EVAL=true; shift ;;
+    --no-bag) BAG=false; shift ;;
+    -h|--help) sed -n 2,23p "$0"; exit 0 ;;
     *) echo "unknown option $1"; exit 2 ;;
   esac
 done
@@ -198,6 +208,9 @@ run_one() {
   CURRENT_PARTITION="vigilreg_${sc}_${n}_$$"
   local args="scenario:=$sc cleanup:=false partition:=$CURRENT_PARTITION gui:=$GUI"
   $LIGHT && args="$args camera_width:=960 camera_height:=720 camera_rate:=5"
+  $TRUTH_ISO && args="$args truth_isolation:=true"
+  local truth_topic=/sim/ground_truth eval_mode=baseline
+  $TRUTH_ISO && { truth_topic=/eval/ground_truth; eval_mode=isolation; }
   say "Scenario $sc trial $n/$TRIALS (sim limit ${lim}s)"
   echo "ros2 launch vigil_rough_terrain vision_nav.launch.py $args" | tee "$rundir/command.txt"
   for _ in $(seq 1 15); do port_busy || break; sleep 1; done
@@ -220,9 +233,27 @@ run_one() {
     grab_dashboard "$rundir" running; shot "$rundir/screen_running.png" >> "$rundir/screenshot_status.txt"
   ) > "$rundir/probes.log" 2>&1 &
   local probe=$!
+  local evpid="" bagpid=""
+  if $EVAL; then
+    # isolated evaluator: the only operational-graph reader of simulator truth; writes guard.json,
+    # eval_report.json and eval_trajectory.csv when stopped (SIGINT)
+    ros "exec python3 '$EVAL_DIR/evaluator.py' --out '$rundir' --mode $eval_mode --truth-topic $truth_topic" \
+        > "$rundir/evaluator.log" 2>&1 &
+    evpid=$!
+    if $BAG; then
+      ros "exec ros2 bag record -o '$rundir/bag' $truth_topic /tf /tf_static /clock /navigation/status /cmd_vel \
+           /imu/data /encoders /joint_states /camera/camera_info /vision/cliff" > "$rundir/bag.log" 2>&1 &
+      bagpid=$!
+    fi
+    echo "evaluator pid=$evpid bag pid=${bagpid:-none} mode=$eval_mode truth=$truth_topic" >> "$rundir/pids.txt"
+  fi
   ros "python3 '$SELF_DIR/monitor.py' --scenario $sc --trial $n --out '$rundir' --scenarios '$PKG/scripts/scenarios.py' \
-       --config '$PKG/config/vision_nav.yaml' --sim-limit $lim --wall-limit $(( lim * 6 + 300 )) --startup-timeout 300" \
+       --config '$PKG/config/vision_nav.yaml' --sim-limit $lim --wall-limit $(( lim * 6 + 300 )) --startup-timeout 300 \
+       --truth-topic $truth_topic" \
        > "$rundir/monitor.log" 2>&1
+  local p
+  for p in $evpid $bagpid; do kill -INT "$p" 2>/dev/null; done
+  for p in $evpid $bagpid; do for _ in $(seq 1 20); do kill -0 "$p" 2>/dev/null || break; sleep 1; done; kill -KILL "$p" 2>/dev/null; done
   [ -f "$rundir/result.json" ] || { note "$sc t$n: MONITOR FAILURE - no result.json (see monitor.log)"; \
       echo '{"end_condition":"MONITOR_ERROR","category":"MONITOR_FAILURE","verdict":"FAIL"}' > "$rundir/result.json"; }
   grab_dashboard "$rundir" final; ros 'timeout 10 ros2 topic echo --once --full-length /navigation/status' > "$rundir/echo_status_final.txt" 2>&1
@@ -323,6 +354,23 @@ print(f"{r.get('scenario')} t{r.get('trial')}: {r.get('category')} [{r.get('verd
       f"clearance={r.get('min_footprint_clearance_m')} runtime_errors={r['runtime_error_lines']}"
       + (f" missing={missing}" if missing else ''))
 PY
+  if $EVAL; then
+    python3 - "$rundir" <<'PY'
+import json, sys
+from pathlib import Path
+d = Path(sys.argv[1])
+try:
+    e = json.loads((d / 'eval_report.json').read_text()); m = e['metrics']
+except (OSError, ValueError, KeyError) as x:
+    print(f"  eval: NO REPORT ({x}) - see evaluator.log"); sys.exit(0)
+ate = (m.get('ate_start') or {}).get('rmse')
+r2 = ((m.get('rpe') or {}).get('2m') or {}).get('p95')
+f = lambda v: 'n/a' if v is None else f'{v:.3f}'
+print(f"  eval: mode={e['mode']} guard={e['guard_verdict']} truth_msgs={e['truth_messages']} samples={m['samples']} "
+      f"availability={f(m['availability'])} ATE_start_rmse={f(ate)} RPE2m_p95={f(r2)} "
+      f"drift_pct={f(m.get('drift_pct'))} gt_max_displacement={f(m.get('gt_max_displacement_m'))}")
+PY
+  fi
   sleep 3
 }
 
@@ -341,6 +389,7 @@ for sc in $SCENARIOS; do for n in $(seq 1 "$TRIALS"); do
   fi
 done; done
 echo "simulator start-up failures retried: $SIM_RETRIES" >> "$OUT/notes.txt"
+echo "truth isolation: $TRUTH_ISO, evaluator: $EVAL, bag: $($EVAL && $BAG && echo yes || echo no)" >> "$OUT/notes.txt"
 
 # ============================================================ 7. summary + git verification
 say "7. Summary"

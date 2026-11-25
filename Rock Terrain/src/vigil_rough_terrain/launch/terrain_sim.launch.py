@@ -27,6 +27,14 @@ def generate_launch_description():
                       'hd_rate': LaunchConfiguration('camera_rate').perform(context)}).toxml()
         return [Node(package='robot_state_publisher', executable='robot_state_publisher',
                      parameters=[{'robot_description': description, 'use_sim_time': True}], output='screen')]
+    def bridge(context):
+        # truth_isolation:=true (VIGIL 2.0 GPS-denied evaluation): simulator truth is bridged only as
+        # /eval/ground_truth and /eval/link_poses, for the isolated evaluator. Default: unchanged bridge.
+        isolated = LaunchConfiguration('truth_isolation').perform(context) == 'true'
+        cfg = share / ('config/bridge_truth_isolated.yaml' if isolated else 'config/bridge.yaml')
+        return [LogInfo(msg=f'[terrain_sim] bridge config: {cfg.name}'),
+                Node(package='ros_gz_bridge', executable='parameter_bridge',
+                     parameters=[{'config_file': str(cfg), 'use_sim_time': True}], output='screen')]
     spawn = Node(package='ros_gz_sim', executable='create', output='screen',
                  arguments=['-world', 'vigil_rock_terrain', '-name', 'agri_ugv',
                             '-topic', 'robot_description',
@@ -72,6 +80,8 @@ def generate_launch_description():
         DeclareLaunchArgument('world', default_value=str(share / 'worlds/rock_terrain.sdf')),
         DeclareLaunchArgument('partition', default_value='vigil_rough_terrain'),
         DeclareLaunchArgument('vision_sensors', default_value='false'),
+        DeclareLaunchArgument('truth_isolation', default_value='false',
+                              description='true: bridge simulator truth only under /eval/ (GPS-denied evaluation)'),
         # HD display camera (only with vision_sensors:=true). 4:3 keeps it aligned with depth.
         DeclareLaunchArgument('camera_width', default_value='1920'),
         DeclareLaunchArgument('camera_height', default_value='1440'),
@@ -89,9 +99,7 @@ def generate_launch_description():
         RegisterEventHandler(OnProcessExit(target_action=sim, on_exit=[
             EmitEvent(event=Shutdown(reason='Gazebo closed'))])),
         OpaqueFunction(function=state_publisher),
-        Node(package='ros_gz_bridge', executable='parameter_bridge',
-             parameters=[{'config_file': str(share / 'config/bridge.yaml'), 'use_sim_time': True}],
-             output='screen'),
+        OpaqueFunction(function=bridge),
         RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=spawned)),
         spawn,
         Node(package='vigil_rough_terrain', executable='drive.py',

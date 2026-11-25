@@ -127,7 +127,7 @@ class Monitor(Node):
         self.create_subscription(String, '/navigation/status', self.on_status, 10)
         self.create_subscription(String, '/vision/cliff', self.on_cliff, 10)
         self.create_subscription(String, '/vision/terrain', lambda m: self.tick_rate('terrain'), 10)
-        self.create_subscription(Odometry, '/sim/ground_truth', self.on_gt, s)
+        self.create_subscription(Odometry, a.truth_topic, self.on_gt, s)  # /eval/ground_truth when truth is isolated
         self.create_subscription(Twist, '/cmd_vel', self.on_cmd, 10)
         self.create_subscription(Image, '/camera/depth_image', lambda m: self.tick_rate('depth'), s)
         self.create_timer(0.5, self.check)
@@ -332,6 +332,8 @@ def main():
     ap.add_argument('--sim-limit', type=float, default=150.0)
     ap.add_argument('--wall-limit', type=float, default=1200.0)
     ap.add_argument('--startup-timeout', type=float, default=300.0)
+    ap.add_argument('--truth-topic', default='/sim/ground_truth',
+                    help='ground-truth topic (evaluation only); /eval/ground_truth with truth isolation')
     a = ap.parse_args()
     rclpy.init()
     node = None

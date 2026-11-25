@@ -104,6 +104,11 @@ def setup(context):
     lc = lambda k: LaunchConfiguration(k).perform(context)  # noqa: E731
     scenario = lc('scenario')
     seg = lc('segmentation')
+    isolated = lc('truth_isolation') == 'true'
+    if isolated and seg == 'true':
+        # The segmentation camera is a simulator oracle (labels of the hit object); terrain_core uses
+        # label 0 as drop evidence. It is never bridged in GPS-denied evaluation.
+        seg = 'false'
     overrides = {}
     if scenario:
         spec = importlib.util.spec_from_file_location('scenarios', share / 'scripts/scenarios.py')
@@ -133,12 +138,14 @@ def setup(context):
     actions += [
         SetEnvironmentVariable('GZ_PARTITION', partition),
         LogInfo(msg=f'[vision_nav] {info}; world={world}; GZ_PARTITION={partition}'),
+        LogInfo(msg=f'[vision_nav] truth_isolation={isolated} segmentation_bridge={seg == "true"}'),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(share / 'launch/terrain_sim.launch.py')),
             launch_arguments={'gui': lc('gui'), 'world': world, 'spawn_x': spawn[0], 'spawn_y': spawn[1],
                               'spawn_z': spawn[2], 'vision_sensors': 'true', 'partition': partition,
                               'camera_width': lc('camera_width'), 'camera_height': lc('camera_height'),
-                              'camera_rate': lc('camera_rate')}.items()),
+                              'camera_rate': lc('camera_rate'),
+                              'truth_isolation': 'true' if isolated else 'false'}.items()),
         Node(package='ros_gz_bridge', executable='parameter_bridge', name='hd_camera_bridge',
              arguments=['/camera/hd/image@sensor_msgs/msg/Image[gz.msgs.Image'],
              parameters=[{'use_sim_time': True}], output='screen'),
@@ -164,6 +171,9 @@ def generate_launch_description():
         DeclareLaunchArgument('gui', default_value='true'),
         DeclareLaunchArgument('dashboard', default_value='true'),
         DeclareLaunchArgument('segmentation', default_value='true'),
+        DeclareLaunchArgument('truth_isolation', default_value='false',
+                              description='true: simulator truth only under /eval/ and no segmentation oracle '
+                                          '(VIGIL 2.0 GPS-denied evaluation); default = unchanged behaviour'),
         DeclareLaunchArgument('goal_x', default_value='', description='override navigation.goal_x'),
         DeclareLaunchArgument('goal_y', default_value='', description='override navigation.goal_y'),
         DeclareLaunchArgument('spawn_x', default_value='-5.4'),
