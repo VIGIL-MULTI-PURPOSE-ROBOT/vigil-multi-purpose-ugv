@@ -25,7 +25,7 @@ VIGIL is an eight-wheel unmanned ground vehicle (UGV) developed in simulation. I
 7. [Gazebo simulation environments](#7-gazebo-simulation-environments)
 8. [Installation and execution](#8-installation-and-execution)
 9. [Regression results](#9-regression-results)
-10. [Known limitations](#10-known-limitations)
+10. [VIGIL 2.0 development progress](#10-vigil-20-development-progress)
 11. [Future work](#11-future-work)
 12. [Repository layout](#12-repository-layout)
 13. [Team and attribution](#13-team-and-attribution)
@@ -182,7 +182,22 @@ Gazebo regression of the rough-terrain navigator, 25 November 2026, on an RTX 50
 
 **18/18 PASS**, minimum clearance 0.15 m, zero runtime errors, zero simulator start-up failures. Offline suites: 30/30 unit tests, 11/11 tool tests, 13/13 closed-loop scenarios. The full record of all four regression runs, including the failures that led to each fix, is in [REGRESSION_RESULTS.md](docs/REGRESSION_RESULTS.md).
 
-## 10. Future work
+## 10. VIGIL 2.0 development progress
+
+Work towards GPS-denied navigation happens on the `vigil-ai-gps-denied` branch. Results are reported per milestone, and only for what was measured.
+
+| Milestone | Status | Report |
+|---|---|---|
+| 1. Ground-truth isolation and independent evaluation | **Completed** (26 Nov 2026) | [VIGIL_2.0_MILESTONE_1.md](docs/VIGIL_2.0_MILESTONE_1.md) |
+| 2. Rock Terrain localization (odometry, IMU, visual odometry, EKF, RTAB-Map) | **Pending, not started** | — |
+
+- **Current GPS-denied capability:** not yet demonstrated.
+- **Current ground-truth dependency:** identified. Rock Terrain's mapper and navigator steer from the simulator pose, and the mapper also uses Gazebo's segmentation camera. With truth isolated, the robot stops safely with `LOCALIZATION_LOST`.
+- **Next objective:** implement and validate Rock Terrain localization (milestone 2).
+
+The truth-isolation mode, evaluator and guard are documented in [tools/vigil_eval/README.md](tools/vigil_eval/README.md).
+
+## 11. Future work
 
 1. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
 2. Replace simulator pose with sensor-derived localization in the rough-terrain and SAR loops.
@@ -192,19 +207,21 @@ Gazebo regression of the rough-terrain navigator, 25 November 2026, on an RTX 50
 6. Cooperative multi-robot operation sharing maps, hazards and mission assignments.
 7. Long-range communication (LoRa, mesh networking or private 5G) for remote monitoring.
 
-## 11. Repository layout
+## 12. Repository layout
 
 ```text
 vigil-multi-purpose-ugv/
 ├── README.md                    This overview
 ├── STRUCTURE.md                 Which folder holds which environment
 ├── docs/                        Architecture, setup, audit, regression results, changelog
+│   ├── evidence/                Compact evidence of VIGIL 2.0 milestones
 │   ├── media/                   Simulation captures
 │   └── validation/              Captured machine-readable status
 ├── vigil/                       Launcher menu for the five environments
 ├── Rock Terrain/                Rough-terrain ROS workspace
 │   ├── src/vigil_rough_terrain/ Package: perception, planner, launch, config, tests
 │   └── tools/regression/        Gazebo regression runner, monitor and summary
+├── tools/vigil_eval/            VIGIL 2.0 evaluator, GPS-denied guard, truth scan, tests
 ├── Agriculture/                 Agriculture ROS workspace
 ├── Military Search and Rescue/  SAR world, assets and ROS workspace
 ├── New Mining/                  Underground-mine ROS workspace
@@ -214,7 +231,7 @@ vigil-multi-purpose-ugv/
 
 Build outputs (`build/`, `install/`, `log/`) and Python caches are excluded from version control.
 
-## 12. Team and attribution
+## 13. Team and attribution
 
 **Team VIGIL**, Smart India Hackathon 2026. Contributors in the Git history: Y-Manish (Yarramshetty Manish), Gagan Reddy Manikanti, Sruthik Reddy and the shared VIGIL Team account. Individual roles are not recorded in this repository and are not invented here.
 

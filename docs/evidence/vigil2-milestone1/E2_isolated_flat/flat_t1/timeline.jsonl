@@ -1,0 +1,14 @@
+{"event": "monitor_start", "scenario": "flat", "expect": {"outcome": "GOAL_REACHED", "max_hazard_replans": 0, "max_abs_y": 0.5}, "goal": [10.0, 0.0], "wall": 0.01, "sim": null}
+{"event": "first_message", "topic": "clock", "wall": 2.8, "sim": 0.0}
+{"event": "first_message", "topic": "depth", "wall": 3.54, "sim": 0.0}
+{"event": "first_message", "topic": "gt", "wall": 3.62, "sim": 0.05}
+{"event": "first_message", "topic": "status", "wall": 3.67, "sim": 0.1}
+{"event": "state", "state": "WAITING", "raw_state": "WAITING", "reason": null, "replans": 0, "hazard_replans": 0, "recoveries": 0, "wall": 3.67, "sim": 0.1}
+{"event": "first_message", "topic": "cmd", "wall": 3.67, "sim": 0.1}
+{"event": "state", "state": "HOLD", "raw_state": "HOLD", "reason": "WAITING FOR POSE - holding at zero velocity", "replans": 0, "hazard_replans": 0, "recoveries": 0, "wall": 9.67, "sim": 6.1}
+{"event": "sample", "state": "HOLD", "x": null, "y": null, "hazard_replans": 0, "no_progress_for": 0.2869999999999999, "wall": 10.01, "sim": 6.44}
+{"event": "sample", "state": "HOLD", "x": null, "y": null, "hazard_replans": 0, "no_progress_for": 10.287000000000003, "wall": 20.01, "sim": 16.44}
+{"event": "sample", "state": "HOLD", "x": null, "y": null, "hazard_replans": 0, "no_progress_for": 20.285, "wall": 30.01, "sim": 26.43}
+{"event": "state", "state": "LOCALIZATION_LOST", "raw_state": "LOCALIZATION_LOST", "reason": "no valid pose received 30 s after start (limit 30 s) - stopped", "replans": 0, "hazard_replans": 0, "recoveries": 0, "wall": 33.78, "sim": 30.2}
+{"event": "terminal_failure", "state": "LOCALIZATION_LOST", "reason": "no valid pose received 30 s after start (limit 30 s) - stopped", "wall": 33.78, "sim": 30.2}
+{"event": "monitor_end", "end_condition": "TERMINAL", "category": "SAFE_STOP", "wall": 39.01, "sim": 35.43}

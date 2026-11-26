@@ -1,0 +1,48 @@
+
+OPERATIONAL (17 files)
+  Agriculture/src/agri_ugv/scripts/agri_dashboard.py: ground_truth l.148
+  Agriculture/src/agri_ugv/scripts/agri_obstacles.py: ground_truth l.64
+  Agriculture/src/agri_ugv/scripts/agri_supervisor.py: ground_truth l.54
+  Agriculture/src/agri_ugv/scripts/agri_vision.py: ground_truth l.114
+  Agriculture/src/agri_ugv/scripts/crop_row_driver.py: ground_truth l.157
+  Agriculture/src/agri_ugv/scripts/visualization.py: link_poses l.17
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/cliff_navigator.py: ground_truth l.66
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/drive.py: ground_truth l.171
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/obstacle_tracker.py: ground_truth l.65; segmentation_oracle l.63
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/sar_manager.py: ground_truth l.69
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/terrain_mapper.py: ground_truth l.79; segmentation_oracle l.78
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/thermal_human_detector.py: ground_truth l.82
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/ugv_dashboard.py: ground_truth l.132
+  Rock Terrain/src/vigil_rough_terrain/scripts/cliff_navigator.py: ground_truth l.54
+  Rock Terrain/src/vigil_rough_terrain/scripts/comparison_driver.py: ground_truth l.30
+  Rock Terrain/src/vigil_rough_terrain/scripts/terrain_mapper.py: ground_truth l.74; segmentation_oracle l.73
+  Rock Terrain/src/vigil_rough_terrain/scripts/ugv_dashboard.py: ground_truth l.85
+
+SIMULATION (4 files)
+  Agriculture/src/agri_ugv/scripts/agri_mission_core.py: world_file_read l.44,47,84  [reads the field model (prior map) - see audit 3.2]
+  Agriculture/src/agri_ugv/scripts/agri_moisture_sensor.py: ground_truth l.51  [simulated soil-moisture field]
+  Agriculture/src/agri_ugv/scripts/environment.py: ground_truth l.25; gz_transport l.13  [worker motion and lighting zone (world simulation)]
+  New Mining/src/vigil_new_mining/scripts/mining_runtime.py: ground_truth l.90  [gas/temperature/humidity field (sensor simulation); NOTE: same file also navigates - to be split]
+
+EVALUATION (19 files)
+  Agriculture/src/agri_ugv/scripts/agri_vision_eval.py: world_file_read l.55,67
+  Agriculture/src/agri_ugv_setup/scripts/check_environment.py: world_file_read l.20
+  Agriculture/tests/agri_mission_sim.py: ground_truth l.76
+  Agriculture/tools/check_dynamic_obstacle.py: gz_transport l.3
+  Agriculture/tools/check_live.py: ground_truth l.31; link_poses l.31
+  Agriculture/tools/test_navigation.py: ground_truth l.19
+  Military Search and Rescue/sar_physics.py: world_file_read l.140
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/build_sar_world.py: world_file_read l.342
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/find_crash.py: segmentation_oracle l.41; world_file_read l.198
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/motion_test.py: ground_truth l.131,256,396,539; contact_positions l.136
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/scale_check.py: world_file_read l.126
+  Military Search and Rescue/sar_ws/src/vigil_sar/scripts/scenario_worlds.py: world_file_read l.126
+  Military Search and Rescue/sar_ws/src/vigil_sar/test/test_dynamic_obstacles.py: world_file_read l.493,519,547,674
+  Military Search and Rescue/sar_ws/src/vigil_sar/test/test_sar_offline.py: world_file_read l.493,494,758,1122
+  Military Search and Rescue/tests/check_export.py: world_file_read l.20
+  Military Search and Rescue/tests/make_contact_worlds.py: world_file_read l.12
+  Rock Terrain/src/vigil_rough_terrain/test/model_contract.py: contact_positions l.54
+  Rock Terrain/src/vigil_rough_terrain/test/traverse.py: ground_truth l.35; contact_positions l.42
+  Rock Terrain/tools/regression/monitor.py: ground_truth l.335
+
+operational files with a truth channel: 17

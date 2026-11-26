@@ -1,0 +1,12 @@
+{
+ "checks": 35,
+ "violations": [],
+ "warnings": [],
+ "truth_users": [],
+ "dormant": [
+  "/cliff_navigator subscribes to /sim/ground_truth (no publisher: receives nothing)",
+  "/terrain_mapper subscribes to /sim/ground_truth (no publisher: receives nothing)",
+  "/ugv_dashboard subscribes to /sim/ground_truth (no publisher: receives nothing)"
+ ],
+ "verdict": "ISOLATED"
+}

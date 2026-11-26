@@ -1,0 +1,13 @@
+{
+ "checks": 27,
+ "violations": [],
+ "warnings": [],
+ "truth_users": [
+  "/cliff_navigator <- /sim/ground_truth",
+  "/terrain_mapper <- /camera/segmentation/labels_map",
+  "/terrain_mapper <- /sim/ground_truth",
+  "/ugv_dashboard <- /sim/ground_truth"
+ ],
+ "dormant": [],
+ "verdict": "GROUND_TRUTH_ASSISTED"
+}

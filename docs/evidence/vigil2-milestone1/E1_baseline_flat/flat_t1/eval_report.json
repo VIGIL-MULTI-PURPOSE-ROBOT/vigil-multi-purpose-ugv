@@ -1,0 +1,22 @@
+{
+ "mode": "baseline",
+ "truth_topic": "/sim/ground_truth",
+ "truth_messages": 546,
+ "estimate_source": "tf map->base_footprint",
+ "guard_verdict": "GROUND_TRUTH_ASSISTED",
+ "metrics": {
+  "samples": 219,
+  "with_estimate": 0,
+  "availability": 0.0,
+  "gt_path_length_m": 10.207644009009481,
+  "gt_max_displacement_m": 10.099789676930182,
+  "ate_start": null,
+  "ate_se2": null,
+  "rpe": {},
+  "drift_pct": null,
+  "final_error_m": null,
+  "yaw_err_deg": null,
+  "z_err": null,
+  "longest_gap_s": 27.25
+ }
+}

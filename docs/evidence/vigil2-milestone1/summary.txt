@@ -1,0 +1,57 @@
+
+=== 0. Checkout ===
+repo: /home/user/sih26126_ws/vigil-ai-gps-denied-wt  branch: vigil-ai-gps-denied  HEAD: f1d7158  dirty files: 0
+
+=== 0b. Leftover evaluation helpers from an earlier run ===
+stopping leftover helpers: 266552 266554
+
+=== S1 offline tests (tools/vigil_eval) ===
+.............                                                            [100%]
+13 passed in 0.10s
+
+=== S2 source scan (report only) ===
+operational files with a truth channel: 17
+
+=== S3 guard self-test ===
+PASS  A_rogue_reader         verdict=VIOLATION (expected VIOLATION)  checks=7  out=/tmp/vigil_guard_A_rogue_reader_q7iqvplc
+PASS  B_clean                verdict=ISOLATED (expected ISOLATED)  checks=7  out=/tmp/vigil_guard_B_clean_eouml_6u
+PASS  C_republished_truth    verdict=VIOLATION (expected VIOLATION)  checks=7  out=/tmp/vigil_guard_C_republished_truth_b5a_e51v
+GUARD SELF-TEST PASSED
+
+=== E1 baseline (ground-truth-assisted) flat x1 + evaluator ===
+flat t1: GOAL_REACHED [PASS] goal=24.1 terminal=None replans=1/0 clearance=None runtime_errors=0
+  eval: mode=baseline guard=GROUND_TRUTH_ASSISTED truth_msgs=546 samples=219 availability=0.000 ATE_start_rmse=n/a RPE2m_p95=n/a drift_pct=n/a gt_max_displacement=10.100
+Evidence copied to: /home/user/vigil-baseline-validation/regression-20261126-063011
+
+=== E2 truth-isolated flat x2 + cliff_front x1 + evaluator ===
+flat t1: SAFE_STOP [FAIL] goal=None terminal=LOCALIZATION_LOST replans=0/0 clearance=None runtime_errors=0
+  eval: mode=isolation guard=ISOLATED truth_msgs=711 samples=284 availability=0.000 ATE_start_rmse=n/a RPE2m_p95=n/a drift_pct=n/a gt_max_displacement=0.034
+flat t2: SAFE_STOP [FAIL] goal=None terminal=LOCALIZATION_LOST replans=0/0 clearance=None runtime_errors=0
+  eval: mode=isolation guard=ISOLATED truth_msgs=712 samples=285 availability=0.000 ATE_start_rmse=n/a RPE2m_p95=n/a drift_pct=n/a gt_max_displacement=0.034
+Evidence copied to: /home/user/vigil-baseline-validation/regression-20261126-063105
+cliff_front t1: SAFE_STOP [FAIL] goal=None terminal=LOCALIZATION_LOST replans=0/0 clearance=2.25 runtime_errors=0
+  eval: mode=isolation guard=ISOLATED truth_msgs=712 samples=285 availability=0.000 ATE_start_rmse=n/a RPE2m_p95=n/a drift_pct=n/a gt_max_displacement=0.034
+Evidence copied to: /home/user/vigil-baseline-validation/regression-20261126-063308
+
+=== Guard details (truth users / violations / dormant subscribers) ===
+-- vigil-baseline-validation/regression-20261126-063011/runs/flat_t1/guard.json
+    verdict: GROUND_TRUTH_ASSISTED
+    truth_users: /cliff_navigator <- /sim/ground_truth
+    truth_users: /terrain_mapper <- /camera/segmentation/labels_map
+    truth_users: /terrain_mapper <- /sim/ground_truth
+    truth_users: /ugv_dashboard <- /sim/ground_truth
+-- vigil-baseline-validation/regression-20261126-063105/runs/flat_t1/guard.json
+    verdict: ISOLATED
+    dormant: /cliff_navigator subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /terrain_mapper subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /ugv_dashboard subscribes to /sim/ground_truth (no publisher: receives nothing)
+-- vigil-baseline-validation/regression-20261126-063105/runs/flat_t2/guard.json
+    verdict: ISOLATED
+    dormant: /cliff_navigator subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /terrain_mapper subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /ugv_dashboard subscribes to /sim/ground_truth (no publisher: receives nothing)
+-- vigil-baseline-validation/regression-20261126-063308/runs/cliff_front_t1/guard.json
+    verdict: ISOLATED
+    dormant: /cliff_navigator subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /terrain_mapper subscribes to /sim/ground_truth (no publisher: receives nothing)
+    dormant: /ugv_dashboard subscribes to /sim/ground_truth (no publisher: receives nothing)

@@ -1,0 +1,1 @@
+229:[cliff_navigator.py-9] [ERROR] [1795655026.967547727] [cliff_navigator]: LOCALIZATION_LOST: no valid pose received 30 s after start (limit 30 s) - stopped

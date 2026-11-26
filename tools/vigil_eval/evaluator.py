@@ -117,7 +117,7 @@ class Evaluator(Node):
         self.associate(final=True)
         os.makedirs(self.a.out, exist_ok=True)
         with open(os.path.join(self.a.out, 'eval_trajectory.csv'), 'w', newline='') as f:
-            w = csv.writer(f)
+            w = csv.writer(f, lineterminator='\n')
             w.writerow(['t', 'gt_x', 'gt_y', 'gt_z', 'gt_yaw', 'est_x', 'est_y', 'est_z', 'est_yaw'])
             for s in self.samples:
                 e = s['est'] or ('', '', '', '')

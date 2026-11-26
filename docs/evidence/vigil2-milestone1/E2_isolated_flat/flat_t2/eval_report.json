@@ -1,0 +1,22 @@
+{
+ "mode": "isolation",
+ "truth_topic": "/eval/ground_truth",
+ "truth_messages": 712,
+ "estimate_source": "tf map->base_footprint",
+ "guard_verdict": "ISOLATED",
+ "metrics": {
+  "samples": 285,
+  "with_estimate": 0,
+  "availability": 0.0,
+  "gt_path_length_m": 0.08796257908548274,
+  "gt_max_displacement_m": 0.033860271271889,
+  "ate_start": null,
+  "ate_se2": null,
+  "rpe": {},
+  "drift_pct": null,
+  "final_error_m": null,
+  "yaw_err_deg": null,
+  "z_err": null,
+  "longest_gap_s": 35.55
+ }
+}

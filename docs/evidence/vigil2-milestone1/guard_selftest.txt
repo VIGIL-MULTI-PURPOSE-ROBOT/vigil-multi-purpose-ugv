@@ -1,0 +1,6 @@
+PASS  A_rogue_reader         verdict=VIOLATION (expected VIOLATION)  checks=7  out=/tmp/vigil_guard_A_rogue_reader_q7iqvplc
+        violation: /eval/ground_truth read by non-evaluation node(s) ['/rogue_navigator']
+PASS  B_clean                verdict=ISOLATED (expected ISOLATED)  checks=7  out=/tmp/vigil_guard_B_clean_eouml_6u
+PASS  C_republished_truth    verdict=VIOLATION (expected VIOLATION)  checks=7  out=/tmp/vigil_guard_C_republished_truth_b5a_e51v
+        violation: /sim/ground_truth has publisher(s) ['/truth_republisher']: simulator truth is on an operational topic
+GUARD SELF-TEST PASSED

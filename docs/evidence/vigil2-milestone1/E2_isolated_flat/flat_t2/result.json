@@ -1,0 +1,156 @@
+{
+  "scenario": "flat",
+  "trial": 2,
+  "expected": "GOAL_REACHED",
+  "end_condition": "TERMINAL",
+  "category": "SAFE_STOP",
+  "verdict": "FAIL",
+  "verdict_note": null,
+  "final_state": "LOCALIZATION_LOST",
+  "raw_state": "LOCALIZATION_LOST",
+  "failure_reason": "no valid pose received 30 s after start (limit 30 s) - stopped",
+  "goal_reached": false,
+  "goal_time_sim_s": null,
+  "terminal_failure": "LOCALIZATION_LOST",
+  "terminal_time_sim_s": 30.2,
+  "stopped_after_terminal": true,
+  "max_speed_after_terminal": 0.0,
+  "sim_elapsed_s": 35.49,
+  "wall_elapsed_s": 38.51,
+  "real_time_factor": 0.976,
+  "path_length_m": 0.08,
+  "path_samples": 709,
+  "path_duplicates_ignored": 0,
+  "path_glitches_ignored": 0,
+  "replans": 0,
+  "hazard_replans": 0,
+  "recoveries": 0,
+  "recoveries_source": "navigator status",
+  "explore_attempts": 0,
+  "shield_vetoes": 0,
+  "body_overlap_ticks": 0,
+  "longest_no_progress_s": 29.3,
+  "min_footprint_clearance_m": null,
+  "min_clearance_at": null,
+  "max_roll_deg": 0.0,
+  "max_pitch_deg": 0.17,
+  "max_tilt_deg": 0.17,
+  "fell_or_rollover": null,
+  "ground_truth_z": {
+    "spawn": 0.3488811410730292,
+    "min": -8.751398713782847e-05
+  },
+  "cliff_first_detected_sim_s": null,
+  "max_cliff_cells": 0,
+  "collision_instrumentation": "none (geometric clearance only)",
+  "rates_hz_sim": {
+    "depth": 9.85,
+    "cmd": 10.0,
+    "status": 10.0,
+    "terrain": null,
+    "gt": 20.0,
+    "clock": 1000.0
+  },
+  "rates_hz_wall": {
+    "depth": 9.81,
+    "cmd": 9.97,
+    "status": 9.97,
+    "terrain": null,
+    "gt": 19.94,
+    "clock": 976.3
+  },
+  "message_counts": {
+    "depth": 350,
+    "cmd": 354,
+    "status": 354,
+    "terrain": 0,
+    "gt": 709,
+    "clock": 35494
+  },
+  "first_message_wall_s": {
+    "clock": 2.16,
+    "depth": 2.89,
+    "gt": 2.97,
+    "status": 3.02,
+    "cmd": 3.02
+  },
+  "state_transitions": [
+    {
+      "state": "WAITING",
+      "sim": 0.1
+    },
+    {
+      "state": "HOLD",
+      "sim": 6.1
+    },
+    {
+      "state": "LOCALIZATION_LOST",
+      "sim": 30.2
+    }
+  ],
+  "last_status": {
+    "state": "LOCALIZATION_LOST",
+    "raw_state": "LOCALIZATION_LOST",
+    "mode": "normal",
+    "goal": [
+      10.0,
+      0.0
+    ],
+    "start": null,
+    "replans": 0,
+    "hazard_replans": 0,
+    "path_version": 0,
+    "path_length": 0.0,
+    "cmd_v": 0.0,
+    "cmd_w": 0.0,
+    "climb_slope": 0.0,
+    "target": null,
+    "last_block": null,
+    "events": [
+      {
+        "t": 30.2,
+        "state": "LOCALIZATION_LOST",
+        "msg": "no valid pose received 30 s after start (limit 30 s) - stopped"
+      },
+      {
+        "t": 6.1,
+        "state": "HOLD",
+        "msg": "WAITING FOR POSE - holding at zero velocity"
+      }
+    ],
+    "terminal": true,
+    "failure_reason": "no valid pose received 30 s after start (limit 30 s) - stopped",
+    "recoveries": 0,
+    "explore_attempts": 0,
+    "map_version": 0,
+    "map_age": null,
+    "no_route_for": null,
+    "no_progress_for": null,
+    "hold_reason": null,
+    "body_overlap_ticks": 0,
+    "shield_vetoes": 0,
+    "hazard_speed_factor": 1.0,
+    "vel_est": [
+      0.0,
+      0.0
+    ],
+    "null_recoveries": 0,
+    "proven_cells": 0,
+    "seen_speed_cap": 0.0,
+    "reason": "no valid pose received 30 s after start (limit 30 s) - stopped",
+    "pose_age": null
+  },
+  "wheel_controller_active": true,
+  "runtime_error_lines": 0,
+  "runtime_warning_lines": 5,
+  "shutdown_message_lines": 8,
+  "screenshots": [
+    "SCREENSHOT FAILED /tmp/vigil-regression/20261126-063105/runs/flat_t2/screen_final.png (gnome-screenshot/import unavailable or refused on wayland)",
+    "SCREENSHOT FAILED /tmp/vigil-regression/20261126-063105/runs/flat_t2/screen_running.png (gnome-screenshot/import unavailable or refused on wayland)"
+  ],
+  "dashboard_collection": [
+    "final: state.json=200 map.png=404 camera.jpg=200",
+    "running: state.json=200 map.png=404 camera.jpg=200"
+  ],
+  "diagnostics_missing": []
+}

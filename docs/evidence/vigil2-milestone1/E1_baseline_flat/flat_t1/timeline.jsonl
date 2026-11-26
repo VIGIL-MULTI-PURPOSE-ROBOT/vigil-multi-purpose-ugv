@@ -1,0 +1,13 @@
+{"event": "monitor_start", "scenario": "flat", "expect": {"outcome": "GOAL_REACHED", "max_hazard_replans": 0, "max_abs_y": 0.5}, "goal": [10.0, 0.0], "wall": 0.01, "sim": null}
+{"event": "first_message", "topic": "clock", "wall": 2.04, "sim": 0.0}
+{"event": "first_message", "topic": "depth", "wall": 2.78, "sim": 0.0}
+{"event": "first_message", "topic": "gt", "wall": 2.88, "sim": 0.05}
+{"event": "first_message", "topic": "status", "wall": 2.93, "sim": 0.1}
+{"event": "state", "state": "WAITING", "raw_state": "WAITING", "reason": null, "replans": 0, "hazard_replans": 0, "recoveries": 0, "wall": 2.93, "sim": 0.1}
+{"event": "first_message", "topic": "cmd", "wall": 2.93, "sim": 0.1}
+{"event": "first_message", "topic": "terrain", "wall": 3.07, "sim": 0.24}
+{"event": "state", "state": "NAVIGATING", "raw_state": "NAVIGATING", "reason": "initial path to B: 10.0 m", "replans": 1, "hazard_replans": 0, "recoveries": 0, "wall": 8.95, "sim": 6.12}
+{"event": "sample", "state": "NAVIGATING", "x": 0.1, "y": 0.0, "hazard_replans": 0, "no_progress_for": 0.23299999999999965, "wall": 10.01, "sim": 7.18}
+{"event": "sample", "state": "NAVIGATING", "x": 5.51, "y": 0.09, "hazard_replans": 0, "no_progress_for": 0.028000000000002245, "wall": 20.01, "sim": 17.18}
+{"event": "state", "state": "GOAL_REACHED", "raw_state": "GOAL_REACHED", "reason": "reached B, 0.30 m from goal", "replans": 1, "hazard_replans": 0, "recoveries": 0, "wall": 26.94, "sim": 24.1}
+{"event": "monitor_end", "end_condition": "GOAL_REACHED", "category": "GOAL_REACHED", "wall": 30.01, "sim": 27.17}

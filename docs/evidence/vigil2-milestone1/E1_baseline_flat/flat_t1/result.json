@@ -1,0 +1,169 @@
+{
+  "scenario": "flat",
+  "trial": 1,
+  "expected": "GOAL_REACHED",
+  "end_condition": "GOAL_REACHED",
+  "category": "GOAL_REACHED",
+  "verdict": "PASS",
+  "verdict_note": null,
+  "final_state": "GOAL_REACHED",
+  "raw_state": "GOAL_REACHED",
+  "failure_reason": null,
+  "goal_reached": true,
+  "goal_time_sim_s": 24.1,
+  "terminal_failure": null,
+  "terminal_time_sim_s": null,
+  "stopped_after_terminal": null,
+  "max_speed_after_terminal": 0.0,
+  "sim_elapsed_s": 27.17,
+  "wall_elapsed_s": 30.01,
+  "real_time_factor": 0.971,
+  "path_length_m": 10.2,
+  "path_samples": 543,
+  "path_duplicates_ignored": 0,
+  "path_glitches_ignored": 0,
+  "replans": 1,
+  "hazard_replans": 0,
+  "recoveries": 0,
+  "recoveries_source": "navigator status",
+  "explore_attempts": 0,
+  "shield_vetoes": 0,
+  "body_overlap_ticks": 0,
+  "longest_no_progress_s": 2.55,
+  "min_footprint_clearance_m": null,
+  "min_clearance_at": null,
+  "max_roll_deg": 2.84,
+  "max_pitch_deg": 0.82,
+  "max_tilt_deg": 2.86,
+  "fell_or_rollover": null,
+  "ground_truth_z": {
+    "spawn": 0.3488811410730292,
+    "min": -8.751398713782847e-05
+  },
+  "cliff_first_detected_sim_s": null,
+  "max_cliff_cells": 0,
+  "collision_instrumentation": "none (geometric clearance only)",
+  "rates_hz_sim": {
+    "depth": 9.99,
+    "cmd": 10.0,
+    "status": 10.0,
+    "terrain": 5.0,
+    "gt": 20.0,
+    "clock": 1000.0
+  },
+  "rates_hz_wall": {
+    "depth": 9.96,
+    "cmd": 9.99,
+    "status": 9.99,
+    "terrain": 5.0,
+    "gt": 19.99,
+    "clock": 971.5
+  },
+  "message_counts": {
+    "depth": 272,
+    "cmd": 271,
+    "status": 271,
+    "terrain": 135,
+    "gt": 543,
+    "clock": 27170
+  },
+  "first_message_wall_s": {
+    "clock": 2.04,
+    "depth": 2.78,
+    "gt": 2.88,
+    "status": 2.93,
+    "cmd": 2.93,
+    "terrain": 3.07
+  },
+  "state_transitions": [
+    {
+      "state": "WAITING",
+      "sim": 0.1
+    },
+    {
+      "state": "NAVIGATING",
+      "sim": 6.12
+    },
+    {
+      "state": "GOAL_REACHED",
+      "sim": 24.1
+    }
+  ],
+  "last_status": {
+    "state": "GOAL_REACHED",
+    "raw_state": "GOAL_REACHED",
+    "mode": "normal",
+    "goal": [
+      10.0,
+      0.0
+    ],
+    "start": [
+      0.00047491995237917094,
+      0.000338099842755414
+    ],
+    "replans": 1,
+    "hazard_replans": 0,
+    "path_version": 1,
+    "path_length": 10.02,
+    "cmd_v": 0.0,
+    "cmd_w": 0.0,
+    "climb_slope": 2.8,
+    "target": [
+      10.0,
+      0.0
+    ],
+    "last_block": null,
+    "events": [
+      {
+        "t": 24.1,
+        "state": "GOAL_REACHED",
+        "msg": "reached B, 0.30 m from goal"
+      },
+      {
+        "t": 6.1,
+        "state": "NAVIGATING",
+        "msg": "initial path to B: 10.0 m"
+      }
+    ],
+    "terminal": true,
+    "failure_reason": null,
+    "recoveries": 0,
+    "explore_attempts": 0,
+    "map_version": 135,
+    "map_age": 0.07,
+    "no_route_for": null,
+    "no_progress_for": 3.9,
+    "hold_reason": null,
+    "body_overlap_ticks": 0,
+    "shield_vetoes": 0,
+    "hazard_speed_factor": 1.0,
+    "vel_est": [
+      0.0,
+      0.0
+    ],
+    "null_recoveries": 0,
+    "proven_cells": 1354,
+    "seen_speed_cap": 0.6,
+    "reason": "reached B, 0.30 m from goal",
+    "distance_to_goal": 0.1,
+    "x": 10.1,
+    "y": -0.0,
+    "heading_deg": -3.1,
+    "speed": 0.0,
+    "tilt": 2.5,
+    "pose_age": 0.05
+  },
+  "wheel_controller_active": true,
+  "runtime_error_lines": 0,
+  "runtime_warning_lines": 5,
+  "shutdown_message_lines": 8,
+  "screenshots": [
+    "SCREENSHOT FAILED /tmp/vigil-regression/20261126-063011/runs/flat_t1/screen_final.png (gnome-screenshot/import unavailable or refused on wayland)",
+    "SCREENSHOT FAILED /tmp/vigil-regression/20261126-063011/runs/flat_t1/screen_running.png (gnome-screenshot/import unavailable or refused on wayland)"
+  ],
+  "dashboard_collection": [
+    "final: state.json=200 map.png=200 camera.jpg=200",
+    "running: state.json=200 map.png=200 camera.jpg=200"
+  ],
+  "diagnostics_missing": []
+}

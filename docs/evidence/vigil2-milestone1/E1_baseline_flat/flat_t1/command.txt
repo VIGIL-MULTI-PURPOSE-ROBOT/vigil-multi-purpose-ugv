@@ -1,0 +1,1 @@
+ros2 launch vigil_rough_terrain vision_nav.launch.py scenario:=flat cleanup:=false partition:=vigilreg_flat_1_269226 gui:=true

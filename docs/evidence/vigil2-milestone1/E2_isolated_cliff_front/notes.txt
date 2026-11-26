@@ -1,0 +1,4 @@
+branch check: none requested; running on 'vigil-ai-gps-denied'
+build exit code: 0
+simulator start-up failures retried: 0
+truth isolation: true, evaluator: true, bag: yes

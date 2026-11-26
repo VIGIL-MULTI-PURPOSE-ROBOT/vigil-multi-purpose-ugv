@@ -1,0 +1,1 @@
+ros2 launch vigil_rough_terrain vision_nav.launch.py scenario:=cliff_front cleanup:=false partition:=vigilreg_cliff_front_1_274514 gui:=true truth_isolation:=true
