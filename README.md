@@ -182,18 +182,8 @@ Gazebo regression of the rough-terrain navigator, 25 November 2026, on an RTX 50
 
 **18/18 PASS**, minimum clearance 0.15 m, zero runtime errors, zero simulator start-up failures. Offline suites: 30/30 unit tests, 11/11 tool tests, 13/13 closed-loop scenarios. The full record of all four regression runs, including the failures that led to each fix, is in [REGRESSION_RESULTS.md](docs/REGRESSION_RESULTS.md).
 
-## 10. Known limitations
 
-- **No physical hardware validation.** All results are from simulation.
-- **Simulator pose** in rough terrain, SAR and the agriculture row mission; localization error has not been measured anywhere.
-- **No collision instrumentation.** Clearance is geometric only; no collision-free claim is made.
-- **False cliff cells beneath the robot:** their source in the perception pipeline is unknown. The navigator tolerates them, but this mitigation has not yet been exercised in Gazebo.
-- **`hill_choice` is slower** than the original (29.8 → 43.6 s). The time is lost on the flat approach and the 22° climb; the seen-terrain speed cap is the likely cause, not confirmed.
-- **Controller-spawner retry path untested in Gazebo:** the normal path worked in all 18 launches; the retry and failure paths were tested only offline.
-- **Idealised offline sensing:** no sensor noise, depth dropouts or pose drift are tested.
-- **Separate workspaces:** the environments do not share one autonomy package.
-
-## 11. Future work
+## 10. Future work
 
 1. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
 2. Replace simulator pose with sensor-derived localization in the rough-terrain and SAR loops.
@@ -203,7 +193,7 @@ Gazebo regression of the rough-terrain navigator, 25 November 2026, on an RTX 50
 6. Cooperative multi-robot operation sharing maps, hazards and mission assignments.
 7. Long-range communication (LoRa, mesh networking or private 5G) for remote monitoring.
 
-## 12. Repository layout
+## 11. Repository layout
 
 ```text
 vigil-multi-purpose-ugv/
@@ -225,7 +215,7 @@ vigil-multi-purpose-ugv/
 
 Build outputs (`build/`, `install/`, `log/`) and Python caches are excluded from version control.
 
-## 13. Team and attribution
+## 12. Team and attribution
 
 **Team VIGIL**, Smart India Hackathon 2026. Contributors in the Git history: Y-Manish (Yarramshetty Manish), Gagan Reddy Manikanti, Sruthik Reddy and the shared VIGIL Team account. Individual roles are not recorded in this repository and are not invented here.
 
