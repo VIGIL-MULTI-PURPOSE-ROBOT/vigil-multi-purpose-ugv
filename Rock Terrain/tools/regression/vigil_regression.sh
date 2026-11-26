@@ -72,6 +72,14 @@ ros() {
   clean bash --noprofile --norc -c "source /opt/ros/jazzy/setup.bash >/dev/null 2>&1; \
     [ -f \"$RT/install/local_setup.bash\" ] && source \"$RT/install/local_setup.bash\"; export ROS_DOMAIN_ID=71; $*"
 }
+group_alive() { ps -o stat= -g "$1" 2>/dev/null | grep -qv '^Z'; }   # any non-zombie process in group $1
+bg_ros() {
+  # bg_ros LOGFILE "COMMAND": start COMMAND (ROS sourced, domain 71) in a new process group; print its pgid
+  ( exec setsid "${CLEAN_ENV[@]}" PYTHONUNBUFFERED=1 bash --noprofile --norc -c "source /opt/ros/jazzy/setup.bash >/dev/null 2>&1; \
+      [ -f \"$RT/install/local_setup.bash\" ] && source \"$RT/install/local_setup.bash\"; export ROS_DOMAIN_ID=71; $2" ) > "$1" 2>&1 &
+  local pid=$!; sleep 0.5
+  echo "$pid"            # setsid made this process a group leader: pid == pgid; callers signal -pid
+}
 sweep_partition() {
   # NOTE: every variable here is local. Bash locals are dynamically scoped, so a non-local loop
   # variable named like a caller's local (it used to be "d") silently overwrote run_one's output
@@ -236,24 +244,26 @@ run_one() {
   local evpid="" bagpid=""
   if $EVAL; then
     # isolated evaluator: the only operational-graph reader of simulator truth; writes guard.json,
-    # eval_report.json and eval_trajectory.csv when stopped (SIGINT)
-    ros "exec python3 '$EVAL_DIR/evaluator.py' --out '$rundir' --mode $eval_mode --truth-topic $truth_topic" \
-        > "$rundir/evaluator.log" 2>&1 &
-    evpid=$!
+    # eval_report.json and eval_trajectory.csv when stopped (SIGINT). Each helper runs in its OWN
+    # process group (setsid, like the launch) so SIGINT reaches the process itself, and the exit trap
+    # can stop it. (0f44a87 signalled a subshell instead; the evaluator never stopped.)
+    evpid="$(bg_ros "$rundir/evaluator.log" "exec python3 -u '$EVAL_DIR/evaluator.py' --out '$rundir' --mode $eval_mode --truth-topic $truth_topic")"
     if $BAG; then
-      ros "exec ros2 bag record -o '$rundir/bag' $truth_topic /tf /tf_static /clock /navigation/status /cmd_vel \
-           /imu/data /encoders /joint_states /camera/camera_info /vision/cliff" > "$rundir/bag.log" 2>&1 &
-      bagpid=$!
+      bagpid="$(bg_ros "$rundir/bag.log" "exec ros2 bag record -o '$rundir/bag' --topics $truth_topic /tf /tf_static /clock /navigation/status /cmd_vel /imu/data /encoders /joint_states /camera/camera_info /vision/cliff")"
     fi
-    echo "evaluator pid=$evpid bag pid=${bagpid:-none} mode=$eval_mode truth=$truth_topic" >> "$rundir/pids.txt"
+    for p in $evpid $bagpid; do STARTED_PGIDS+=("$p"); done
+    echo "evaluator pgid=${evpid:-none} bag pgid=${bagpid:-none} mode=$eval_mode truth=$truth_topic" >> "$rundir/pids.txt"
   fi
   ros "python3 '$SELF_DIR/monitor.py' --scenario $sc --trial $n --out '$rundir' --scenarios '$PKG/scripts/scenarios.py' \
        --config '$PKG/config/vision_nav.yaml' --sim-limit $lim --wall-limit $(( lim * 6 + 300 )) --startup-timeout 300 \
        --truth-topic $truth_topic" \
        > "$rundir/monitor.log" 2>&1
   local p
-  for p in $evpid $bagpid; do kill -INT "$p" 2>/dev/null; done
-  for p in $evpid $bagpid; do for _ in $(seq 1 20); do kill -0 "$p" 2>/dev/null || break; sleep 1; done; kill -KILL "$p" 2>/dev/null; done
+  for p in $evpid $bagpid; do kill -INT -"$p" 2>/dev/null; done
+  for p in $evpid $bagpid; do
+    for _ in $(seq 1 25); do group_alive "$p" || break; sleep 1; done
+    group_alive "$p" && { note "$sc t$n: helper group $p did not stop on SIGINT - killed"; kill -KILL -"$p" 2>/dev/null; }
+  done
   [ -f "$rundir/result.json" ] || { note "$sc t$n: MONITOR FAILURE - no result.json (see monitor.log)"; \
       echo '{"end_condition":"MONITOR_ERROR","category":"MONITOR_FAILURE","verdict":"FAIL"}' > "$rundir/result.json"; }
   grab_dashboard "$rundir" final; ros 'timeout 10 ros2 topic echo --once --full-length /navigation/status' > "$rundir/echo_status_final.txt" 2>&1

@@ -20,6 +20,16 @@ cd "$REPO" || exit 1
 say "0. Checkout"
 echo "repo: $REPO  branch: $(git branch --show-current)  HEAD: $(git rev-parse --short HEAD)  dirty files: $(git status --porcelain | wc -l)" | tee -a "$S"
 
+say "0b. Leftover evaluation helpers from an earlier run"
+# 0f44a87 could leave the evaluator and bag recorder running after a trial; they block the runner's
+# "ROS_DOMAIN_ID=71 already has nodes" check. Stop only these two helpers, gently (SIGINT finalises bags).
+left="$(pgrep -f 'tools/vigil_eval/evaluator.py|ros2 bag record -o /tmp/vigil-regression' || true)"
+if [ -n "$left" ]; then
+  echo "stopping leftover helpers: $(echo $left)" | tee -a "$S"; kill -INT $left 2>/dev/null; sleep 8
+  left="$(pgrep -f 'tools/vigil_eval/evaluator.py|ros2 bag record -o /tmp/vigil-regression' || true)"
+  [ -n "$left" ] && { kill -KILL $left 2>/dev/null; echo "force-stopped: $(echo $left)" | tee -a "$S"; }
+else echo "none" | tee -a "$S"; fi
+
 say "S1 offline tests (tools/vigil_eval)"
 python3 -m pytest -q -p no:cacheprovider tools/vigil_eval 2>&1 | tail -2 | tee -a "$S"
 
