@@ -182,7 +182,6 @@ Gazebo regression of the rough-terrain navigator, 25 November 2026, on an RTX 50
 
 **18/18 PASS**, minimum clearance 0.15 m, zero runtime errors, zero simulator start-up failures. Offline suites: 30/30 unit tests, 11/11 tool tests, 13/13 closed-loop scenarios. The full record of all four regression runs, including the failures that led to each fix, is in [REGRESSION_RESULTS.md](docs/REGRESSION_RESULTS.md).
 
-
 ## 10. Future work
 
 1. Measure perception accuracy, localization error, repeated mission success and collision/intervention counts.
