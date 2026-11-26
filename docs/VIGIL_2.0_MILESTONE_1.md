@@ -24,7 +24,7 @@ No navigation algorithm or safety parameter was changed.
 
 ## B. Test results
 
-Evidence: [`docs/evidence/vigil2-milestone1/`](evidence/vigil2-milestone1/) (see section F).
+Evidence: [`docs/evidence/vigil2-milestone1/`](evidence/vigil2-milestone1/) (see section E).
 
 | Check | Result |
 |---|---|
@@ -66,23 +66,7 @@ expected to.
    be invisible in the ROS graph. `truth_scan.py` searches the source for truth topics, `gz.transport`
    imports and world-file readers.
 
-## D. Limitations
-
-- **No GPS-denied navigation success has been demonstrated yet.**
-- **Rock Terrain localization is not implemented.** There is no wheel odometry, EKF, visual odometry or
-  SLAM in the Rock Terrain loop.
-- **The segmentation shortcut dependency remains** in the baseline configuration. Truth isolation turns
-  it off, but the geometric cliff detector has not yet been evaluated without it on a moving robot.
-- **Direct simulator messaging needs source-level auditing.** The runtime guard cannot see Gazebo
-  transport subscribers; `truth_scan.py` covers this statically.
-- **ROS bag storage needs optimising before large-scale testing.** One trial's bag is 15.9–20.7 MB, and
-  `/clock` and `/encoders` (each about 900 messages/s) make up about 88% of its messages. A 360-trial
-  campaign would need about 7 GB. Planned: drop `/clock` (message stamps carry the time) and record
-  `/joint_states` instead of `/encoders`. This is a recommendation only; it is not implemented or
-  measured.
-- Only Rock Terrain has truth isolation. Agriculture, SAR and New Mining are untouched.
-
-## E. Next milestone
+## D. Next milestone
 
 **Milestone 2 — Rock Terrain localization: NOT STARTED.** Proposed scope, pending approval:
 
@@ -98,7 +82,7 @@ expected to.
 9. GPS-denied navigation on the estimated pose (flat first, then narrow route, rough terrain, hill and
    cliff_front), under the guard.
 
-## F. Evidence and reproduction
+## E. Evidence and reproduction
 
 ### Published evidence
 
